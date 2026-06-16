@@ -23,7 +23,7 @@ if (!defined('MODX_ASSETS_URL')) {
 return [
     'name' => 'Localizator3',
     'name_lower' => 'localizator3',
-    'version' => '1.0.0',
+    'version' => '1.0.7',
     'release' => 'beta',
     // Install package to site right after build
     'install' => true,

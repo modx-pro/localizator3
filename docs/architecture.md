@@ -33,9 +33,9 @@
                             │
 ┌────────────────────────────────────────────────────────┐
 │  Snippets                                              │
-│  getLocalizedResources, getLocales, makeLocalizedUrl   │
-│  getLocalizedField, getLocalizedCanonical,             │
-│  getLocalizedSitemap                                   │
+│  getLocalizedResources, getLanguageList, makeLocalizedUrl│
+│  getLocalizedField, getLocalizedCanonical,               │
+│  getLocalizedSitemap                                     │
 └────────────────────────────────────────────────────────┘
                             │
 ┌────────────────────────────────────────────────────────┐
@@ -140,20 +140,23 @@
 
 Интерфейс менеджера построен на Vue 3 + PrimeVue 4 (тема Aura) и встроен в ExtJS-менеджер MODX 3.
 
-| Компонент | Entry point | Контейнер |
-|-----------|-------------|-----------|
-| `ContentGrid.vue` | `content.js` | `#localizator3-content-app` |
-| `LanguagesGrid.vue` | `languages.js` | `#localizator3-languages-app` |
+| Компонент | Entry point | Контейнер | Сборка |
+|-----------|-------------|-----------|--------|
+| `ContentGrid.vue` | `src/entries/content.js` | `#localizator3-content-app` | `js/mgr/vue-dist/content.min.js` |
+| `LanguagesGrid.vue` | `src/entries/languages.js` | `#localizator3-languages-app` | `js/mgr/vue-dist/languages.min.js` |
+
+Стек: Vue 3, PrimeVue 4 (Aura), Pinia, Vite 6.
 
 Изоляция стилей:
 - `main.css` — откат глобального `box-sizing` от PrimeVue через `!important`
-- Scoped styles в компонентах с BEM-префиксами `.content-grid__*`, `.languages-grid__*`
-- `appendTo="self"` на Dialog для изоляции порталов
+- PostCSS prefix `.vueApp` для scoped-изоляции в ExtJS
+- BEM-префиксы `.content-grid__*`, `.languages-grid__*` в компонентах
+- `appendTo="self"` на Dialog и ConfirmDialog для изоляции порталов
 
 ---
 
 ## Зависимости
 
-- **pdoTools** — обязательно (getLocalizedResources, getLocales)
+- **pdoTools** — обязательно (getLocalizedResources, getLanguageList)
 - **miniShop3** — опционально (локализация товаров и опций)
 - **mSearch** — опционально (индексация локализованных полей)

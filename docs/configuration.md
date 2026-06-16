@@ -14,6 +14,7 @@
 | `localizator3_404_if_no_localization` | bool | false | Показывать 404, если нет локализации для текущего языка. Событие: `OnHasLocalizatorError404` |
 | `localizator3_auto_detect_language` | bool | false | Автоопределение языка по Accept-Language / cookie `localizator3_key` |
 | `localizator3_debug_log` | bool | false | Отладочное логирование в `core/cache/logs/error.log` с префиксом `[localizator3]` |
+| `localizator3_tv_fields` | text | — | Список TV через запятую для вкладки локализации. Пусто — все TV, доступные для локализации |
 
 ---
 
@@ -49,7 +50,7 @@
 
 ## pdoTools
 
-Для корректной работы `getLocalizedResources` и `getLocales`:
+Для корректной работы `getLocalizedResources` и `getLanguageList`:
 
 | Namespace | Ключ | Значение |
 |-----------|------|----------|

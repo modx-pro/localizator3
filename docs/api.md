@@ -34,9 +34,11 @@
 
 ---
 
-### getLocales (getLanguageList)
+### getLanguageList
 
 Список языков для переключателя. Требует pdoTools.
+
+> Зарегистрированное имя сниппета — **`getLanguageList`**. В старых примерах может встречаться `getLocales` — это некорректное имя для MODX Package Manager.
 
 **Параметры:**
 
@@ -54,8 +56,8 @@
 **Пример:**
 
 ```fenom
-{'!getLocales' | snippet}
-{'!getLocales' | snippet : ['outputMode' => 'dropdown', 'activeClass' => 'current']}
+{'!getLanguageList' | snippet}
+{'!getLanguageList' | snippet : ['outputMode' => 'dropdown', 'activeClass' => 'current']}
 ```
 
 ---

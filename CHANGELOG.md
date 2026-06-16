@@ -8,8 +8,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added
+### Changed
 - (pending changes)
+
+---
+
+## [1.0.7-beta]
+
+### Changed
+- Vue UI: scoped styles с BEM-префиксами (.content-grid__*, .languages-grid__*)
+- Vue UI: замена native confirm() на PrimeVue ConfirmDialog (useConfirm)
+- Vue UI: appendTo="self" для Dialog-порталов (изоляция от ExtJS)
+- CSS: откат глобального box-sizing от PrimeVue через !important в main.css
+- Удалены legacy ExtJS-стили из main.css
+- Удалены дублирующие import-ы PrimeVue компонентов в ContentGrid.vue
+- Обновлена документация: README.md, docs/*, llms.txt, architecture.md, api.md, configuration.md, CUSTOMIZATION.md
+- Исправлено имя сниппета переключателя языков: getLanguageList
+- Cursor rules обновлены под Localizator3
 
 ---
 

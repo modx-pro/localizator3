@@ -1,17 +1,20 @@
 # Localizator3
-> Мультиязычность для MODX Revolution 3. Локализация ресурсов, TV, товаров miniShop3 и опций.
+> Мультиязычность для MODX Revolution 3. Локализация ресурсов, TV, товаров miniShop3 и опций. Версия: 1.0.7-beta.
 
 ## Requirements
-- MODX 3.0+, PHP 8.2+, pdoTools
+- MODX 3.0+, PHP 8.2+ (component: 8.1+), pdoTools, Node.js 18+ (build only)
 
 ## Core Files
-- [core/components/localizator3/localizator.class.php]: Основной сервис (findLocalization, translate, getLocalizedOption*)
+- [core/components/localizator3/localizator.class.php]: Основной сервис (findLocalization, translate, versionedAsset, getLocalizedOption*)
 - [core/components/localizator3/model/localizator3/]: xPDO-модели (localizatorLanguage, localizatorContent, locTemplateVarResource, locOption, locProductOption)
 - [core/components/localizator3/processors/mgr/]: Процессоры API (language/*, content/*, fields, lexicon/*)
-- [core/components/localizator3/elements/snippets/]: Сниппеты (localizator, getlocalizedfield, makelocalizedurl, getlocales, getlocalizedcanonical, getlocalizedsitemap)
+- [core/components/localizator3/elements/snippets/]: Сниппеты (localizator→getLocalizedResources, getlocales→getLanguageList, getlocalizedfield, makelocalizedurl, getlocalizedcanonical, getlocalizedsitemap)
 - [core/components/localizator3/elements/plugins/handlers/]: Обработчики событий (OnMODXInit, OnHandleRequest, OnDocFormPrerender, OnDocFormSave, OnLoadWebDocument, OnEmptyTrash, OnPageNotFound, OnTVFormPrerender, pdoToolsOnFenomInit, mseOnBeforeIndex, mseOnGetWorkFields)
 - [vueManager/src/components/]: Vue 3 + PrimeVue 4 UI (ContentGrid.vue, LanguagesGrid.vue)
-- [_build/]: Сборка транспортного пакета, резолверы, миграции Phinx
+- [vueManager/src/entries/]: Entry points (content.js, languages.js)
+- [assets/components/localizator3/js/mgr/vue-dist/]: Собранные бандлы Vue UI
+- [_build/build.php]: Сборка transport-пакета (основной скрипт)
+- [_build/]: Резолверы, миграции Phinx
 - [docs/]: Документация
 
 ## Key Concepts
@@ -21,7 +24,7 @@
 - **Опции MS3**: localizator3_option (option_id, key, caption, description), localizator3_product_option (product_option_id, key, value)
 - **Текущий язык**: $modx->localizator3_key, cookie localizator3_key
 - **Fenom**: locfield, locoptioncaption, locproductoptionvalue
-- **Сниппеты**: getLocalizedResources, getLocales, makeLocalizedUrl, getLocalizedField, getLocalizedCanonical, getLocalizedSitemap
+- **Сниппеты**: getLocalizedResources, getLanguageList, makeLocalizedUrl, getLocalizedField, getLocalizedCanonical, getLocalizedSitemap
 
 ## Events (custom)
 OnBuildLocalizationTabs, OnBeforeFindLocalization, OnFindLocalization, OnFindLocalizatorResource, OnToggleLocalizatorLanguage, OnBeforeSaveLocalization, OnSaveLocalization, OnBeforeSaveLocalizatorLanguage, OnSaveLocalizatorLanguage, OnHasLocalizatorError404
@@ -38,6 +41,7 @@ OnBuildLocalizationTabs, OnBeforeFindLocalization, OnFindLocalization, OnFindLoc
 - localizator3_404_if_no_localization — 404 при отсутствии локализации (bool)
 - localizator3_auto_detect_language — автоопределение языка (bool)
 - localizator3_debug_log — отладочное логирование (bool)
+- localizator3_tv_fields — ограничение списка TV во вкладке (пусто = все)
 - localizator3_default_translator — переводчик (Yandex/Google/DeepL/LibreTranslate/MyMemory/SimpleCopy)
 - localizator3_key_yandex, localizator3_key_google, localizator3_key_deepl — API-ключи
 - localizator3_libretranslate_url, localizator3_key_libretranslate — LibreTranslate
@@ -48,4 +52,10 @@ OnBuildLocalizationTabs, OnBeforeFindLocalization, OnFindLocalization, OnFindLoc
 ## Vue UI
 - ContentGrid.vue → content.js → #localizator3-content-app (вкладка Локализация в ресурсе)
 - LanguagesGrid.vue → languages.js → #localizator3-languages-app (страница Localizator3 → Языки)
-- PrimeVue 4 Aura theme, scoped BEM styles, box-sizing isolation via CSS !important
+- PrimeVue 4 Aura theme, Pinia, ConfirmDialog, scoped BEM + .vueApp prefix, box-sizing isolation
+
+## Build
+```bash
+cd vueManager && npm run build
+cd .. && php _build/build.php
+```

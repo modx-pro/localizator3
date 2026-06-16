@@ -4,23 +4,26 @@
 
 **Только для MODX 3** — для MODX 2.x используйте [Localizator](https://github.com/modx-pro/localizator).
 
+**Текущая версия:** 1.0.7-beta
+
 ---
 
 ## Требования
 
 - MODX Revolution 3.0+
-- PHP 8.2+
+- PHP 8.2+ (компонент: PHP 8.1+)
 - pdoTools (устанавливается автоматически)
+- Node.js 18+ — только для сборки Vue UI из исходников
 
 ---
 
 ## Quick Start
 
-1. Установите пакет через Package Manager или соберите из `_build/`
-2. **Localizator3 → Языки** — создайте языки (ru, en)
-3. Укажите HTTP HOST для каждого языка
-4. Включите «TV is available in localizations» для нужных TV
-5. В pdoTools: **pdoFetch.class** = `pdotools.pdofetchlocalizator3`
+1. Установите пакет через [ModStore](https://modstore.pro/packages/utilities/localizator3) или соберите из `_build/` (см. [Установка](docs/INSTALL_LOCALIZATOR3.md)).
+2. **Localizator3 → Языки** — создайте языки (`ru`, `en` и т.д.).
+3. Укажите **HTTP host** для каждого языка (мультидоменность или поддомены).
+4. Включите «TV is available in localizations» для нужных TV в форме TV.
+5. В pdoTools: **pdoFetch.class** = `pdotools.pdofetchlocalizator3` (создаётся при установке).
 
 ```fenom
 {'!getLocalizedResources' | snippet : [
@@ -30,20 +33,39 @@
 ]}
 ```
 
+Переключатель языков — сниппет **`getLanguageList`**:
+
+```fenom
+{'!getLanguageList' | snippet}
+{'!getLanguageList' | snippet : ['outputMode' => 'dropdown', 'activeClass' => 'current']}
+```
+
 ---
 
 ## Возможности
 
 - Локализация полей ресурсов (pagetitle, content, TV)
-- Vue 3 + PrimeVue 4 интерфейс в менеджере MODX
+- Vue 3 + PrimeVue 4 интерфейс в менеджере MODX (вкладка «Локализация», страница «Языки»)
 - Интеграция с pdoTools, pdoResources, pdoMenu
 - Fenom-модификаторы: `locfield`, `locoptioncaption`, `locproductoptionvalue`
 - Автоперевод: Yandex, Google, DeepL, LibreTranslate, MyMemory, SimpleCopy
-- Автоопределение языка по Accept-Language / cookie
+- Автоопределение языка по Accept-Language / cookie `localizator3_key`
 - SEO: canonical, hreflang, sitemap.xml
 - miniShop3: локализация товаров и опций (цвет, размер)
 - mSearch: индексация локализованных полей
-- Кастомизация форм через событие OnBuildLocalizationTabs
+- Кастомизация форм через событие `OnBuildLocalizationTabs`
+- CLI: массовый перевод ресурсов (`translate_resources.php`)
+
+---
+
+## Интерфейс менеджера
+
+| Раздел | Компонент | Назначение |
+|--------|-----------|------------|
+| Localizator3 → Языки | `LanguagesGrid.vue` | CRUD языков, активация, ранг |
+| Ресурс → вкладка Локализация | `ContentGrid.vue` | Переводы полей и TV, автоперевод |
+
+UI: PrimeVue 4 (Aura), изолированные стили (`.vueApp`, BEM-префиксы), `ConfirmDialog` вместо native `confirm()`.
 
 ---
 
@@ -56,14 +78,35 @@
 | `localizator3_disabled_templates` | ID шаблонов без вкладки (через запятую) | — |
 | `localizator3_404_if_no_localization` | 404 при отсутствии локализации | false |
 | `localizator3_auto_detect_language` | Автоопределение языка посетителя | false |
+| `localizator3_debug_log` | Отладочное логирование | false |
 | `localizator3_default_translator` | Переводчик | Yandex |
 | `localizator3_key_yandex` | API-ключ Yandex | — |
 | `localizator3_key_google` | API-ключ Google | — |
 | `localizator3_key_deepl` | API-ключ DeepL | — |
-| `localizator3_translate_fields` | Поля для перевода | pagetitle,longtitle,... |
-| `localizator3_debug_log` | Отладочное логирование | false |
+| `localizator3_libretranslate_url` | URL LibreTranslate | `http://localhost:5000` |
+| `localizator3_key_libretranslate` | API-ключ LibreTranslate | — |
+| `localizator3_mymemory_email` | Email для MyMemory | — |
+| `localizator3_translate_fields` | Поля для автоперевода | pagetitle,longtitle,... |
+| `localizator3_translate_translated` | Дополнять пустые поля в существующих локализациях | false |
+| `localizator3_translate_translated_fields` | Перезаписывать все поля при повторном переводе | false |
+| `localizator3_tv_fields` | Ограничить список TV во вкладке (пусто = все) | — |
 
 Полный список: [docs/configuration.md](docs/configuration.md)
+
+---
+
+## Сборка для разработчиков
+
+Из корня репозитория:
+
+```bash
+cd vueManager && npm install && npm run build
+cd .. && php _build/build.php
+```
+
+Transport-пакет: `core/packages/localizator3-1.0.7-beta.transport.zip`
+
+Подробнее: [docs/INSTALL_LOCALIZATOR3.md](docs/INSTALL_LOCALIZATOR3.md)
 
 ---
 
@@ -72,21 +115,25 @@
 | Документ | Описание |
 |----------|----------|
 | [Установка и сборка](docs/INSTALL_LOCALIZATOR3.md) | Сборка из исходников, Vue, CLI |
-| [API Reference](docs/api.md) | Сниппеты, параметры, события |
+| [API Reference](docs/api.md) | Сниппеты, параметры, события, процессоры |
 | [Конфигурация](docs/configuration.md) | Системные настройки |
 | [Архитектура](docs/architecture.md) | Модели, плагины, интеграции |
 | [Кастомизация](docs/CUSTOMIZATION.md) | Кастомизация форм через события |
 | [miniShop3](docs/04_miniShop3_integration.md) | Локализация товаров и опций |
 | [mSearch](docs/05_mSearch_integration.md) | Индексация локализованных полей |
+| [llms.txt](docs/llms.txt) | Краткий контекст для LLM |
 
 ---
 
 ## Contributing
 
+Репозиторий: [github.com/modx-pro/localizator3](https://github.com/modx-pro/localizator3)
+
 1. Fork репозитория
 2. Создайте ветку для фичи
-3. Запустите `composer phpcs` и `composer test`
-4. Отправьте Pull Request
+3. После изменений в `vueManager/` или `core/`: `npm run build` в `vueManager/`, затем `php _build/build.php`
+4. Запустите `composer phpcs` и `composer test`
+5. Отправьте Pull Request
 
 ---
 
