@@ -1,0 +1,25 @@
+{
+  "name": "localizator3-vue",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "prebuild": "rimraf ../assets/components/localizator3/js/mgr/vue-dist/*.min.js ../assets/components/localizator3/css/mgr/vue-dist/*.min.css",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@primevue/themes": "^4.3.1",
+    "pinia": "^3.0.1",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.3.1",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "postcss-prefix-selector": "^2.1.1",
+    "rimraf": "^3.0.2",
+    "vite": "^6.4.1"
+  }
+}

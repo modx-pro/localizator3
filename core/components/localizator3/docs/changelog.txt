@@ -1,0 +1,63 @@
+Changelog for Localizator3.
+
+1.0.7-beta
+==============
+- Vue UI: scoped styles с BEM-префиксами (.content-grid__*, .languages-grid__*)
+- Vue UI: замена native confirm() на PrimeVue ConfirmDialog (useConfirm)
+- Vue UI: appendTo="self" для Dialog-порталов (изоляция от ExtJS)
+- CSS: откат глобального box-sizing от PrimeVue через !important в main.css
+- Удалены legacy ExtJS-стили из main.css
+- Удалены дублирующие import-ы PrimeVue компонентов в ContentGrid.vue
+- Обновлена документация: architecture.md, api.md, configuration.md, CUSTOMIZATION.md
+- Cursor rules обновлены под Localizator3
+
+1.0.6-beta
+==============
+- Лексиконы для языков СНГ: украинский (uk), казахский (kk), узбекский (uz), азербайджанский (az)
+- B0: Vue-вкладка локализации в форме ресурса (ContentGrid.vue)
+  - Процессор mgr/content/getformconfig — конфигурация формы с учётом кастомизации
+  - OnBuildLocalizationTabs расширен: resource, user, customization
+  - Поддержка visible/rank полей для кастомизации по пользователю
+- mSearch integration — indexing of localized fields (mseOnBeforeIndex, mseOnGetWorkFields)
+  - Fields like ru-pagetitle, en-description etc. for each language
+  - See docs/05_mSearch_integration.md for frontend usage
+- B1: msProductOption — localization of miniShop3 product options (color, size, etc.)
+  - Tables localizator3_option (locOption) and localizator3_product_option (locProductOption)
+  - Fenom modifiers: locoptioncaption, locproductoptionvalue
+  - Methods: getLocalizedOptionCaption, getLocalizedOptionDescription, getLocalizedProductOptionValue
+
+1.0.5-beta
+==============
+- Removed mSearch2/mFilter2 support — use mFilter for faceted filtering: https://docs.modx.pro/components/mfilter/
+
+1.0.4-beta
+==============
+- B1: miniShop3 integration — Localizator tab for msProduct, getLocalizedResources with msProducts/ms3Products
+
+1.0.3-beta
+==============
+- B5: Snippet getLocalizedField — output resource field in specified language
+- F4: CLI script translate_resources.php — mass translation from console
+- B2: Auto-detect visitor language — setting localizator3_auto_detect_language, redirect by Accept-Language/cookie
+
+1.0.2-beta
+==============
+- Q3: Event OnToggleLocalizatorLanguage — fired when language is determined (validation, cache, integrations)
+- B3: Snippet getLocalizedSitemap — sitemap.xml with hreflang for multilingual pages (SEO)
+
+1.0.1-beta
+==============
+- Q1: Parameter onlyWithLocalization in getLocalizedResources — excludes resources without localization for current language (INNER JOIN)
+- Q2: Snippet makeLocalizedUrl — builds resource URL with language prefix
+- F2: Extended getLanguageList — outputMode (list/dropdown), showActive, activeClass; chunk languages.dropdown.tpl
+- Q4: Setting localizator3_404_if_no_localization — 404 for documents without localization; event OnHasLocalizatorError404
+- F1: Field rank in localizator3_languages — sort order for languages (sortby, sortdir in getLanguageList)
+- B4: Snippet getLocalizedCanonical — canonical and hreflang links for SEO
+
+1.0.0-beta
+==============
+- Initial release for MODX 3 only
+- Fork of Localizator adapted exclusively for MODX Revolution 3
+- Separate package name (localizator3) and tables (localizator3_*) to avoid conflicts with original Localizator
+- Uses MODX 3 namespaces (\MODX\Revolution\*, \xPDO\Transport\*)
+- Removed compatibility layer - native MODX 3 support only

@@ -1,0 +1,17 @@
+/* Откат глобального box-sizing от PrimeVue (data-primevue-style-id="global-style"):
+   инжектируется после нашего CSS, поэтому перекрываем через !important. */
+*,
+*::before,
+*::after {
+  box-sizing: content-box !important;
+}
+#localizator3-content-app,
+#localizator3-content-app *,
+#localizator3-content-app *::before,
+#localizator3-content-app *::after,
+#localizator3-languages-app,
+#localizator3-languages-app *,
+#localizator3-languages-app *::before,
+#localizator3-languages-app *::after {
+  box-sizing: border-box !important;
+}

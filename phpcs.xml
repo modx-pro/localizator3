@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<ruleset name="Localizator3">
+    <description>PSR-12 для PHP кода Localizator3 (совместимость с MODX)</description>
+    <rule ref="PSR12">
+        <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+        <exclude name="PSR1.Files.SideEffects.FoundWithSymbols"/>
+        <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps"/>
+        <exclude name="PSR2.Classes.PropertyDeclaration.Underscore"/>
+        <exclude name="PSR2.Methods.MethodDeclaration.Underscore"/>
+    </rule>
+    <rule ref="Generic.WhiteSpace.DisallowTabIndent"/>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="250"/>
+        </properties>
+    </rule>
+    <!-- MODX processors/controllers используют lowercase в именах классов -->
+    <rule ref="Squiz.Classes.ValidClassName">
+        <exclude name="Squiz.Classes.ValidClassName.NotCamelCaps"/>
+    </rule>
+    <rule ref="Squiz.Scope.MethodScope">
+        <exclude name="Squiz.Scope.MethodScope.Missing"/>
+    </rule>
+    <file>core/components/localizator3</file>
+    <file>_build</file>
+    <file>tests</file>
+    <arg name="extensions" value="php"/>
+    <arg value="sp"/>
+</ruleset>

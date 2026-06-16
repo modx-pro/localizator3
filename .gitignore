@@ -1,0 +1,14 @@
+.idea
+.DS_Store
+
+# VSCode
+.vscode
+
+# Node
+node_modules
+
+# Vue build
+vueManager/dist
+
+# Cursor
+.cursor

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model package="localizator3" baseClass="xPDOObject" platform="mysql" defaultEngine="InnoDB" phpdoc-package="localizator3"
+       version="3.0">
+
+       <object class="localizatorLanguage" table="localizator3_languages" extends="xPDOSimpleObject">
+              <field key="name" dbtype="varchar" precision="100" phptype="string" null="false" default=""/>
+              <field key="key" dbtype="varchar" precision="100" phptype="string" null="false" default=""/>
+              <field key="cultureKey" dbtype="varchar" precision="100" phptype="string" null="true" default=""/>
+              <field key="http_host" dbtype="varchar" precision="100" phptype="string" null="false" default=""/>
+              <field key="description" dbtype="text" phptype="string" null="true" default=""/>
+              <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+              <field key="rank" dbtype="int" precision="10" phptype="integer" null="false" default="0"/>
+
+              <index alias="key" name="key" primary="false" unique="false" type="BTREE">
+                     <column key="key" length="" collation="A" null="false"/>
+              </index>
+              <index alias="cultureKey" name="cultureKey" primary="false" unique="false" type="BTREE">
+                     <column key="cultureKey" length="" collation="A" null="true"/>
+              </index>
+       </object>
+
+       <object class="localizatorContent" table="localizator3_content" extends="xPDOSimpleObject">
+              <field key="resource_id" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" default="0"/>
+              <field key="key" dbtype="varchar" precision="100" phptype="string" null="false" default=""/>
+              <field key="pagetitle" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+              <field key="longtitle" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+              <field key="menutitle" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+              <field key="seotitle" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+              <field key="keywords" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+              <field key="introtext" dbtype="text" phptype="string" null="true" default=""/>
+              <field key="description" dbtype="text" phptype="string" null="true" default=""/>
+              <field key="content" dbtype="mediumtext" phptype="string" null="true"  />
+              <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+
+              <index alias="resource_id" name="resource_id" primary="false" unique="false" type="BTREE">
+                     <column key="resource_id" length="" collation="A" null="false"/>
+              </index>
+              <index alias="key" name="key" primary="false" unique="false" type="BTREE">
+                     <column key="key" length="" collation="A" null="false"/>
+              </index>
+
+              <aggregate alias="Resource" class="MODX\Revolution\modResource" local="resource_id" foreign="id" cardinality="one" owner="foreign" />
+       </object>
+
+       <object class="locTemplateVarResource" table="localizator3_tmplvar_contentvalues" extends="xPDOSimpleObject">
+              <field key="key" dbtype="varchar" precision="100" phptype="string" null="false" default="" index="index"/>
+              <field key="tmplvarid" dbtype="int" precision="10" phptype="integer" null="false" default="0" index="index" />
+              <field key="contentid" dbtype="int" precision="10" phptype="integer" null="false" default="0" index="index" />
+              <field key="value" dbtype="mediumtext" phptype="string" null="false" />
+
+              <index alias="key" name="key" primary="false" unique="false" type="BTREE">
+                     <column key="key" length="" collation="A" null="false" />
+              </index>
+              <index alias="tmplvarid" name="tmplvarid" primary="false" unique="false" type="BTREE">
+                     <column key="tmplvarid" length="" collation="A" null="false" />
+              </index>
+              <index alias="contentid" name="contentid" primary="false" unique="false" type="BTREE">
+                     <column key="contentid" length="" collation="A" null="false" />
+              </index>
+              <index alias="tv_cnt" name="tv_cnt" primary="false" unique="true" type="BTREE">
+                     <column key="key" length="" collation="A" null="false" />
+                     <column key="tmplvarid" length="" collation="A" null="false" />
+                     <column key="contentid" length="" collation="A" null="false" />
+              </index>
+
+              <aggregate alias="TemplateVar" class="MODX\Revolution\modTemplateVar" local="tmplvarid" foreign="id" cardinality="one" owner="foreign" />
+              <aggregate alias="Resource" class="MODX\Revolution\modResource" local="contentid" foreign="id" cardinality="one" owner="foreign" />
+       </object>
+
+       <!-- B1: msProductOption — локализация опций miniShop3 -->
+       <object class="locOption" table="localizator3_option" extends="xPDOSimpleObject">
+              <field key="option_id" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" index="index"/>
+              <field key="key" dbtype="varchar" precision="100" phptype="string" null="false" default="" index="index"/>
+              <field key="caption" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+              <field key="description" dbtype="text" phptype="string" null="true"/>
+
+              <index alias="option_lang" name="option_lang" primary="false" unique="true" type="BTREE">
+                     <column key="option_id" length="" collation="A" null="false"/>
+                     <column key="key" length="" collation="A" null="false"/>
+              </index>
+       </object>
+
+       <object class="locProductOption" table="localizator3_product_option" extends="xPDOSimpleObject">
+              <field key="product_option_id" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" index="index"/>
+              <field key="key" dbtype="varchar" precision="100" phptype="string" null="false" default="" index="index"/>
+              <field key="value" dbtype="text" phptype="string" null="true"/>
+
+              <index alias="product_option_lang" name="product_option_lang" primary="false" unique="true" type="BTREE">
+                     <column key="product_option_id" length="" collation="A" null="false"/>
+                     <column key="key" length="" collation="A" null="false"/>
+              </index>
+       </object>
+
+</model>

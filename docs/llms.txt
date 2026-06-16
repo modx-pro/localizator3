@@ -1,0 +1,51 @@
+# Localizator3
+> Мультиязычность для MODX Revolution 3. Локализация ресурсов, TV, товаров miniShop3 и опций.
+
+## Requirements
+- MODX 3.0+, PHP 8.2+, pdoTools
+
+## Core Files
+- [core/components/localizator3/localizator.class.php]: Основной сервис (findLocalization, translate, getLocalizedOption*)
+- [core/components/localizator3/model/localizator3/]: xPDO-модели (localizatorLanguage, localizatorContent, locTemplateVarResource, locOption, locProductOption)
+- [core/components/localizator3/processors/mgr/]: Процессоры API (language/*, content/*, fields, lexicon/*)
+- [core/components/localizator3/elements/snippets/]: Сниппеты (localizator, getlocalizedfield, makelocalizedurl, getlocales, getlocalizedcanonical, getlocalizedsitemap)
+- [core/components/localizator3/elements/plugins/handlers/]: Обработчики событий (OnMODXInit, OnHandleRequest, OnDocFormPrerender, OnDocFormSave, OnLoadWebDocument, OnEmptyTrash, OnPageNotFound, OnTVFormPrerender, pdoToolsOnFenomInit, mseOnBeforeIndex, mseOnGetWorkFields)
+- [vueManager/src/components/]: Vue 3 + PrimeVue 4 UI (ContentGrid.vue, LanguagesGrid.vue)
+- [_build/]: Сборка транспортного пакета, резолверы, миграции Phinx
+- [docs/]: Документация
+
+## Key Concepts
+- **Язык**: запись в localizator3_languages (key, name, http_host, cultureKey, active, rank)
+- **Локализация**: запись в localizator3_content (resource_id, key, pagetitle, longtitle, menutitle, seotitle, keywords, introtext, description, content, active)
+- **TV-локализация**: localizator3_tmplvar_contentvalues (key, tmplvarid, contentid, value)
+- **Опции MS3**: localizator3_option (option_id, key, caption, description), localizator3_product_option (product_option_id, key, value)
+- **Текущий язык**: $modx->localizator3_key, cookie localizator3_key
+- **Fenom**: locfield, locoptioncaption, locproductoptionvalue
+- **Сниппеты**: getLocalizedResources, getLocales, makeLocalizedUrl, getLocalizedField, getLocalizedCanonical, getLocalizedSitemap
+
+## Events (custom)
+OnBuildLocalizationTabs, OnBeforeFindLocalization, OnFindLocalization, OnFindLocalizatorResource, OnToggleLocalizatorLanguage, OnBeforeSaveLocalization, OnSaveLocalization, OnBeforeSaveLocalizatorLanguage, OnSaveLocalizatorLanguage, OnHasLocalizatorError404
+
+## Dependencies
+- pdoTools (обязательно): pdoFetch.class = pdotools.pdofetchlocalizator3
+- miniShop3 (опционально): локализация товаров msProduct и опций msOption
+- mSearch (опционально): индексация локализованных полей (mseOnBeforeIndex, mseOnGetWorkFields)
+
+## Configuration (namespace: localizator3)
+- localizator3_default_language — ключ языка по умолчанию
+- localizator3_check_permissions — проверка прав (bool)
+- localizator3_disabled_templates — ID шаблонов без вкладки
+- localizator3_404_if_no_localization — 404 при отсутствии локализации (bool)
+- localizator3_auto_detect_language — автоопределение языка (bool)
+- localizator3_debug_log — отладочное логирование (bool)
+- localizator3_default_translator — переводчик (Yandex/Google/DeepL/LibreTranslate/MyMemory/SimpleCopy)
+- localizator3_key_yandex, localizator3_key_google, localizator3_key_deepl — API-ключи
+- localizator3_libretranslate_url, localizator3_key_libretranslate — LibreTranslate
+- localizator3_mymemory_email — email для MyMemory
+- localizator3_translate_fields — поля для автоперевода
+- localizator3_translate_translated, localizator3_translate_translated_fields — перезапись переводов
+
+## Vue UI
+- ContentGrid.vue → content.js → #localizator3-content-app (вкладка Локализация в ресурсе)
+- LanguagesGrid.vue → languages.js → #localizator3-languages-app (страница Localizator3 → Языки)
+- PrimeVue 4 Aura theme, scoped BEM styles, box-sizing isolation via CSS !important
