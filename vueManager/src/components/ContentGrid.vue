@@ -186,8 +186,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useToast } from 'primevue/usetoast'
-import { useConfirm } from 'primevue/useconfirm'
+import { useToast, useConfirm } from 'primevue'
 
 const props = defineProps({
   resourceId: { type: Number, required: true },

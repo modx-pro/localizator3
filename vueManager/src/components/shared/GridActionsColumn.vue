@@ -43,7 +43,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import Button from 'primevue/button'
+import { Button } from 'primevue'
 
 const props = defineProps({
   data: {

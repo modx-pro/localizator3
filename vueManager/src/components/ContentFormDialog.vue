@@ -50,13 +50,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import Dialog from 'primevue/dialog'
-import Tabs from 'primevue/tabs'
-import TabList from 'primevue/tablist'
-import Tab from 'primevue/tab'
-import TabPanels from 'primevue/tabpanels'
-import TabPanel from 'primevue/tabpanel'
-import Button from 'primevue/button'
+import { Dialog, Tabs, TabList, Tab, TabPanels, TabPanel, Button } from 'primevue'
 import FormFieldRenderer from './shared/FormFieldRenderer.vue'
 
 const props = defineProps({

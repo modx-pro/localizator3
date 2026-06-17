@@ -93,11 +93,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
-import Checkbox from 'primevue/checkbox'
-import Button from 'primevue/button'
+import { Dialog, InputText, Textarea, Checkbox, Button } from 'primevue'
 
 const props = defineProps({
   modelValue: Boolean,

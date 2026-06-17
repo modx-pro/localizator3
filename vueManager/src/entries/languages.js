@@ -6,17 +6,18 @@
 import '../base.css'
 
 import { createLocalizatorApp } from '../app/createLocalizatorApp.js'
-import ConfirmationService from 'primevue/confirmationservice'
-import ToastService from 'primevue/toastservice'
-import Toast from 'primevue/toast'
-import ConfirmDialog from 'primevue/confirmdialog'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Button from 'primevue/button'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
-import Dialog from 'primevue/dialog'
-import Checkbox from 'primevue/checkbox'
+import { ConfirmationService, ToastService } from 'primevue'
+import {
+  Toast,
+  ConfirmDialog,
+  DataTable,
+  Column,
+  Button,
+  InputText,
+  Textarea,
+  Dialog,
+  Checkbox,
+} from 'primevue'
 
 import LanguagesGrid from '../components/LanguagesGrid.vue'
 

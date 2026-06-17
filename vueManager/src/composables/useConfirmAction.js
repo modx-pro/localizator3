@@ -3,8 +3,7 @@
  *
  * Wraps PrimeVue useConfirm and useToast for consistent UX.
  */
-import { useConfirm } from 'primevue/useconfirm'
-import { useToast } from 'primevue/usetoast'
+import { useConfirm, useToast } from 'primevue'
 
 export function useConfirmAction(lexicon = {}) {
   const confirm = useConfirm()

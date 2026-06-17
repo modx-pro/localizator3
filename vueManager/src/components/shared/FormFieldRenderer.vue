@@ -53,10 +53,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
-import Select from 'primevue/select'
-import InputNumber from 'primevue/inputnumber'
+import { InputText, Textarea, Select, InputNumber } from 'primevue'
 
 const props = defineProps({
   field: {

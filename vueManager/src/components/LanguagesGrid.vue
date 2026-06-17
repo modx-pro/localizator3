@@ -139,8 +139,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { useConfirm } from 'primevue/useconfirm'
-import { useToast } from 'primevue/usetoast'
+import { useToast, useConfirm } from 'primevue'
 
 const connectorUrl = typeof localizator !== 'undefined' && localizator?.config?.connector_url
   ? localizator.config.connector_url
