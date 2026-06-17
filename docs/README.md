@@ -39,7 +39,7 @@
 
 | Документ | Описание |
 |----------|----------|
-| [roadmap.md](./roadmap.md) | План развития, анализ CMS (Babel/WPML/Drupal), каталог фич F1–F10 |
+| [roadmap.md](./roadmap.md) | План развития, анализ CMS (Babel/WPML/Drupal), каталог фич F1–F11 |
 | [llms.txt](./llms.txt) | Краткий контекст для LLM |
 | [../core/components/localizator3/docs/changelog.txt](../core/components/localizator3/docs/changelog.txt) | История изменений (в transport-пакете) |
 

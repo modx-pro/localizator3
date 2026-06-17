@@ -1,0 +1,172 @@
+<p>Всем привет!</p>
+
+<p>Делаю <strong>Localizator3</strong> для MODX 3: перевод полей и TV без отдельного context на язык, Vue 3 + PrimeVue 4 в менеджере, автоперевод, miniShop3, mSearch, SEO-сниппеты. Репозиторий: <a href="https://github.com/modx-pro/localizator3" target="_blank" rel="noopener">github.com/modx-pro/localizator3</a>.</p>
+
+<p><strong>Нужны тестировщики.</strong> Поставьте на свой MODX 3, сломайте что получится, опишите в <a href="https://github.com/modx-pro/localizator3/issues" target="_blank" rel="noopener">Issues</a>. Так быстрее дойдём до бесплатного релиза.</p>
+
+<p><strong>Установка:</strong></p>
+<ul>
+<li>transport из <a href="https://github.com/modx-pro/localizator3/releases" target="_blank" rel="noopener">Releases</a> (<strong>1.0.8-beta</strong>);</li>
+<li>сборка: <strong>vueManager && npm run build</strong>, <strong>php _build/build.php</strong> (нужны VueTools ≥1.1.2-pl и pdoTools).</li>
+</ul>
+
+<hr>
+
+<p>Один ресурс MODX, несколько строк в <strong>localizator3_content</strong>. ID ресурса общий для Fenom, pdoTools и ссылок. Babel клонирует дерево; здесь одно дерево с переводами полей.</p>
+
+<p>В менеджере: <strong>Localizator3 → Языки</strong>, вкладка <strong>Локализация</strong> на ресурсе (dropdown, Document / TV, «Перевести»). Vue через <strong>VueTools</strong>. На витрине: 6 сниппетов, Fenom, hreflang, sitemap.</p>
+
+<hr>
+
+<h3>Кому подойдёт</h3>
+
+<ul>
+<li>мультидомен и несколько языков на MODX 3;</li>
+<li>miniShop3 с переводами товаров и опций;</li>
+<li>pdoTools / Fenom, один ресурс, локализованные поля;</li>
+<li>автоперевод (Yandex, Google, DeepL, LibreTranslate, MyMemory) и CLI.</li>
+</ul>
+
+<h3>Менеджер</h3>
+
+<p><strong>Языки</strong>: key, name, HTTP host, cultureKey, rank. На ресурсе: Save, enable/disable, автоперевод. Поля формы настраиваются через <strong>OnBuildLocalizationTabs</strong>.</p>
+
+<h3>Сниппеты (1.0.8-beta)</h3>
+
+<p><strong>getLanguageList</strong> — переключатель языков (list или dropdown). URL ведёт на ту же страницу на другом host.</p>
+<pre>{'!getLanguageList' | snippet}
+{'!getLanguageList' | snippet : ['outputMode' => 'dropdown', 'activeClass' => 'current']}</pre>
+
+<p><strong>getLocalizedResources</strong> — pdoResources / pdoMenu / msProducts с JOIN локализации. Параметр <strong>onlyWithLocalization</strong> отсекает ресурсы без перевода.</p>
+<pre>{'!getLocalizedResources' | snippet : [
+  'snippet' => 'pdoResources',
+  'parents' => 0,
+  'tpl' => '@INLINE &lt;li&gt;&lt;a href="{$uri}"&gt;{$pagetitle}&lt;/a&gt;&lt;/li&gt;',
+  'onlyWithLocalization' => 1
+]}</pre>
+
+<p><strong>makeLocalizedUrl</strong> — URL ресурса с учётом языка и http_host.</p>
+<pre>&lt;a href="{'!makeLocalizedUrl' | snippet : ['id' => $id, 'language' => 'en']}"&gt;English&lt;/a&gt;</pre>
+
+<p><strong>getLocalizedField</strong> — одно поле или TV на указанном языке; если перевода нет, вернёт <strong>default</strong> или значение из modResource.</p>
+<pre>{'!getLocalizedField' | snippet : ['field' => 'pagetitle', 'language' => 'en']}
+{'!getLocalizedField' | snippet : ['field' => 'introtext', 'language' => 'de', 'default' => '']}</pre>
+
+<p><strong>getLocalizedCanonical</strong> — в <strong>&lt;head&gt;</strong>: canonical и hreflang для всех активных языков.</p>
+<pre>{'!getLocalizedCanonical' | snippet}</pre>
+
+<p><strong>getLocalizedSitemap</strong> — XML sitemap с alternate-ссылками по языкам.</p>
+<pre>{'!getLocalizedSitemap' | snippet : ['parents' => '0', 'depth' => 5]}</pre>
+
+<p><strong>Fenom-модификаторы</strong> (текущий язык из <strong>localizator3_key</strong>):</p>
+<pre>{$pagetitle | locfield}
+{$id | locfield : 'introtext'}
+{$option_id | locoptioncaption : 'Цвет'}
+{$product_option_id | locproductoptionvalue : '—'}</pre>
+
+<hr>
+
+<h3>Сниппеты в roadmap (ещё нет в 1.0.8)</h3>
+
+<p>Имена и параметры могут измениться до релиза. Целевые примеры из <a href="https://github.com/modx-pro/localizator3/blob/main/docs/roadmap.md" target="_blank" rel="noopener">roadmap F11</a>:</p>
+
+<p><strong>getCurrentLanguage</strong> <em>(1.1)</em> — key, cultureKey, name или http_host текущей локали.</p>
+<pre>{'!getCurrentLanguage' | snippet : ['field' => 'key']}
+{'!getCurrentLanguage' | snippet : ['field' => 'name', 'format' => 'json']}</pre>
+
+<p><strong>hasLocalization</strong> <em>(1.1)</em> — есть ли активный перевод ресурса на языке. Для условий в Fenom.</p>
+<pre>{if '!hasLocalization' | snippet : ['id' => $id, 'language' => 'en']}
+  &lt;a href="{'!makeLocalizedUrl' | snippet : ['id' => $id, 'language' => 'en']}"&gt;English version&lt;/a&gt;
+{/if}</pre>
+
+<p><strong>getResourceLocalizations</strong> <em>(1.1)</em> — массив языков ресурса: key, name, url, active, hasTranslation. Свой switcher без getLanguageList.</p>
+<pre>{foreach '!getResourceLocalizations' | snippet : ['id' => $id] as $loc}
+  &lt;a href="{$loc.url}" hreflang="{$loc.key}" class="{if $loc.is_current}active{/if}"&gt;{$loc.name}&lt;/a&gt;
+{/foreach}</pre>
+
+<p><strong>getLocalizedField / locfield + fallbackLanguage</strong> <em>(1.1)</em> — если перевода нет, взять язык по умолчанию из настроек.</p>
+<pre>{'!getLocalizedField' | snippet : [
+  'field' => 'pagetitle',
+  'language' => 'en',
+  'fallbackLanguage' => 'ru'
+]}</pre>
+
+<p><strong>makeLocalizedUrl + localized alias</strong> <em>(1.1, F4-04)</em> — URL с отдельным slug на язык, не только другой host.</p>
+<pre>{'!makeLocalizedUrl' | snippet : ['id' => $id, 'language' => 'en']}
+{* ожидается: /en/about-us вместо общего alias на en.site.com *}</pre>
+
+<p><strong>getAlternateUrls</strong> <em>(1.2)</em> — alternate-ссылки текущего ресурса (данные для своего шаблона, без готового HTML как у getLocalizedCanonical).</p>
+<pre>{set $alternates = '!getAlternateUrls' | snippet : ['id' => $id, 'format' => 'json']}
+{* массив: key, url, hreflang *}</pre>
+
+<p><strong>getLocalizedContent</strong> <em>(1.2)</em> — вся строка localizatorContent + TV: массив или JSON для tpl / JS.</p>
+<pre>{set $loc = '!getLocalizedContent' | snippet : ['id' => $id, 'language' => 'en', 'format' => 'json']}</pre>
+
+<p><strong>getDefaultLanguage</strong> <em>(backlog)</em> — key языка из <strong>localizator3_default_language</strong>.</p>
+<pre>{'!getDefaultLanguage' | snippet}</pre>
+
+<p><strong>locoptiondescription</strong> <em>(1.2, Fenom)</em> — локализованное description опции MS3 (caption уже есть в <strong>locoptioncaption</strong>).</p>
+<pre>{$option_id | locoptiondescription : 'Описание по умолчанию'}</pre>
+
+<hr>
+
+<h3>miniShop3 и mSearch</h3>
+
+<p><strong>msProduct</strong>, <strong>locOption</strong>, <strong>locProductOption</strong>. mSearch: поля <strong>ru-pagetitle</strong>, <strong>en-content</strong> и т.п.</p>
+
+<h3>SEO и CLI</h3>
+
+<p>HTTP host, cookie <strong>localizator3_key</strong>, Accept-Language. <strong>localizator3_404_if_no_localization</strong>. Массовый перевод:</p>
+
+<pre>php core/components/localizator3/scripts/translate_resources.php --parents=1 --depth=5</pre>
+
+<hr>
+
+<h3>Roadmap</h3>
+
+<p>Каталог: <a href="https://github.com/modx-pro/localizator3/blob/main/docs/roadmap.md" target="_blank" rel="noopener">docs/roadmap.md</a>.</p>
+
+<p><strong>1.0.8-beta</strong> (выпущен): VueTools, lean bundles, inline-форма «Локализация», 6 сниппетов, MS3, mSearch, автоперевод.</p>
+
+<p><strong>1.0.9-beta</strong>: composables в grids, декомпозиция Vue-компонентов, hard check VueTools, fix URL в <strong>getLanguageList</strong>.</p>
+
+<p><strong>1.1.0</strong>:</p>
+<ul>
+<li>overview переводов на ресурсе;</li>
+<li>Rich text (MODX RTE) в форме;</li>
+<li>копирование с другого языка, batch translate;</li>
+<li>локализованный alias на язык;</li>
+<li><strong>getCurrentLanguage</strong>, <strong>hasLocalization</strong>, <strong>getResourceLocalizations</strong>, fallback в <strong>getLocalizedField</strong> / <strong>locfield</strong> (см. блок «Сниппеты в roadmap» выше).</li>
+</ul>
+
+<p><strong>1.2.0</strong>:</p>
+<ul>
+<li>msPayment / msDelivery, mFilter + locOption;</li>
+<li>XLIFF и CSV;</li>
+<li>переиндексация mSearch при save;</li>
+<li><strong>getAlternateUrls</strong>, <strong>getLocalizedContent</strong>, Fenom <strong>locoptiondescription</strong>.</li>
+</ul>
+
+<p><strong>1.3.0</strong>:</p>
+<ul>
+<li>очередь переводов в UI;</li>
+<li>sync shared TV;</li>
+<li>UI перевода лексиконов;</li>
+<li>translation memory, выход из beta.</li>
+</ul>
+
+<p>Нужная фича из roadmap: issue с ID <strong>F*-*</strong> или комментарий к посту.</p>
+
+<hr>
+
+<h3>Требования</h3>
+
+<ul>
+<li>MODX 3.0+, PHP 8.2+</li>
+<li><strong>VueTools ≥1.1.2-pl</strong>, pdoTools</li>
+<li>miniShop3, mSearch по желанию</li>
+</ul>
+
+<p>MODX 2: <a href="https://github.com/modx-pro/localizator">Localizator</a>. Разное дерево по языкам: <strong>Babel</strong>.</p>
+
+<p><a href="https://github.com/modx-pro/localizator3/blob/main/docs/README.md" target="_blank" rel="noopener">docs/README.md</a></p>

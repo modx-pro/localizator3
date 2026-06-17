@@ -1,0 +1,90 @@
+<strong>Localizator3 — мультиязычность для MODX Revolution 3</strong>
+
+<p>Один ресурс, несколько языковых версий полей и TV. Данные в <code>localizator3_content</code>; ID ресурса общий для Fenom, pdoTools и miniShop3. Подходит мультидоменным сайтам на MODX 3.</p>
+
+<p>Менеджер: Vue 3 + PrimeVue 4 через <strong>VueTools ≥1.1.2-pl</strong>, страница «Языки», вкладка «Локализация» с inline-формой и автопереводом. Витрина: 6 сниппетов, Fenom, hreflang, canonical, sitemap.</p>
+
+<strong>Подходит, если нужно:</strong>
+<ul>
+  <li>переводить pagetitle, content, SEO и TV без отдельных ресурсов в context;</li>
+  <li>вывести переключатель (<strong>getLanguageList</strong>) и URL по HTTP host;</li>
+  <li>собрать каталог через pdoResources / pdoMenu / msProducts (<strong>getLocalizedResources</strong>);</li>
+  <li>локализовать товары и опции <strong>miniShop3</strong>;</li>
+  <li>индексировать переводы в <strong>mSearch</strong>;</li>
+  <li>переводить пакетно: Yandex, Google, DeepL, LibreTranslate, MyMemory, CLI.</li>
+</ul>
+
+<strong>Сниппеты</strong>
+<ul>
+  <li><strong>getLocalizedResources</strong> — pdoResources, pdoMenu, msProducts / ms3Products + JOIN локализации</li>
+  <li><strong>getLanguageList</strong> — list / dropdown, rank, activeClass</li>
+  <li><strong>makeLocalizedUrl</strong> — URL по языку и http_host</li>
+  <li><strong>getLocalizedField</strong> — поле или TV на языке</li>
+  <li><strong>getLocalizedCanonical</strong> — canonical + hreflang</li>
+  <li><strong>getLocalizedSitemap</strong> — sitemap с alternate</li>
+</ul>
+
+<strong>Fenom</strong>
+<ul>
+  <li><code>{$pagetitle | locfield}</code></li>
+  <li><code>{$option_id | locoptioncaption}</code></li>
+  <li><code>{$id | locproductoptionvalue}</code></li>
+</ul>
+
+<strong>Менеджер</strong>
+<ul>
+  <li><strong>Localizator3 → Языки</strong> — key, http_host, cultureKey, rank</li>
+  <li>Ресурс → <strong>Локализация</strong> — dropdown, Document / TV, Save, Translate</li>
+  <li>Поля формы: <code>OnBuildLocalizationTabs</code></li>
+  <li>Vue entry ~14 KB через Import Map VueTools</li>
+</ul>
+
+<strong>miniShop3</strong>
+<ul>
+  <li>Вкладка на <code>msProduct</code>, <code>locOption</code>, <code>locProductOption</code></li>
+  <li><code>getLocalizedResources</code> + <code>msProducts</code> / <code>ms3Products</code></li>
+</ul>
+
+<strong>mSearch</strong>
+<ul>
+  <li>Поля <code>{key}-pagetitle</code>, <code>{key}-content</code></li>
+  <li><code>fields</code> в mSearchForm по активным языкам</li>
+</ul>
+
+<strong>Маршрутизация и SEO</strong>
+<ul>
+  <li>HTTP host, cookie <code>localizator3_key</code>, Accept-Language</li>
+  <li><code>localizator3_404_if_no_localization</code></li>
+  <li>hreflang, canonical, sitemap</li>
+</ul>
+
+<strong>Установка</strong>
+<ol>
+  <li><strong>VueTools ≥1.1.2-pl</strong> + <strong>Localizator3</strong></li>
+  <li><strong>Localizator3 → Языки</strong>, укажите <strong>HTTP host</strong></li>
+  <li>TV: «TV is available in localizations»</li>
+  <li><code>pdoFetch.class</code> = <code>pdotools.pdofetchlocalizator3</code></li>
+  <li>Шаблон: <code>[[!getLanguageList]]</code>, <code>[[!getLocalizedCanonical]]</code></li>
+</ol>
+
+<p><strong>Fenom:</strong></p>
+<pre><code>{'!getLanguageList' | snippet}
+{'!getLocalizedResources' | snippet : [
+  'snippet' => 'pdoResources',
+  'parents' => 0,
+  'onlyWithLocalization' => 1
+]}
+{'!getLocalizedCanonical' | snippet}</code></pre>
+
+<strong>Требования</strong>
+<ul>
+  <li>MODX <strong>3.0+</strong>, PHP <strong>8.2+</strong></li>
+  <li><strong>VueTools ≥1.1.2-pl</strong>, <strong>pdoTools</strong></li>
+  <li><strong>miniShop3</strong>, <strong>mSearch</strong> по желанию</li>
+</ul>
+
+<p>Overlay-модель: один ресурс, N локализаций. Разная структура по языкам: <strong>Babel</strong>. MODX 2: <strong>Localizator</strong>.</p>
+
+<p>События: <code>OnBuildLocalizationTabs</code>, <code>OnSaveLocalization</code>, <code>OnToggleLocalizatorLanguage</code>, <code>OnHasLocalizatorError404</code>.</p>
+
+<p><a href="https://github.com/modx-pro/localizator3/tree/main/docs" target="_blank" rel="noopener">github.com/modx-pro/localizator3/docs</a></p>
