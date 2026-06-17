@@ -5,28 +5,34 @@
 *::after {
   box-sizing: content-box !important;
 }
+
+/* Mount points — без padding (padding на .languages-grid / .content-grid в mgr-ui.css) */
 #localizator3-content-app,
 #localizator3-languages-app {
-  width: 100%;
-  max-width: none;
-  box-sizing: border-box;
+  box-sizing: border-box !important;
+  max-width: 100%;
+  min-width: 0;
 }
 
+/* Вкладка «Локализация» на форме ресурса — ExtJS form layout сужает panel, растягиваем цепочку */
+#localizator3-resource-tab,
+#localizator3-resource-tab .x-panel-bwrap,
 #localizator3-resource-tab .x-panel-body,
-#localizator3-resource-tab .main-wrapper {
+.localizator3-content-tab,
+.localizator3-content-tab .x-panel-body {
   width: 100% !important;
-  max-width: none !important;
-  box-sizing: border-box;
+  box-sizing: border-box !important;
 }
 
-#localizator3-content-app .content-grid {
-  width: 100%;
-  max-width: none;
+#localizator3-content-app {
+  width: 100% !important;
+  display: block;
+  box-sizing: border-box !important;
 }
+
 #localizator3-content-app *,
 #localizator3-content-app *::before,
 #localizator3-content-app *::after,
-#localizator3-languages-app *,
 #localizator3-languages-app *,
 #localizator3-languages-app *::before,
 #localizator3-languages-app *::after {

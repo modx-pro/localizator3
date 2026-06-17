@@ -37,8 +37,13 @@ const postcssPlugins = [
       /^\[data-p-/,
       /^\[data-pc-/,
     ],
-    transform: (prefix, selector) =>
-      selector === ':root' ? '.vueApp' : prefix + ' ' + selector,
+    transform: (prefix, selector) => {
+      if (selector === ':root') return '.vueApp'
+      if (/^#localizator3-/.test(selector)) return selector
+      if (/^\.localizator3-/.test(selector)) return selector
+      if (selector.startsWith('.vueApp')) return selector
+      return prefix + ' ' + selector
+    },
   }),
 ]
 

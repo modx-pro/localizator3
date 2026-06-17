@@ -18,22 +18,20 @@
   --loc-page-padding-x: 1.25rem;
   --loc-page-padding-y: 1rem;
 }
-/* Page inset — MODX manager panels often have no inner padding */
-.vueApp #localizator3-languages-app,
-.vueApp #localizator3-content-app {
-  padding: var(--loc-page-padding-y) var(--loc-page-padding-x) 1.5rem;
-  box-sizing: border-box;
-}
-.vueApp #localizator3-resource-tab .x-panel-body,
-.vueApp .localizator3-content-tab .x-panel-body {
-  padding: var(--loc-page-padding-y) var(--loc-page-padding-x) 1.5rem;
-  box-sizing: border-box;
-}
 .vueApp.languages-grid,
 .vueApp.content-grid {
   width: 100%;
-  max-width: none;
+  max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
+}
+/* Страница «Языки» — MODX не даёт inner padding панели */
+.vueApp.languages-grid {
+  padding: 1rem 1.25rem 1.5rem;
+}
+/* Вкладка ресурса — padding уже у .main-wrapper MODX, не дублируем по горизонтали */
+.vueApp.content-grid {
+  padding: 0.5rem 0 1rem;
 }
 /* Section subtitle bar */
 .vueApp .loc-section-bar {
@@ -120,6 +118,8 @@
   border-radius: var(--loc-radius-lg);
   box-shadow: var(--loc-shadow);
   overflow: hidden;
+  max-width: 100%;
+  min-width: 0;
 }
 .vueApp .loc-panel :deep(.p-datatable) {
   border: 0;
@@ -222,15 +222,6 @@
   padding-top: 1rem;
   border-top: 1px solid var(--loc-border);
 }
-/* Resource localization tab — full width inside ExtJS panel */
-.vueApp.content-grid,
-.vueApp #localizator3-content-app .vueApp {
-  width: 100%;
-  max-width: none;
-}
-.vueApp .content-grid__form.loc-panel {
-  width: 100%;
-}
 @media (max-width: 640px) {
   .vueApp .loc-toolbar {
     flex-direction: column;
@@ -255,44 +246,45 @@
   }
 }
 
-.vueApp .content-grid[data-v-11729440] {
+.vueApp .content-grid[data-v-c24db190] {
   width: 100%;
-  max-width: none;
+  max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
 }
-.vueApp .content-grid__locale-bar[data-v-11729440] {
+.vueApp .content-grid__locale-bar[data-v-c24db190] {
   align-items: flex-end;
-  width: 100%;
+  max-width: 100%;
 }
-.vueApp .content-grid__locale-select[data-v-11729440] {
-  flex: 1 1 100%;
+.vueApp .content-grid__locale-select[data-v-c24db190] {
+  flex: 1 1 auto;
   min-width: 0;
-  max-width: none;
-  width: 100%;
+  max-width: 100%;
 }
-.vueApp .content-grid__locale-dropdown[data-v-11729440] {
+.vueApp .content-grid__locale-dropdown[data-v-c24db190] {
   width: 100%;
+  max-width: 100%;
 }
-.vueApp .content-grid__select-group[data-v-11729440] {
+.vueApp .content-grid__select-group[data-v-c24db190] {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
-.vueApp .content-grid__active-row[data-v-11729440] {
+.vueApp .content-grid__active-row[data-v-c24db190] {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
-.vueApp .content-grid__form[data-v-11729440] {
-  padding: 1rem;
+.vueApp .content-grid__form[data-v-c24db190] {
+  padding: 0;
 }
-.vueApp .content-grid__loading[data-v-11729440],
-.vueApp .content-grid__empty[data-v-11729440] {
+.vueApp .content-grid__loading[data-v-c24db190],
+.vueApp .content-grid__empty[data-v-c24db190] {
   padding: 2rem 1rem;
   text-align: center;
   color: var(--loc-text-muted, #64748b);
 }
-.vueApp .content-form-tabs[data-v-11729440] {
+.vueApp .content-form-tabs[data-v-c24db190] {
   margin-bottom: 0.25rem;
 }

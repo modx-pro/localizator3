@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Mount recovery: сброс «залипшего» `data-mounted` без `.content-grid`, обработчик `activate` на вкладке, `doLayout` после mount.
 - Вкладка локализации ресурса: вместо grid-списка — выбор языка и inline-форма полей (Документ / TV) с сохранением на месте.
 - Dropdown локали: все активные языки из настроек Localizator3; переключение между существующими переводами и создание нового по ключу языка.
-- Полная ширина вкладки локализации в форме ресурса MODX.
+- Полная ширина вкладки локализации в форме ресурса: ExtJS `layout: anchor` + `anchor: 100%`, CSS для цепочки `#localizator3-resource-tab` → `#localizator3-content-app`.
 
 ### Added
 - VueTools ≥1.1.2-pl integration: Vue-стек (Vue 3, Pinia, PrimeVue 4) через Import Map.

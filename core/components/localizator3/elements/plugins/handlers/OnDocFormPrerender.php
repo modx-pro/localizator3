@@ -117,12 +117,17 @@ $vueBridge->addClientHtml('<script type="text/javascript">
         title: _("localizator3_tab"),
         id: "localizator3-resource-tab",
         cls: "modx-resource-tab",
-        layout: "form",
         autoHeight: true,
+        layout: "anchor",
+        bodyStyle: "padding:0",
+        defaults: { anchor: "100%" },
         items: [{
             xtype: "panel",
             border: false,
+            anchor: "100%",
+            autoHeight: true,
             cls: "main-wrapper vueApp localizator3-content-tab",
+            bodyStyle: "padding:0;width:100%",
             html: ' . $tabPanelHtml . ',
             listeners: {
                 afterrender: function(panel) { localizator3MountContentTab(panel); },
@@ -155,8 +160,10 @@ $vueBridge->addClientHtml('<script type="text/javascript">
                 return;
             }
             var tab = Ext.getCmp("localizator3-resource-tab");
-            if (tab && typeof tab.doLayout === "function") {
-                tab.doLayout();
+            var tabs = Ext.getCmp("modx-resource-tabs");
+            if (tab && tabs && typeof tabs.doLayout === "function") {
+                tab.setWidth(tabs.getInnerWidth());
+                tabs.doLayout();
             }
             return;
         }

@@ -570,24 +570,25 @@ watch(() => props.resourceId, () => {
 <style scoped>
 .content-grid {
   width: 100%;
-  max-width: none;
+  max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
 }
 
 .content-grid__locale-bar {
   align-items: flex-end;
-  width: 100%;
+  max-width: 100%;
 }
 
 .content-grid__locale-select {
-  flex: 1 1 100%;
+  flex: 1 1 auto;
   min-width: 0;
-  max-width: none;
-  width: 100%;
+  max-width: 100%;
 }
 
 .content-grid__locale-dropdown {
   width: 100%;
+  max-width: 100%;
 }
 
 .content-grid__select-group {
@@ -604,7 +605,7 @@ watch(() => props.resourceId, () => {
 }
 
 .content-grid__form {
-  padding: 1rem;
+  padding: 0;
 }
 
 .content-grid__loading,

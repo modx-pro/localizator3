@@ -19,24 +19,22 @@
   --loc-page-padding-y: 1rem;
 }
 
-/* Page inset — MODX manager panels often have no inner padding */
-#localizator3-languages-app,
-#localizator3-content-app {
-  padding: var(--loc-page-padding-y) var(--loc-page-padding-x) 1.5rem;
-  box-sizing: border-box;
-}
-
-#localizator3-resource-tab .x-panel-body,
-.localizator3-content-tab .x-panel-body {
-  padding: var(--loc-page-padding-y) var(--loc-page-padding-x) 1.5rem;
-  box-sizing: border-box;
-}
-
 .vueApp.languages-grid,
 .vueApp.content-grid {
   width: 100%;
-  max-width: none;
+  max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
+}
+
+/* Страница «Языки» — MODX не даёт inner padding панели */
+.vueApp.languages-grid {
+  padding: 1rem 1.25rem 1.5rem;
+}
+
+/* Вкладка ресурса — padding уже у .main-wrapper MODX, не дублируем по горизонтали */
+.vueApp.content-grid {
+  padding: 0.5rem 0 1rem;
 }
 
 /* Section subtitle bar */
@@ -134,6 +132,8 @@
   border-radius: var(--loc-radius-lg);
   box-shadow: var(--loc-shadow);
   overflow: hidden;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .vueApp .loc-panel :deep(.p-datatable) {
@@ -255,17 +255,6 @@
   gap: 0.5rem;
   padding-top: 1rem;
   border-top: 1px solid var(--loc-border);
-}
-
-/* Resource localization tab — full width inside ExtJS panel */
-.vueApp.content-grid,
-#localizator3-content-app .vueApp {
-  width: 100%;
-  max-width: none;
-}
-
-.vueApp .content-grid__form.loc-panel {
-  width: 100%;
 }
 
 @media (max-width: 640px) {
