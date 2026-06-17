@@ -14,7 +14,7 @@
 import { createApp } from 'vue'
 // PrimeVue и тема Aura резолвятся через Import Map VueTools: ключ «primevue»
 // указывает на сборку, реэкспортирующую и config, и темы (Aura).
-import PrimeVue, { Aura } from 'primevue'
+import { PrimeVue, Aura } from 'primevue'
 import { getPrimeVueLocale } from '@vuetools/usePrimeVueLocale'
 
 export function createLocalizatorApp(RootComponent, rootProps = {}, options = {}) {

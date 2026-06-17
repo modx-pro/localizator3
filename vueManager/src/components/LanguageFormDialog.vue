@@ -49,12 +49,18 @@
         <div class="language-form__field language-form__field--full">
           <label for="lang-host" class="language-form__label">
             {{ lexicon?.localizator_language_http_host || 'HTTP Host' }}
+            <span class="language-form__required">*</span>
           </label>
           <InputText
             id="lang-host"
             v-model="form.http_host"
+            required
+            :placeholder="lexicon?.localizator_language_http_host_placeholder || 'project.test/ru/'"
             class="language-form__input"
           />
+          <small class="language-form__hint">
+            {{ lexicon?.localizator_language_http_host_hint || 'Without http:// or https://, e.g. project.test/ru/' }}
+          </small>
         </div>
 
         <div class="language-form__field language-form__field--full">
@@ -133,11 +139,19 @@ const submitLabel = computed(() => {
 
 watch(() => props.initialData, (data) => {
   if (data) {
-    form.value = { ...data }
+    form.value = {
+      ...data,
+      http_host: normalizeHttpHost(data.http_host),
+    }
   } else {
     resetForm()
   }
 }, { immediate: true })
+
+function normalizeHttpHost(value) {
+  if (!value) return ''
+  return String(value).trim().replace(/^https?:\/\//i, '')
+}
 
 function resetForm() {
   form.value = {
@@ -151,7 +165,10 @@ function resetForm() {
 }
 
 function onSubmit() {
-  emit('submit', { ...form.value })
+  emit('submit', {
+    ...form.value,
+    http_host: normalizeHttpHost(form.value.http_host),
+  })
 }
 
 function onCancel() {
@@ -193,6 +210,14 @@ function onCancel() {
 
 .language-form__input {
   width: 100%;
+}
+
+.language-form__hint {
+  display: block;
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--p-text-muted-color, #6b7280);
 }
 
 .language-form__checkbox {

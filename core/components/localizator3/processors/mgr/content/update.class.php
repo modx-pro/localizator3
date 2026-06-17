@@ -4,7 +4,7 @@ class localizatorContentUpdateProcessor extends modObjectUpdateProcessor
 {
     public $objectType = 'localizatorContent';
     public $classKey = \localizator3\localizatorContent::class;
-    public $languageTopics = array('localizator');
+    public $languageTopics = array('localizator3:default');
     public $beforeSaveEvent = 'OnBeforeSaveLocalization';
     public $afterSaveEvent = 'OnSaveLocalization';
     public $permission = '';
@@ -44,8 +44,10 @@ class localizatorContentUpdateProcessor extends modObjectUpdateProcessor
                 'resource_id' => $this->getProperty('resource_id', false),
                 'key' => $this->getProperty('key', false),
             ));
+            if (!$this->object) {
+                return $this->modx->lexicon('localizator_item_err_nf');
+            }
             $this->setProperty($this->primaryKeyField, $this->object->get($this->primaryKeyField));
-            //$this->setProperty('key',$this->object->get('key'));
         }
 
         return parent::initialize();

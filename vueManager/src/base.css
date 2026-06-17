@@ -1,3 +1,1 @@
-.vueApp {
-  color-scheme: light;
-}
+@import './styles/mgr-ui.css';

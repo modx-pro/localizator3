@@ -103,6 +103,10 @@ export function useConnector(connectorUrl, modAuth) {
         searchParams.append(key, String(value))
       }
     }
+    if (authToken.value) {
+      searchParams.append('modAuth', authToken.value)
+      searchParams.append('HTTP_MODAUTH', authToken.value)
+    }
 
     const url = `${baseUrl.value}?${searchParams.toString()}`
 

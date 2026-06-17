@@ -2,7 +2,7 @@
 
 return [
     'localizator3' => [
-        'file' => 'localizator',
+        'file' => 'plugin.localizator',
         'description' => 'localizator3_plugin_desc',
         'events' => [
             'OnTVFormPrerender' => [],

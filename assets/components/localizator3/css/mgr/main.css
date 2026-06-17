@@ -6,10 +6,27 @@
   box-sizing: content-box !important;
 }
 #localizator3-content-app,
+#localizator3-languages-app {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+#localizator3-resource-tab .x-panel-body,
+#localizator3-resource-tab .main-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box;
+}
+
+#localizator3-content-app .content-grid {
+  width: 100%;
+  max-width: none;
+}
 #localizator3-content-app *,
 #localizator3-content-app *::before,
 #localizator3-content-app *::after,
-#localizator3-languages-app,
+#localizator3-languages-app *,
 #localizator3-languages-app *,
 #localizator3-languages-app *::before,
 #localizator3-languages-app *::after {

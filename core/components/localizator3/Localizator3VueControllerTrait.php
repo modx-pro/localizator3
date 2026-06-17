@@ -50,6 +50,44 @@ trait Localizator3VueControllerTrait
     }
 
     /**
+     * Подключает HTML/JS в footer страницы менеджера (контроллер или regClientStartupHTMLBlock).
+     *
+     * @param string $html
+     */
+    public function addClientHtml($html)
+    {
+        $modx = $this->modx ?? ($this->localizator->modx ?? null);
+        if (!$modx) {
+            return;
+        }
+        if (method_exists($this, 'addHtml')) {
+            $this->addHtml($html);
+        } elseif ($modx->controller && method_exists($modx->controller, 'addHtml')) {
+            $modx->controller->addHtml($html);
+        } else {
+            $modx->regClientStartupHTMLBlock($html);
+        }
+    }
+
+    /**
+     * @param string $url
+     */
+    public function addClientCss($url)
+    {
+        $modx = $this->modx ?? ($this->localizator->modx ?? null);
+        if (!$modx) {
+            return;
+        }
+        if (method_exists($this, 'addCss')) {
+            $this->addCss($url);
+        } elseif ($modx->controller && method_exists($modx->controller, 'addCss')) {
+            $modx->controller->addCss($url);
+        } else {
+            $modx->regClientCSS($url);
+        }
+    }
+
+    /**
      * Подключает lean entry-бандл Vue-UI как ES-модуль.
      * Атрибут data-vue-module — опознавательный маркер модулей localizator3.
      *
@@ -57,15 +95,7 @@ trait Localizator3VueControllerTrait
      */
     public function addVueModule($src)
     {
-        $modx = $this->modx ?? ($this->localizator->modx ?? null);
         $html = '<script type="module" data-vue-module src="' . htmlspecialchars($src, ENT_QUOTES, 'UTF-8') . '"></script>';
-        // modExtraManagerController использует $this->addHtml(); обработчики плагинов — $modx->controller->addHtml().
-        if (method_exists($this, 'addHtml')) {
-            $this->addHtml($html);
-        } elseif ($modx && $modx->controller) {
-            $modx->controller->addHtml($html);
-        } elseif ($modx) {
-            $modx->regClientStartupScript($html);
-        }
+        $this->addClientHtml($html);
     }
 }

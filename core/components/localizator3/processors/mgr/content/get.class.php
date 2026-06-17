@@ -4,7 +4,7 @@ class localizatorContentGetProcessor extends modObjectGetProcessor
 {
     public $objectType = 'localizatorContent';
     public $classKey = \localizator3\localizatorContent::class;
-    public $languageTopics = array('localizator:default');
+    public $languageTopics = array('localizator3:default');
     public $permission = 'localizatorcontent_view';
 
     public function checkPermissions()

@@ -68,8 +68,11 @@ class Localizator3homeManagerController extends modExtraManagerController
         $this->addCss($this->localizator->versionedAsset('css/mgr/bootstrap.buttons.css'));
 
         $lexiconKeys = array(
-            'localizator_languages', 'localizator_language_create', 'localizator_language_update',
+            'localizator_languages', 'localizator_languages_section_desc',
+            'localizator_stats_total', 'localizator_stats_active', 'localizator_stats_inactive',
+            'localizator_language_create', 'localizator_language_update',
             'localizator_key', 'localizator_language_name', 'localizator_language_http_host',
+            'localizator_language_http_host_hint', 'localizator_language_http_host_placeholder',
             'localizator_language_cultureKey', 'localizator_language_description', 'localizator_active',
             'localizator_grid_search', 'localizator_grid_actions', 'localizator_item_update',
             'localizator_item_create', 'localizator_item_enable', 'localizator_item_disable',

@@ -3,7 +3,7 @@
         'name' => 'modx-pro/localizator3',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'c75e927f5198ced9d9088ac7a2500799efd6b9df',
+        'reference' => 'ba2c28733112ed9f11ac44a2a12b4767a2d42692',
         'type' => 'modx-extra',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -67,7 +67,7 @@
         'modx-pro/localizator3' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'c75e927f5198ced9d9088ac7a2500799efd6b9df',
+            'reference' => 'ba2c28733112ed9f11ac44a2a12b4767a2d42692',
             'type' => 'modx-extra',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

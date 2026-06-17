@@ -3,15 +3,41 @@
     <Toast />
     <ConfirmDialog />
 
-    <div class="languages-grid__header">
-      <h2 class="languages-grid__title">{{ lexicon.localizator_languages || 'Localization' }}</h2>
-      <div class="languages-grid__header-actions">
-        <InputText
-          v-model="searchQuery"
-          :placeholder="lexicon.localizator_grid_search || 'Search'"
-          class="languages-grid__search"
-          @keyup.enter="loadLanguages"
-        />
+    <p class="loc-section-bar">
+      {{ lexicon.localizator_languages_section_desc || 'Manage site languages, HTTP hosts and culture keys for localization.' }}
+    </p>
+
+    <div class="loc-stats">
+      <div class="loc-stat-card">
+        <div class="loc-stat-card__value">{{ stats.total }}</div>
+        <div class="loc-stat-card__label">{{ lexicon.localizator_stats_total || 'Total languages' }}</div>
+      </div>
+      <div class="loc-stat-card">
+        <div class="loc-stat-card__value">{{ stats.active }}</div>
+        <div class="loc-stat-card__label">{{ lexicon.localizator_stats_active || 'Active' }}</div>
+      </div>
+      <div class="loc-stat-card">
+        <div class="loc-stat-card__value">{{ stats.inactive }}</div>
+        <div class="loc-stat-card__label">{{ lexicon.localizator_stats_inactive || 'Inactive' }}</div>
+      </div>
+    </div>
+
+    <div class="loc-toolbar">
+      <div class="loc-toolbar__field">
+        <label for="languages-search" class="loc-toolbar__label">
+          {{ lexicon.localizator_grid_search || 'Search' }}
+        </label>
+        <IconField class="loc-toolbar__input">
+          <InputIcon class="pi pi-search" />
+          <InputText
+            id="languages-search"
+            v-model="searchQuery"
+            :placeholder="lexicon.localizator_grid_search || 'Search'"
+            @keyup.enter="loadLanguages"
+          />
+        </IconField>
+      </div>
+      <div class="loc-toolbar__actions">
         <Button
           :label="lexicon.localizator_language_create || 'Add localization'"
           icon="pi pi-plus"
@@ -20,117 +46,129 @@
       </div>
     </div>
 
-    <DataTable
-      :value="languages"
-      :loading="loading"
-      :lazy="true"
-      :paginator="true"
-      :rows="10"
-      :total-records="totalRecords"
-      :first="first"
-      data-key="id"
-      striped-rows
-      scrollable
-      @page="onPage"
-      @sort="onSort"
-    >
-      <Column field="key" :header="lexicon.localizator_key || 'Key'" sortable />
-      <Column field="name" :header="lexicon.localizator_language_name || 'Name'" sortable />
-      <Column field="http_host" :header="lexicon.localizator_language_http_host || 'HTTP Host'" sortable />
-      <Column field="cultureKey" :header="lexicon.localizator_language_cultureKey || 'Culture'" sortable />
-      <Column field="active" :header="lexicon.localizator_active || 'Active'" sortable>
-        <template #body="{ data }">
-          <i
-            :class="data.active ? 'pi pi-check languages-grid__status--active' : 'pi pi-times languages-grid__status--inactive'"
-            :title="data.active ? lexicon.localizator_item_enable : lexicon.localizator_item_disable"
-          />
-        </template>
-      </Column>
-      <Column :header="lexicon.localizator_grid_actions || 'Actions'" style="width: 10rem">
-        <template #body="{ data }">
-          <div class="languages-grid__actions">
-            <Button
-              icon="pi pi-pencil"
-              severity="secondary"
-              text
+    <div class="loc-panel">
+      <DataTable
+        :value="languages"
+        :loading="loading"
+        :lazy="true"
+        :paginator="true"
+        :rows="10"
+        :total-records="totalRecords"
+        :first="first"
+        data-key="id"
+        striped-rows
+        scrollable
+        @page="onPage"
+        @sort="onSort"
+      >
+        <Column field="key" :header="lexicon.localizator_key || 'Key'" sortable />
+        <Column field="name" :header="lexicon.localizator_language_name || 'Name'" sortable />
+        <Column field="http_host" :header="lexicon.localizator_language_http_host || 'HTTP Host'" sortable />
+        <Column field="cultureKey" :header="lexicon.localizator_language_cultureKey || 'Culture'" sortable />
+        <Column field="active" :header="lexicon.localizator_active || 'Active'" sortable style="width: 7rem">
+          <template #body="{ data }">
+            <Tag
+              :value="data.active
+                ? (lexicon.localizator_item_enable || 'Active')
+                : (lexicon.localizator_item_disable || 'Inactive')"
+              :severity="data.active ? 'success' : 'secondary'"
               rounded
-              size="small"
-              :title="lexicon.localizator_item_update"
-              @click="openEditDialog(data)"
             />
-            <Button
-              v-if="!data.active"
-              icon="pi pi-power-off"
-              severity="success"
-              text
-              rounded
-              size="small"
-              :title="lexicon.localizator_item_enable"
-              @click="enableItems([data.id])"
-            />
-            <Button
-              v-else
-              icon="pi pi-power-off"
-              severity="secondary"
-              text
-              rounded
-              size="small"
-              :title="lexicon.localizator_item_disable"
-              @click="disableItems([data.id])"
-            />
-            <Button
-              icon="pi pi-trash"
-              severity="danger"
-              text
-              rounded
-              size="small"
-              :title="lexicon.localizator_item_remove"
-              @click="confirmRemove([data.id])"
-            />
-          </div>
-        </template>
-      </Column>
-    </DataTable>
+          </template>
+        </Column>
+        <Column :header="lexicon.localizator_grid_actions || 'Actions'" style="width: 10rem">
+          <template #body="{ data }">
+            <div class="loc-row-actions">
+              <Button
+                icon="pi pi-pencil"
+                severity="secondary"
+                text
+                rounded
+                size="small"
+                :title="lexicon.localizator_item_update"
+                @click="openEditDialog(data)"
+              />
+              <Button
+                icon="pi pi-power-off"
+                :severity="data.active ? 'secondary' : 'success'"
+                text
+                rounded
+                size="small"
+                :title="data.active ? lexicon.localizator_item_disable : lexicon.localizator_item_enable"
+                @click="data.active ? disableItems([data.id]) : enableItems([data.id])"
+              />
+              <Button
+                icon="pi pi-trash"
+                severity="danger"
+                text
+                rounded
+                size="small"
+                :title="lexicon.localizator_item_remove"
+                @click="confirmRemove([data.id])"
+              />
+            </div>
+          </template>
+        </Column>
+      </DataTable>
+    </div>
 
     <Dialog
       v-model:visible="dialogVisible"
       :header="isEdit ? (lexicon.localizator_language_update || 'Update') : (lexicon.localizator_language_create || 'Create')"
       modal
-      :style="{ width: 'min(90vw, 36rem)' }"
+      :style="{ width: 'min(92vw, 40rem)' }"
       :closable="true"
       appendTo="self"
       @hide="resetForm"
     >
-      <form @submit.prevent="submitForm" class="languages-form languages-form--vertical">
-        <div class="languages-form-grid">
-          <div class="field-group">
-            <label for="key" class="field-label">{{ lexicon.localizator_language_key || 'Key' }} *</label>
-            <InputText id="key" v-model="form.key" required :disabled="isEdit" class="languages-form__input" />
+      <form @submit.prevent="submitForm" class="loc-form">
+        <div class="loc-form-grid">
+          <div class="loc-form-field">
+            <label for="key" class="loc-form-label">
+              {{ lexicon.localizator_language_key || 'Key' }}
+              <span class="loc-form-label__required">*</span>
+            </label>
+            <InputText id="key" v-model="form.key" required :disabled="isEdit" />
           </div>
-          <div class="field-group">
-            <label for="name" class="field-label">{{ lexicon.localizator_language_name || 'Name' }}</label>
-            <InputText id="name" v-model="form.name" class="languages-form__input" />
+          <div class="loc-form-field">
+            <label for="name" class="loc-form-label">{{ lexicon.localizator_language_name || 'Name' }}</label>
+            <InputText id="name" v-model="form.name" />
           </div>
-          <div class="field-group field-group-full">
-            <label for="http_host" class="field-label">{{ lexicon.localizator_language_http_host || 'HTTP Host' }} *</label>
-            <InputText id="http_host" v-model="form.http_host" required :disabled="isEdit" class="languages-form__input" />
+          <div class="loc-form-field loc-form-field--full">
+            <label for="http_host" class="loc-form-label">
+              {{ lexicon.localizator_language_http_host || 'HTTP Host' }}
+              <span class="loc-form-label__required">*</span>
+            </label>
+            <InputText
+              id="http_host"
+              v-model="form.http_host"
+              required
+              :placeholder="lexicon.localizator_language_http_host_placeholder || 'project.test/ru/'"
+            />
+            <small class="loc-form-hint">
+              {{ lexicon.localizator_language_http_host_hint || 'Without http:// or https://, e.g. project.test/ru/' }}
+            </small>
           </div>
-          <div class="field-group">
-            <label for="cultureKey" class="field-label">{{ lexicon.localizator_language_cultureKey || 'Culture' }}</label>
-            <InputText id="cultureKey" v-model="form.cultureKey" class="languages-form__input" />
+          <div class="loc-form-field">
+            <label for="cultureKey" class="loc-form-label">{{ lexicon.localizator_language_cultureKey || 'Culture' }}</label>
+            <InputText id="cultureKey" v-model="form.cultureKey" />
           </div>
-          <div class="field-group field-group-full">
-            <label for="description" class="field-label">{{ lexicon.localizator_language_description || 'Description' }}</label>
-            <Textarea id="description" v-model="form.description" rows="3" class="languages-form__input" />
+          <div class="loc-form-field loc-form-field--full">
+            <label for="description" class="loc-form-label">{{ lexicon.localizator_language_description || 'Description' }}</label>
+            <Textarea id="description" v-model="form.description" rows="3" />
           </div>
         </div>
-        <div class="languages-form__checkbox">
+        <div class="loc-form-checkbox">
           <Checkbox id="active" v-model="form.active" :binary="true" input-id="active" />
-          <label for="active" class="languages-form__checkbox-label">{{ lexicon.localizator_active || 'Active' }}</label>
+          <label for="active" class="loc-form-checkbox__label">{{ lexicon.localizator_active || 'Active' }}</label>
         </div>
-        <div class="languages-form__footer">
+        <div class="loc-form-footer">
           <Button type="button" :label="lexicon.localizator_cancel || 'Cancel'" severity="secondary" @click="dialogVisible = false" />
-          <Button type="submit" :label="isEdit ? (lexicon.localizator_item_update || 'Update') : (lexicon.localizator_item_create || 'Create')" />
+          <Button
+            type="submit"
+            :label="isEdit ? (lexicon.localizator_item_update || 'Update') : (lexicon.localizator_item_create || 'Create')"
+            icon="pi pi-check"
+          />
         </div>
       </form>
     </Dialog>
@@ -155,6 +193,7 @@ const loading = ref(false)
 const totalRecords = ref(0)
 const first = ref(0)
 const searchQuery = ref('')
+const stats = ref({ total: 0, active: 0, inactive: 0 })
 const lazyParams = ref({
   start: 0,
   limit: 10,
@@ -176,6 +215,11 @@ const form = reactive({
 const confirm = useConfirm()
 const toast = useToast()
 
+function normalizeHttpHost(value) {
+  if (!value) return ''
+  return String(value).trim().replace(/^https?:\/\//i, '')
+}
+
 async function api(action, params = {}) {
   const bodyParams = { action, ...params }
   if (modAuth) bodyParams.HTTP_MODAUTH = modAuth
@@ -186,8 +230,8 @@ async function api(action, params = {}) {
     body: body.toString(),
   })
   const data = await res.json()
-  if (!data.success && data.message) {
-    throw new Error(data.message)
+  if (!data.success) {
+    throw new Error(data.message || 'Request failed')
   }
   return data
 }
@@ -199,8 +243,12 @@ function loadLexicon() {
   }
   if (typeof MODx !== 'undefined' && MODx.lexicon) {
     const keys = [
-      'localizator_languages', 'localizator_language_create', 'localizator_language_update',
+      'localizator_languages', 'localizator_languages_section_desc',
+      'localizator_stats_total', 'localizator_stats_active', 'localizator_stats_inactive',
+      'localizator_language_create', 'localizator_language_update',
       'localizator_key', 'localizator_language_name', 'localizator_language_http_host',
+      'localizator_language_http_host_hint', 'localizator_language_http_host_placeholder',
+      'localizator_language_err_no_http_host',
       'localizator_language_cultureKey', 'localizator_language_description', 'localizator_active',
       'localizator_grid_search', 'localizator_grid_actions', 'localizator_item_update',
       'localizator_item_create', 'localizator_item_enable', 'localizator_item_disable',
@@ -213,6 +261,25 @@ function loadLexicon() {
     keys.forEach((k) => {
       if (MODx.lexicon[k]) lexicon.value[k] = MODx.lexicon[k]
     })
+  }
+}
+
+function updateStatsFromList(list, total) {
+  stats.value = {
+    total: total ?? list.length,
+    active: list.filter((item) => item.active).length,
+    inactive: list.filter((item) => !item.active).length,
+  }
+}
+
+async function loadStats() {
+  try {
+    const params = { start: 0, limit: 9999, sort: 'rank', dir: 'ASC' }
+    if (searchQuery.value) params.query = searchQuery.value
+    const data = await api('mgr/language/getlist', params)
+    updateStatsFromList(data.results || [], data.total || 0)
+  } catch {
+    updateStatsFromList(languages.value, totalRecords.value)
   }
 }
 
@@ -230,6 +297,7 @@ async function loadLanguages() {
     const data = await api('mgr/language/getlist', params)
     languages.value = data.results || []
     totalRecords.value = data.total || 0
+    await loadStats()
   } catch (e) {
     toast.add({ severity: 'error', summary: lexicon.value.localizator_error || 'Error', detail: e.message, life: 5000 })
   } finally {
@@ -268,7 +336,7 @@ function openEditDialog(row) {
   form.id = row.id
   form.key = row.key
   form.name = row.name
-  form.http_host = row.http_host
+  form.http_host = normalizeHttpHost(row.http_host)
   form.cultureKey = row.cultureKey || ''
   form.description = row.description || ''
   form.active = !!row.active
@@ -286,13 +354,26 @@ function resetForm() {
 }
 
 async function submitForm() {
+  const httpHost = normalizeHttpHost(form.http_host)
+  if (!httpHost) {
+    toast.add({
+      severity: 'error',
+      summary: lexicon.value.localizator_error || 'Error',
+      detail: lexicon.value.localizator_language_err_no_http_host || 'HTTP HOST is required',
+      life: 5000,
+    })
+    return
+  }
+
+  form.http_host = httpHost
+
   try {
     if (isEdit.value) {
       await api('mgr/language/update', {
         id: form.id,
         key: form.key,
         name: form.name,
-        http_host: form.http_host,
+        http_host: httpHost,
         cultureKey: form.cultureKey,
         description: form.description,
         active: form.active ? 1 : 0,
@@ -302,7 +383,7 @@ async function submitForm() {
       await api('mgr/language/create', {
         key: form.key,
         name: form.name,
-        http_host: form.http_host,
+        http_host: httpHost,
         cultureKey: form.cultureKey,
         description: form.description,
         active: form.active ? 1 : 0,
@@ -362,120 +443,3 @@ onMounted(() => {
   loadLanguages()
 })
 </script>
-
-<style scoped>
-/* Grid header */
-.languages-grid__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.languages-grid__title {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.languages-grid__header-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.languages-grid__search {
-  width: 16rem;
-}
-
-/* Status icons */
-.languages-grid__status--active {
-  color: #22c55e;
-}
-
-.languages-grid__status--inactive {
-  color: #9ca3af;
-}
-
-/* Actions */
-.languages-grid__actions {
-  display: flex;
-  gap: 0.25rem;
-}
-
-/* Form layout */
-.languages-form--vertical {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.languages-form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem 1.5rem;
-}
-
-.field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
-
-.field-group-full {
-  grid-column: 1 / -1;
-}
-
-.field-label {
-  font-weight: 500;
-  min-width: 0;
-}
-
-.languages-form__input {
-  width: 100%;
-}
-
-/* Checkbox */
-.languages-form__checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.languages-form__checkbox-label {
-  margin: 0;
-  cursor: pointer;
-}
-
-/* Form footer */
-.languages-form__footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--p-surface-200, #e5e7eb);
-}
-
-@media (max-width: 480px) {
-  .languages-grid__header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-
-  .languages-grid__header-actions {
-    width: 100%;
-  }
-
-  .languages-grid__search {
-    width: 100%;
-  }
-
-  .languages-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .field-group-full {
-    grid-column: 1;
-  }
-}
-</style>

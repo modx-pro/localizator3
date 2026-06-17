@@ -136,10 +136,21 @@ class localizatorContentGetFormConfigProcessor extends modProcessor
         }
         $allActive = $allActive ?? [];
         $totalActiveLanguages = count($allActive);
+        $activeLanguages = array();
         foreach ($allActive as $lang) {
-            $key = is_object($lang) ? $lang->get('key') : $lang['key'];
-            $name = is_object($lang) ? $lang->get('name') : $lang['name'];
-            if ($locId || !in_array($key, $usedKeys)) {
+            $key = is_object($lang) ? $lang->get('key') : ($lang['key'] ?? '');
+            $name = is_object($lang) ? $lang->get('name') : ($lang['name'] ?? $key);
+            $httpHost = is_object($lang) ? $lang->get('http_host') : ($lang['http_host'] ?? '');
+            if ($key === '') {
+                continue;
+            }
+            $activeLanguages[] = array(
+                'key' => $key,
+                'name' => $name,
+                'http_host' => $httpHost,
+                'label' => $name . ' [' . $key . '] (' . ($httpHost !== '' ? $httpHost : '-') . ')',
+            );
+            if ($locId || !in_array($key, $usedKeys, true)) {
                 $languages[] = array(
                     'key' => $key,
                     'name' => $name,
@@ -160,6 +171,7 @@ class localizatorContentGetFormConfigProcessor extends modProcessor
             'formtabs' => $formtabs,
             'customization' => $customization,
             'languages' => $languages,
+            'activeLanguages' => $activeLanguages,
             'totalActiveLanguages' => $totalActiveLanguages,
             'existingCount' => count($usedKeys),
         );
@@ -315,7 +327,7 @@ class localizatorContentGetFormConfigProcessor extends modProcessor
             $prefix = 'modx_';
         }
         $table = '`' . $prefix . 'localizator3_languages`';
-        $sql = "SELECT `key`, name FROM {$table} WHERE active = 1 ORDER BY `rank`, name";
+        $sql = "SELECT `key`, name, http_host FROM {$table} WHERE active = 1 ORDER BY `rank`, name";
         if ($debugLog) {
             $this->modx->log(modX::LOG_LEVEL_DEBUG, '[localizator3 getformconfig] fetchLanguagesFallback table=' . $table . ', prefix=' . $prefix);
         }

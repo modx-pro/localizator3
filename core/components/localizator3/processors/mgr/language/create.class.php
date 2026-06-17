@@ -4,7 +4,7 @@ class localizatorLanguageCreateProcessor extends modObjectCreateProcessor
 {
     public $objectType = 'localizatorLanguage';
     public $classKey = \localizator3\localizatorLanguage::class;
-    public $languageTopics = array('localizator');
+    public $languageTopics = array('localizator3:default');
     public $beforeSaveEvent = 'OnBeforeSaveLocalizatorLanguage';
     public $afterSaveEvent = 'OnSaveLocalizatorLanguage';
     //public $permission = 'create';
@@ -22,7 +22,8 @@ class localizatorLanguageCreateProcessor extends modObjectCreateProcessor
             $this->modx->error->addField('key', $this->modx->lexicon('localizator_language_err_key_exist'));
         }
 
-        $http_host = trim($this->getProperty('http_host'));
+        $http_host = $this->normalizeHttpHost($this->getProperty('http_host'));
+        $this->setProperty('http_host', $http_host);
         if (empty($http_host)) {
             $this->modx->error->addField('http_host', $this->modx->lexicon('localizator_language_err_no_http_host'));
         } elseif ($this->modx->getCount($this->classKey, array('http_host' => $http_host))) {
@@ -30,6 +31,18 @@ class localizatorLanguageCreateProcessor extends modObjectCreateProcessor
         }
 
         return parent::beforeSet();
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    protected function normalizeHttpHost($value): string
+    {
+        $http_host = trim((string)$value);
+        $http_host = preg_replace('#^https?://#i', '', $http_host);
+
+        return $http_host;
     }
 }
 

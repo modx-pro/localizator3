@@ -4,7 +4,7 @@ class localizatorLanguageDisableProcessor extends modObjectProcessor
 {
     public $objectType = 'localizatorLanguage';
     public $classKey = \localizator3\localizatorLanguage::class;
-    public $languageTopics = array('localizator');
+    public $languageTopics = array('localizator3:default');
     //public $permission = 'save';
 
 

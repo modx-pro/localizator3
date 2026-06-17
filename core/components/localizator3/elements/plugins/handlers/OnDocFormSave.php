@@ -9,6 +9,14 @@
  * @var string $mode
  */
 
+$eventParams = $modx->event->params ?? [];
+$mode = $mode ?? ($eventParams['mode'] ?? '');
+$resource = $resource ?? ($eventParams['resource'] ?? null);
+
+if (!$resource instanceof \MODX\Revolution\modResource) {
+    return;
+}
+
 if ($mode == 'new') {
     if ($key = $modx->getOption('localizator3_default_language', null, false, true)) {
         if ($fields = $modx->getOption('localizator3_translate_fields', null, false, true)) {

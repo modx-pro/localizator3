@@ -10,19 +10,17 @@ import { ConfirmationService, ToastService } from 'primevue'
 import {
   Toast,
   ConfirmDialog,
-  DataTable,
-  Column,
   Button,
   InputText,
   InputNumber,
   Textarea,
-  Dialog,
   Select,
   Tabs,
   TabList,
   Tab,
   TabPanels,
   TabPanel,
+  Checkbox,
 } from 'primevue'
 
 import ContentGrid from '../components/ContentGrid.vue'
@@ -30,22 +28,30 @@ import ContentGrid from '../components/ContentGrid.vue'
 const components = {
   Toast,
   ConfirmDialog,
-  DataTable,
-  Column,
   Button,
   InputText,
   InputNumber,
   Textarea,
-  Dialog,
   Select,
   Tabs,
   TabList,
   Tab,
   TabPanels,
   TabPanel,
+  Checkbox,
 }
 
 function mountContentApp(container) {
+  if (!container) {
+    return
+  }
+  if (container.getAttribute('data-mounted') === '1' && container.querySelector('.content-grid')) {
+    return
+  }
+  if (container.getAttribute('data-mounted') === '1') {
+    container.removeAttribute('data-mounted')
+  }
+
   const resourceId = parseInt(container.dataset.resourceId || '0', 10)
   const connectorUrl = container.dataset.connectorUrl || ''
   const modAuth = container.dataset.modAuth || (typeof localizator !== 'undefined' && localizator?.config?.modAuth) || (typeof MODx !== 'undefined' && MODx?.config?.modAuth) || ''
@@ -59,15 +65,15 @@ function mountContentApp(container) {
   app.use(ConfirmationService)
   app.use(ToastService)
   app.mount(container)
+  container.setAttribute('data-mounted', '1')
 }
 
 window.localizatorContentApp = mountContentApp
 
-const container = document.getElementById('localizator3-content-app')
-if (container) {
-  mountContentApp(container)
+const pending = document.getElementById('localizator3-content-app')
+if (pending) {
+  mountContentApp(pending)
 } else {
-  // Вкладка добавляется в ExtJS-табы асинхронно — ждём появления контейнера.
   const observer = new MutationObserver(() => {
     const el = document.getElementById('localizator3-content-app')
     if (el) {

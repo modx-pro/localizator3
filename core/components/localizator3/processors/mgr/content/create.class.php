@@ -4,7 +4,7 @@ class localizatorContentCreateProcessor extends modObjectCreateProcessor
 {
     public $objectType = 'localizatorContent';
     public $classKey = \localizator3\localizatorContent::class;
-    public $languageTopics = array('localizator');
+    public $languageTopics = array('localizator3:default');
     public $beforeSaveEvent = 'OnBeforeSaveLocalization';
     public $afterSaveEvent = 'OnSaveLocalization';
     public $permission = '';

@@ -39,6 +39,14 @@ class localizatorContentTranslateProcessor extends modProcessor
             'key:!=' => $default_language
         ));
 
+        $keysFilter = $this->getProperty('keys');
+        if ($keysFilter) {
+            $keysArray = is_string($keysFilter) ? $this->modx->fromJSON($keysFilter) : $keysFilter;
+            if (is_array($keysArray) && !empty($keysArray)) {
+                $c->where(array('key:IN' => $keysArray));
+            }
+        }
+
         $total = $this->modx->getCount(\localizator3\localizatorLanguage::class, $c);
 
         $defaultTVs = $default_content->loadTVs();

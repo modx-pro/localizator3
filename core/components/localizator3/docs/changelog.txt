@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.8-beta] - 2026-06-17
 
+### Fixed
+- Вкладка «Локализация» на форме ресурса: исправлен race condition mount Vue — bridge больше не выставляет `data-mounted` до `app.mount()`, добавлен retry при асинхронной загрузке ES-модуля.
+- Mount recovery: сброс «залипшего» `data-mounted` без `.content-grid`, обработчик `activate` на вкладке, `doLayout` после mount.
+- Вкладка локализации ресурса: вместо grid-списка — выбор языка и inline-форма полей (Документ / TV) с сохранением на месте.
+- Dropdown локали: все активные языки из настроек Localizator3; переключение между существующими переводами и создание нового по ключу языка.
+- Полная ширина вкладки локализации в форме ресурса MODX.
+
 ### Added
 - VueTools ≥1.1.2-pl integration: Vue-стек (Vue 3, Pinia, PrimeVue 4) через Import Map.
 - Resolver `vuetools`: автоматическая проверка и установка зависимости VueTools.

@@ -3,145 +3,122 @@
     <Toast />
     <ConfirmDialog />
 
-    <div class="content-grid__toolbar">
-      <div class="content-grid__toolbar-actions">
+    <p class="loc-section-bar">
+      {{ lexicon.localizator_content_section_desc || 'Manage resource field translations, TVs and auto-translation.' }}
+    </p>
+
+    <div class="loc-toolbar content-grid__locale-bar">
+      <div class="loc-toolbar__field content-grid__locale-select">
+        <label for="content-locale" class="loc-toolbar__label">
+          {{ lexicon.localizator_language || 'Language' }}
+        </label>
+        <Select
+          id="content-locale"
+          v-model="selectedLocaleKey"
+          :options="localeOptions"
+          option-label="label"
+          option-value="value"
+          :placeholder="lexicon.localizator_language || 'Language'"
+          :loading="loading"
+          :disabled="loading || formConfigLoading || localeOptions.length === 0"
+          fluid
+          class="content-grid__locale-dropdown"
+        />
+      </div>
+      <div class="loc-toolbar__actions">
         <Button
-          :label="lexicon.localizator_add || 'Add'"
-          icon="pi pi-plus"
-          @click="openCreateDialog"
+          :label="lexicon.localizator_save || 'Save'"
+          icon="pi pi-check"
+          :loading="saving"
+          :disabled="!formReady || saving || (!isEdit && !form.key)"
+          @click="submitForm"
         />
         <Button
           :label="lexicon.localizator_translate || 'Translate'"
           icon="pi pi-language"
-          :disabled="!hasSelection"
-          @click="translateSelected"
+          severity="secondary"
+          :disabled="!isEdit || !form.key || saving"
+          @click="translateCurrent"
         />
-      </div>
-      <InputText
-        v-model="searchQuery"
-        :placeholder="lexicon.localizator_grid_search || 'Search'"
-        class="content-grid__search"
-        @keyup.enter="loadContent"
-      />
-    </div>
-
-    <DataTable
-      :value="items"
-      :loading="loading"
-      v-model:selection="selectedItems"
-      :lazy="true"
-      :paginator="true"
-      :rows="10"
-      :total-records="totalRecords"
-      :first="first"
-      data-key="id"
-      striped-rows
-      scrollable
-      @page="onPage"
-      @sort="onSort"
-    >
-      <Column selection-mode="multiple" header-style="width: 3rem" />
-      <Column field="_key" :header="lexicon.localizator__key || 'Language'" sortable />
-      <Column field="pagetitle" :header="lexicon.localizator_pagetitle || 'Title'" sortable />
-      <Column field="seotitle" :header="lexicon.localizator_seotitle || 'SEO Title'" sortable />
-      <Column field="active" :header="lexicon.localizator_active || 'Active'" sortable>
-        <template #body="{ data }">
-          <i
-            :class="data.active ? 'pi pi-check content-grid__status--active' : 'pi pi-times content-grid__status--inactive'"
-            :title="data.active ? lexicon.localizator_item_disable : lexicon.localizator_item_enable"
+        <template v-if="isEdit && form.id">
+          <Button
+            v-if="!form.active"
+            icon="pi pi-power-off"
+            severity="success"
+            text
+            rounded
+            :title="lexicon.localizator_item_enable"
+            @click="toggleActive(true)"
+          />
+          <Button
+            v-else
+            icon="pi pi-power-off"
+            severity="secondary"
+            text
+            rounded
+            :title="lexicon.localizator_item_disable"
+            @click="toggleActive(false)"
+          />
+          <Button
+            icon="pi pi-trash"
+            severity="danger"
+            text
+            rounded
+            :title="lexicon.localizator_item_remove"
+            @click="confirmRemoveCurrent"
           />
         </template>
-      </Column>
-      <Column :header="lexicon.localizator_grid_actions || 'Actions'" style="width: 10rem">
-        <template #body="{ data }">
-          <div class="content-grid__actions">
-            <Button
-              icon="pi pi-pencil"
-              severity="secondary"
-              text
-              rounded
-              size="small"
-              :title="lexicon.localizator_item_update"
-              @click="openEditDialog(data)"
-            />
-            <Button
-              v-if="!data.active"
-              icon="pi pi-power-off"
-              severity="success"
-              text
-              rounded
-              size="small"
-              :title="lexicon.localizator_item_enable"
-              @click="enableItems([data.id])"
-            />
-            <Button
-              v-else
-              icon="pi pi-power-off"
-              severity="secondary"
-              text
-              rounded
-              size="small"
-              :title="lexicon.localizator_item_disable"
-              @click="disableItems([data.id])"
-            />
-            <Button
-              icon="pi pi-trash"
-              severity="danger"
-              text
-              rounded
-              size="small"
-              :title="lexicon.localizator_item_remove"
-              @click="confirmRemove([data.id])"
-            />
-          </div>
-        </template>
-      </Column>
-    </DataTable>
+      </div>
+    </div>
 
-    <Dialog
-      v-model:visible="dialogVisible"
-      :header="isEdit ? (lexicon.localizator_item_update || 'Edit') : (lexicon.localizator_add || 'Add')"
-      modal
-      :style="{ width: '50rem' }"
-      :closable="true"
-      maximizable
-      appendTo="self"
-      @hide="resetForm"
-    >
-      <form v-if="formConfig" @submit.prevent="submitForm" class="content-grid__form">
-        <Tabs v-model:value="activeTab" class="content-form-tabs">
-          <TabList>
-            <Tab v-for="tab in visibleTabs" :key="tab.id" :value="tab.id">
-              {{ tab.caption }}
-            </Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel v-for="tab in visibleTabs" :key="tab.id" :value="tab.id">
-            <div class="content-grid__form-grid">
+    <div v-if="formConfigLoading || loading" class="content-grid__loading">
+      {{ lexicon.localizator_loading || 'Loading...' }}
+    </div>
+    <div v-else-if="formConfigError" class="content-grid__empty">
+      {{ formConfigError }}
+    </div>
+    <div v-else-if="!formReady && activeLanguages.length === 0" class="content-grid__empty">
+      {{ emptyLanguagesMessage }}
+    </div>
+    <form v-else-if="formReady" class="loc-panel loc-form content-grid__form" @submit.prevent="submitForm">
+      <div v-if="!isEdit" class="content-grid__active-row">
+        <Checkbox v-model="form.active" :binary="true" input-id="content-active" />
+        <label for="content-active" class="loc-form-checkbox__label">
+          {{ lexicon.localizator_active || 'Active' }}
+        </label>
+      </div>
+
+      <Tabs v-model:value="activeTab" class="content-form-tabs">
+        <TabList>
+          <Tab v-for="tab in visibleTabs" :key="tab.id" :value="tab.id">
+            {{ tab.caption }}
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel v-for="tab in visibleTabs" :key="tab.id" :value="tab.id">
+            <div class="loc-form-grid">
               <div
                 v-for="field in visibleFields(tab)"
                 :key="field.field"
-                class="content-grid__field"
-                :class="{ 'content-grid__field--full': field.field === 'content' || field.type === 'textarea' || field.type === 'richtext' }"
+                class="loc-form-field"
+                :class="{ 'loc-form-field--full': field.field === 'content' || field.type === 'textarea' || field.type === 'richtext' }"
               >
-                <label v-if="field.caption" :for="'field-' + field.field" class="content-grid__label">
+                <label v-if="field.caption" :for="'field-' + field.field" class="loc-form-label">
                   {{ field.caption }}
-                  <span v-if="field.required" class="content-grid__required">*</span>
+                  <span v-if="field.required" class="loc-form-label__required">*</span>
                 </label>
                 <InputText
                   v-if="field.type === 'text'"
                   :id="'field-' + field.field"
                   v-model="form[field.field]"
                   :required="field.required"
-                  class="content-grid__input"
                 />
                 <Textarea
                   v-else-if="field.type === 'textarea' || field.type === 'richtext' || field.type === 'tv'"
                   :id="'field-' + field.field"
                   v-model="form[tvFieldName(field)]"
                   :required="field.required"
-                  :rows="field.field === 'content' ? 8 : 4"
-                  class="content-grid__input"
+                  :rows="field.field === 'content' ? 12 : 4"
                 />
                 <div v-else-if="field.field === 'key'" class="content-grid__select-group">
                   <Select
@@ -151,11 +128,9 @@
                     option-label="name"
                     option-value="key"
                     :placeholder="field.caption"
-                    :disabled="isEdit"
                     :empty-message="emptyLanguagesMessage"
-                    class="content-grid__input"
                   />
-                  <small v-if="!isEdit && languages.length === 0" class="content-grid__hint">
+                  <small v-if="languages.length === 0" class="loc-form-hint">
                     {{ emptyLanguagesMessage }}
                   </small>
                 </div>
@@ -167,20 +142,10 @@
                 />
               </div>
             </div>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-        <div class="content-grid__dialog-footer">
-          <Button type="button" :label="lexicon.localizator_cancel || 'Cancel'" severity="secondary" @click="dialogVisible = false" />
-          <Button
-            type="submit"
-            :label="isEdit ? (lexicon.localizator_save || 'Save') : (lexicon.localizator_item_create || 'Create')"
-            icon="pi pi-check"
-            :disabled="!isEdit && !form.key"
-          />
-        </div>
-      </form>
-    </Dialog>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </form>
   </div>
 </template>
 
@@ -196,26 +161,46 @@ const props = defineProps({
 })
 
 const loading = ref(false)
+const saving = ref(false)
 const items = ref([])
-const selectedItems = ref([])
-const totalRecords = ref(0)
-const first = ref(0)
-const searchQuery = ref('')
-const sortField = ref('id')
-const sortOrder = ref(-1)
+const selectedLocaleKey = ref('')
+const skipLocaleWatch = ref(false)
+const activeLanguages = ref([])
 
 const formConfig = ref(null)
 const formConfigLoading = ref(false)
 const formConfigError = ref(null)
 const form = ref({})
-const dialogVisible = ref(false)
 const isEdit = ref(false)
 const languages = ref([])
 const activeTab = ref(null)
 
 const toast = useToast()
 const confirmDialog = useConfirm()
-const hasSelection = computed(() => selectedItems.value?.length > 0)
+
+const itemsByKey = computed(() => {
+  const map = {}
+  for (const item of items.value) {
+    if (item.key) {
+      map[item.key] = item
+    }
+  }
+  return map
+})
+
+const localeOptions = computed(() => {
+  const lx = props.lexicon || {}
+  const newSuffix = lx.localizator_item_create ? ` — ${lx.localizator_item_create}` : ''
+  return activeLanguages.value.map((lang) => {
+    const hasTranslation = !!itemsByKey.value[lang.key]
+    return {
+      label: hasTranslation ? lang.label : `${lang.label}${newSuffix}`,
+      value: lang.key,
+    }
+  })
+})
+
+const formReady = computed(() => !!formConfig.value?.formtabs && !!selectedLocaleKey.value)
 
 const emptyLanguagesMessage = computed(() => {
   const lx = props.lexicon || {}
@@ -252,7 +237,11 @@ watch(visibleTabs, (tabs) => {
 
 function visibleFields(tab) {
   const fields = tab.fields || []
-  return fields.filter((f) => f.visible !== false)
+  return fields.filter((f) => {
+    if (f.visible === false || f.field === 'id') return false
+    if (isEdit.value && f.field === 'key') return false
+    return true
+  })
 }
 
 function tvFieldName(field) {
@@ -264,7 +253,10 @@ function tvFieldName(field) {
 
 function buildParams(extra = {}) {
   const params = { ...extra }
-  if (props.modAuth) params.HTTP_MODAUTH = props.modAuth
+  if (props.modAuth) {
+    params.HTTP_MODAUTH = props.modAuth
+    params.modAuth = props.modAuth
+  }
   return new URLSearchParams(params)
 }
 
@@ -275,302 +267,326 @@ function getConnectorUrl() {
   return u
 }
 
-function loadFormConfig() {
-  formConfigLoading.value = true
-  formConfigError.value = null
-  formConfig.value = null
-  languages.value = []
+function showError(error) {
+  toast.add({
+    severity: 'error',
+    summary: props.lexicon?.localizator_error || 'Error',
+    detail: error?.message || String(error),
+    life: 5000,
+  })
+}
 
-  const url = getConnectorUrl()
-  return fetch(url, {
+async function postConnector(params) {
+  const response = await fetch(getConnectorUrl(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: buildParams(params).toString(),
+  })
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+  }
+  const data = await response.json()
+  if (!data.success) {
+    throw new Error(data.message || props.lexicon?.localizator_error || 'Request failed')
+  }
+  return data
+}
+
+function applyFormConfigObject(object, includeRecord = false) {
+  formConfig.value = {
+    formtabs: object.formtabs,
+    customization: object.customization,
+    totalActiveLanguages: object.totalActiveLanguages ?? 0,
+    existingCount: object.existingCount ?? 0,
+  }
+  languages.value = object.languages || []
+  if (object.activeLanguages?.length) {
+    activeLanguages.value = object.activeLanguages
+  }
+  if (includeRecord && object.record) {
+    form.value = { ...object.record, resource_id: props.resourceId }
+    isEdit.value = true
+    selectedLocaleKey.value = object.record.key || selectedLocaleKey.value
+  }
+}
+
+async function fetchFormConfig(locId = 0) {
+  const params = {
+    action: 'mgr/content/getformconfig',
+    resource_id: props.resourceId,
+  }
+  if (locId) {
+    params.loc_id = locId
+  }
+  const response = await fetch(getConnectorUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: buildParams({
-      action: 'mgr/content/getformconfig',
-      resource_id: props.resourceId,
-    }),
+    body: buildParams(params).toString(),
   })
-    .then((r) => {
-      if (!r.ok) throw new Error(`getformconfig ${r.status}: ${r.statusText}`)
-      return r.json()
-    })
-    .then((data) => {
-      if (data.success && data.object) {
-        formConfig.value = {
-          formtabs: data.object.formtabs,
-          customization: data.object.customization,
-          totalActiveLanguages: data.object.totalActiveLanguages ?? 0,
-          existingCount: data.object.existingCount ?? 0,
-        }
-        languages.value = data.object.languages || []
-      } else {
-        const msg = data.message || (props.lexicon?.localizator_unknown_error || 'Unknown error')
-        formConfigError.value = msg
-        console.error('localizator3 getformconfig:', msg)
-        toast.add({
-          severity: 'error',
-          summary: props.lexicon?.localizator_error || 'Error',
-          detail: msg,
-          life: 5000,
-        })
-      }
-    })
-    .catch((e) => {
-      const msg = e.message || String(e)
-      formConfigError.value = msg
-      console.error('localizator3 getformconfig fetch error:', e)
-      toast.add({
-        severity: 'error',
-        summary: props.lexicon?.localizator_error || 'Error',
-        detail: msg,
-        life: 5000,
-      })
-    })
-    .finally(() => {
-      formConfigLoading.value = false
-    })
+  if (!response.ok) {
+    throw new Error(`getformconfig ${response.status}: ${response.statusText}`)
+  }
+  const data = await response.json()
+  if (!data.success || !data.object) {
+    throw new Error(data.message || props.lexicon?.localizator_unknown_error || 'Unknown error')
+  }
+  return data.object
 }
 
-function loadContent() {
+async function loadFormConfig(locId = 0) {
+  formConfigLoading.value = true
+  formConfigError.value = null
+  try {
+    const object = await fetchFormConfig(locId)
+    applyFormConfigObject(object, !!locId)
+    return object
+  } catch (e) {
+    formConfigError.value = e.message || String(e)
+    showError(e)
+    return null
+  } finally {
+    formConfigLoading.value = false
+  }
+}
+
+async function loadAllItems() {
   loading.value = true
-  const params = buildParams({
-    action: 'mgr/content/getlist',
-    resource_id: props.resourceId,
-    start: first.value,
-    limit: 10,
-    sort: sortField.value,
-    dir: sortOrder.value === 1 ? 'ASC' : 'DESC',
-  })
-  if (searchQuery.value) params.set('query', searchQuery.value)
-
-  fetch(getConnectorUrl() + '?' + params)
-    .then((r) => r.json())
-    .then((data) => {
-      items.value = data.results || []
-      totalRecords.value = data.total || 0
+  try {
+    const data = await postConnector({
+      action: 'mgr/content/getlist',
+      resource_id: props.resourceId,
+      start: 0,
+      limit: 999,
+      sort: 'id',
+      dir: 'ASC',
     })
-    .finally(() => (loading.value = false))
+    items.value = data.results || []
+  } catch (e) {
+    showError(e)
+  } finally {
+    loading.value = false
+  }
 }
 
-function onPage(e) {
-  first.value = e.first
-  loadContent()
-}
-
-function onSort(e) {
-  sortField.value = e.sortField || 'id'
-  sortOrder.value = e.sortOrder || -1
-  loadContent()
-}
-
-function openCreateDialog() {
-  isEdit.value = false
+function initEmptyForm() {
   form.value = { resource_id: props.resourceId, key: '', active: 1 }
   if (formConfig.value?.formtabs?.document?.fields) {
     for (const f of formConfig.value.formtabs.document.fields) {
-      if (f.visible !== false && f.field !== 'id') {
+      if (f.visible !== false && f.field !== 'id' && f.field !== 'key') {
         form.value[f.field] = form.value[f.field] ?? ''
       }
     }
   }
-  dialogVisible.value = true
+  isEdit.value = false
 }
 
-function openEditDialog(row) {
-  isEdit.value = true
-  form.value = { ...row, resource_id: props.resourceId }
-  dialogVisible.value = true
-  fetch(getConnectorUrl(), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: buildParams({ action: 'mgr/content/getformconfig', resource_id: props.resourceId, loc_id: row.id }),
-  })
-    .then((r) => r.json())
-    .then((data) => {
-      if (data.success && data.object?.record) {
-        form.value = { ...form.value, ...data.object.record }
-      }
-    })
+async function enterCreateModeForKey(key) {
+  if (!key) {
+    return
+  }
+  skipLocaleWatch.value = true
+  selectedLocaleKey.value = key
+  skipLocaleWatch.value = false
+  await loadFormConfig(0)
+  initEmptyForm()
+  form.value.key = key
 }
 
-function resetForm() {
+async function loadLocalization(locId) {
+  if (!locId) {
+    return
+  }
+  loading.value = true
+  try {
+    const object = await fetchFormConfig(locId)
+    applyFormConfigObject(object, true)
+  } catch (e) {
+    showError(e)
+  } finally {
+    loading.value = false
+  }
+}
+
+function findItemByKey(key) {
+  return items.value.find((item) => item.key === key)
+}
+
+async function selectLocaleKey(key) {
+  if (!key) {
+    return
+  }
+  const item = findItemByKey(key)
+  if (item) {
+    skipLocaleWatch.value = true
+    selectedLocaleKey.value = key
+    skipLocaleWatch.value = false
+    await loadLocalization(item.id)
+    return
+  }
+  await enterCreateModeForKey(key)
+}
+
+watch(selectedLocaleKey, (value, oldValue) => {
+  if (skipLocaleWatch.value || !value || value === oldValue) {
+    return
+  }
+  if (isEdit.value && form.value.key === value) {
+    return
+  }
+  selectLocaleKey(value)
+})
+
+async function refreshAll() {
+  const currentKey = selectedLocaleKey.value || form.value.key
+  await loadAllItems()
+  await loadFormConfig(0)
+  if (currentKey) {
+    await selectLocaleKey(currentKey)
+    return
+  }
+  if (activeLanguages.value.length > 0) {
+    await selectLocaleKey(activeLanguages.value[0].key)
+    return
+  }
+  selectedLocaleKey.value = ''
   form.value = {}
+  isEdit.value = false
 }
 
-function submitForm() {
+async function submitForm() {
   if (!isEdit.value && !form.value.key) {
     return
   }
+  saving.value = true
   const action = isEdit.value ? 'mgr/content/update' : 'mgr/content/create'
-  const payload = { action, ...form.value }
-  const body = buildParams(payload)
-
-  fetch(getConnectorUrl(), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body,
-  })
-    .then((r) => r.json())
-    .then((data) => {
-      if (data.success) {
-        dialogVisible.value = false
-        loadContent()
-        const lx = props.lexicon || {}
-        const detail = isEdit.value
-          ? (lx.localizator_content_updated || lx.localizator_language_updated || 'Translation updated')
-          : (lx.localizator_content_created || lx.localizator_language_created || 'Translation created')
-        toast.add({
-          severity: 'success',
-          summary: lx.localizator_success || 'Success',
-          detail,
-          life: 3000,
-        })
-      } else {
-        toast.add({
-          severity: 'error',
-          summary: props.lexicon?.localizator_error || 'Error',
-          detail: data.message || '',
-          life: 5000,
-        })
-      }
+  try {
+    await postConnector({ action, ...form.value })
+    const lx = props.lexicon || {}
+    toast.add({
+      severity: 'success',
+      summary: lx.localizator_success || 'Success',
+      detail: isEdit.value
+        ? (lx.localizator_content_updated || lx.localizator_save || 'Saved')
+        : (lx.localizator_content_created || lx.localizator_item_create || 'Created'),
+      life: 3000,
     })
+    await loadAllItems()
+    const savedKey = form.value.key
+    if (isEdit.value && form.value.id) {
+      await selectLocaleKey(savedKey || selectedLocaleKey.value)
+    } else if (savedKey) {
+      await selectLocaleKey(savedKey)
+    } else {
+      await refreshAll()
+    }
+  } catch (e) {
+    showError(e)
+  } finally {
+    saving.value = false
+  }
 }
 
-function enableItems(ids) {
-  ids.forEach((id) => runAction('mgr/content/enable', { id }))
+async function runAction(action, extra = {}) {
+  await postConnector({ action, ...extra })
+  await refreshAll()
+  const lx = props.lexicon || {}
+  toast.add({
+    severity: 'success',
+    summary: lx.localizator_success || 'Success',
+    life: 3000,
+  })
 }
 
-function disableItems(ids) {
-  ids.forEach((id) => runAction('mgr/content/disable', { id }))
+function toggleActive(enable) {
+  if (!form.value.id) return
+  const action = enable ? 'mgr/content/enable' : 'mgr/content/disable'
+  runAction(action, { id: form.value.id, key: form.value.key || '' }).catch(showError)
 }
 
-function runAction(action, extra = {}) {
-  const body = buildParams({ action, ...extra })
-  fetch(getConnectorUrl(), { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
-    .then((r) => r.json())
-    .then((data) => data.success && loadContent())
-}
-
-function confirmRemove(ids) {
+function confirmRemoveCurrent() {
+  if (!form.value.id) return
   const lx = props.lexicon || {}
   confirmDialog.require({
     message: lx.localizator_items_remove_confirm || 'Are you sure you want to delete?',
     header: lx.localizator_items_remove || 'Delete',
     icon: 'pi pi-exclamation-triangle',
     accept: () => {
-      ids.forEach((id) => runAction('mgr/content/remove', { id }))
+      runAction('mgr/content/remove', { id: form.value.id, key: form.value.key || '' }).catch(showError)
     },
   })
 }
 
-function translateSelected() {
-  if (!hasSelection.value) return
+function translateCurrent() {
+  if (!form.value.key) return
   const lx = props.lexicon || {}
   confirmDialog.require({
-    message: lx.localizator_translate_confirm || 'Translate selected?',
+    message: lx.localizator_translate_confirm || 'Translate this localization?',
     header: lx.localizator_translate || 'Translate',
     icon: 'pi pi-language',
     accept: () => {
-      fetch(getConnectorUrl(), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: buildParams({
-          action: 'mgr/content/translate',
-          resource_id: props.resourceId,
-          start: 0,
-        }),
+      postConnector({
+        action: 'mgr/content/translate',
+        resource_id: props.resourceId,
+        keys: JSON.stringify([form.value.key]),
       })
-        .then((r) => r.json())
-        .then((data) => {
-          if (data.success) loadContent()
+        .then(async () => {
+          await loadLocalization(form.value.id)
+          toast.add({
+            severity: 'success',
+            summary: lx.localizator_success || 'Success',
+            detail: lx.localizator_translate || 'Translate',
+            life: 3000,
+          })
         })
+        .catch(showError)
     },
   })
 }
 
+async function bootstrap() {
+  formConfigError.value = null
+  await loadFormConfig(0)
+  await loadAllItems()
+  if (activeLanguages.value.length === 0) {
+    return
+  }
+  const preferredKey = items.value[0]?.key || activeLanguages.value[0].key
+  await selectLocaleKey(preferredKey)
+}
+
 onMounted(() => {
-  loadFormConfig().then(loadContent)
+  bootstrap()
 })
 
 watch(() => props.resourceId, () => {
-  loadFormConfig().then(loadContent)
+  selectedLocaleKey.value = ''
+  bootstrap()
 })
 </script>
 
 <style scoped>
-.content-grid__toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
+.content-grid {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
 }
 
-.content-grid__toolbar-actions {
-  display: flex;
-  gap: 0.5rem;
+.content-grid__locale-bar {
+  align-items: flex-end;
+  width: 100%;
 }
 
-.content-grid__search {
-  width: 16rem;
+.content-grid__locale-select {
+  flex: 1 1 100%;
+  min-width: 0;
+  max-width: none;
+  width: 100%;
 }
 
-.content-grid__form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  padding: 0.5rem 0;
-}
-
-.content-grid__field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
-
-.content-grid__field--full {
-  grid-column: 1 / -1;
-}
-
-.content-grid__label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--p-text-color, #374151);
-}
-
-.content-grid__required {
-  color: #ef4444;
-  margin-left: 2px;
-}
-
-.content-grid__dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.content-grid__actions {
-  display: flex;
-  gap: 0.25rem;
-}
-
-/* Status icons */
-.content-grid__status--active {
-  color: #22c55e;
-}
-
-.content-grid__status--inactive {
-  color: #9ca3af;
-}
-
-/* Form layout */
-.content-grid__form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.content-grid__input {
+.content-grid__locale-dropdown {
   width: 100%;
 }
 
@@ -580,18 +596,25 @@ watch(() => props.resourceId, () => {
   gap: 0.5rem;
 }
 
-.content-grid__hint {
-  color: var(--p-text-muted-color, #6b7280);
-  font-size: 0.875rem;
+.content-grid__active-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-@media (max-width: 480px) {
-  .content-grid__form-grid {
-    grid-template-columns: 1fr;
-  }
+.content-grid__form {
+  padding: 1rem;
+}
 
-  .content-grid__field--full {
-    grid-column: 1;
-  }
+.content-grid__loading,
+.content-grid__empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--loc-text-muted, #64748b);
+}
+
+.content-form-tabs {
+  margin-bottom: 0.25rem;
 }
 </style>

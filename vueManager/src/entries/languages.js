@@ -17,6 +17,9 @@ import {
   Textarea,
   Dialog,
   Checkbox,
+  Tag,
+  IconField,
+  InputIcon,
 } from 'primevue'
 
 import LanguagesGrid from '../components/LanguagesGrid.vue'
@@ -31,6 +34,9 @@ const components = {
   Textarea,
   Dialog,
   Checkbox,
+  Tag,
+  IconField,
+  InputIcon,
 }
 
 const container = document.getElementById('localizator3-languages-app')
