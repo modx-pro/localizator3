@@ -1,103 +1,83 @@
 <?php
 
-/** @var modX $modx */
-/** @var array $sources */
-
-$settings = array();
-
-$tmp = array(
-    'default_language' => array(
+return [
+    'default_language' => [
         'xtype' => 'textfield',
         'area' => 'localizator3_main',
-    ),
-    'check_permissions' => array(
+    ],
+    'check_permissions' => [
         'xtype' => 'combo-boolean',
         'value' => false,
         'area' => 'localizator3_main',
-    ),
-    'disabled_templates' => array(
+    ],
+    'disabled_templates' => [
         'xtype' => 'textfield',
         'value' => '',
         'area' => 'localizator3_main',
-    ),
-    '404_if_no_localization' => array(
+    ],
+    '404_if_no_localization' => [
         'xtype' => 'combo-boolean',
         'value' => false,
         'area' => 'localizator3_main',
-    ),
-    'auto_detect_language' => array(
+    ],
+    'auto_detect_language' => [
         'xtype' => 'combo-boolean',
         'value' => false,
         'area' => 'localizator3_main',
-    ),
-
-    // translator
-    'default_translator' => array(
+    ],
+    'debug_log' => [
+        'xtype' => 'combo-boolean',
+        'value' => false,
+        'area' => 'localizator3_main',
+    ],
+    'default_translator' => [
         'xtype' => 'textfield',
         'value' => 'Yandex',
         'area' => 'localizator3_translator',
-    ),
-    'key_yandex' => array(
+    ],
+    'key_yandex' => [
         'xtype' => 'textfield',
         'area' => 'localizator3_translator',
-    ),
-    'key_google' => array(
+    ],
+    'key_google' => [
         'xtype' => 'textfield',
         'area' => 'localizator3_translator',
-    ),
-    'key_deepl' => array(
+    ],
+    'key_deepl' => [
         'xtype' => 'textfield',
         'area' => 'localizator3_translator',
-    ),
-    'libretranslate_url' => array(
+    ],
+    'libretranslate_url' => [
         'xtype' => 'textfield',
         'value' => 'http://localhost:5000',
         'area' => 'localizator3_translator',
-    ),
-    'key_libretranslate' => array(
+    ],
+    'key_libretranslate' => [
         'xtype' => 'textfield',
         'area' => 'localizator3_translator',
-    ),
-    'mymemory_email' => array(
+    ],
+    'mymemory_email' => [
         'xtype' => 'textfield',
         'area' => 'localizator3_translator',
-    ),
-    'translate_translated' => array(
+    ],
+    'translate_translated' => [
         'xtype' => 'combo-boolean',
         'value' => false,
         'area' => 'localizator3_translator',
-    ),
-    'translate_translated_fields' => array(
+    ],
+    'translate_translated_fields' => [
         'xtype' => 'combo-boolean',
         'value' => false,
         'area' => 'localizator3_translator',
-    ),
-    'translate_fields' => array(
+    ],
+    'translate_fields' => [
         'xtype' => 'textfield',
         'value' => 'pagetitle,longtitle,menutitle,seotitle,keywords,introtext,description,content',
         'area' => 'localizator3_translator',
-    ),
-
-    'debug_log' => array(
-        'xtype' => 'combo-boolean',
-        'value' => false,
+    ],
+    'tv_fields' => [
+        'xtype' => 'textfield',
+        'value' => '',
         'area' => 'localizator3_main',
-    ),
-);
-
-foreach ($tmp as $k => $v) {
-    /** @var modSystemSetting $setting */
-    $setting = $modx->newObject('modSystemSetting');
-    $setting->fromArray(array_merge(
-        array(
-            'key' => 'localizator3_' . $k,
-            'namespace' => PKG_NAME_LOWER,
-        ),
-        $v
-    ), '', true, true);
-
-    $settings[] = $setting;
-}
-unset($tmp);
-
-return $settings;
+    ],
+];

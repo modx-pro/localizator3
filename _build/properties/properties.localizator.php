@@ -21,8 +21,8 @@ foreach ($tmp as $k => $v) {
     $properties[] = array_merge(
         array(
             'name' => $k,
-            'desc' => PKG_NAME_LOWER . '_prop_' . $k,
-            'lexicon' => PKG_NAME_LOWER . ':properties',
+            'desc' => 'localizator3_prop_' . $k,
+            'lexicon' => 'localizator3:properties',
         ),
         $v
     );

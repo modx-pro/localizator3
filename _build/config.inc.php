@@ -1,23 +1,31 @@
 <?php
 
 if (!defined('MODX_CORE_PATH')) {
-    $path = dirname(__FILE__);
-    while (!file_exists($path . '/core/config/config.inc.php') && (strlen($path) > 1)) {
-        $path = dirname($path);
+    if (getenv('MODX_CORE_PATH')) {
+        define('MODX_CORE_PATH', rtrim(getenv('MODX_CORE_PATH'), '/') . '/');
+    } else {
+        $path = dirname(__FILE__);
+        while (!file_exists($path . '/core/config/config.inc.php') && strlen($path) > 1) {
+            $path = dirname($path);
+        }
+        if (file_exists($path . '/core/config/config.inc.php')) {
+            define('MODX_CORE_PATH', $path . '/core/');
+        } else {
+            $dir = __DIR__;
+            while ($dir && !file_exists($dir . '/config.core.php')) {
+                $parent = dirname($dir);
+                if ($parent === $dir) {
+                    break;
+                }
+                $dir = $parent;
+            }
+            if (file_exists($dir . '/config.core.php')) {
+                require_once $dir . '/config.core.php';
+            } else {
+                die('Could not find MODX. Set MODX_CORE_PATH or place the component in the MODX tree.');
+            }
+        }
     }
-    define('MODX_CORE_PATH', $path . '/core/');
-}
-if (!defined('MODX_BASE_PATH')) {
-    define('MODX_BASE_PATH', dirname(MODX_CORE_PATH) . '/');
-}
-if (!defined('MODX_BASE_URL')) {
-    define('MODX_BASE_URL', '/');
-}
-if (!defined('MODX_ASSETS_PATH')) {
-    define('MODX_ASSETS_PATH', MODX_BASE_PATH . 'assets/');
-}
-if (!defined('MODX_ASSETS_URL')) {
-    define('MODX_ASSETS_URL', MODX_BASE_URL . 'assets/');
 }
 
 return [
@@ -25,46 +33,23 @@ return [
     'name_lower' => 'localizator3',
     'version' => '1.0.8',
     'release' => 'beta',
-    // Install package to site right after build
     'install' => true,
-    // Which elements should be updated on package upgrade
     'update' => [
         'chunks' => false,
         'menus' => true,
-        'permission' => false,
         'plugins' => true,
-        'policies' => false,
-        'policy_templates' => true,
         'settings' => false,
         'snippets' => true,
-        'events' => true,
+        'policies' => false,
+        'policy_templates' => true,
     ],
-    // Which elements should be static by default
     'static' => [
         'plugins' => false,
         'snippets' => false,
         'chunks' => false,
     ],
-    // Resolvers to add (in order)
-    'resolvers' => [
-        'vuetools',        // VueTools dependency check (must be first)
-        'extension',
-        'setup.modx.com',
-        'setup',
-        'cleanup_legacy_model',
-        'migrations',
-        'weblink',
-        'policy',
-        'pdotools_setting',
-        'chunks',
-        'upgrade',
-        'metrics',
-    ],
-    // Chunk names for setup options
-    'chunks' => ['languages.tpl', 'languages.dropdown.tpl'],
-    // Log settings
+    'properties_lexicon' => 'localizator3:properties',
     'log_level' => !empty($_REQUEST['download']) ? 0 : 3,
-    'log_target' => php_sapi_name() === 'cli' ? 'ECHO' : 'HTML',
-    // Download transport.zip after build
+    'log_target' => getenv('BUILD_LOG') ? getenv('BUILD_LOG') : (php_sapi_name() === 'cli' ? 'ECHO' : 'HTML'),
     'download' => !empty($_REQUEST['download']),
 ];
