@@ -6,6 +6,9 @@
  * Vue-UI (languages.min.js) — lean entry, Vue-стек даёт VueTools ≥1.1.2-pl
  * через Import Map. Без VueTools показывается lexicon-сообщение (ExtJS grid удалён).
  */
+
+require_once dirname(__DIR__) . '/Localizator3VueControllerTrait.php';
+
 class Localizator3homeManagerController extends modExtraManagerController
 {
     use Localizator3VueControllerTrait;
@@ -25,11 +28,6 @@ class Localizator3homeManagerController extends modExtraManagerController
             $this->modx->getOption('core_path') . 'components/localizator3/'
         ) . 'model/localizator3/';
         $this->localizator = $this->modx->getService('localizator3', 'localizator', $path);
-        require_once $this->modx->getOption(
-            'localizator3_core_path',
-            null,
-            $this->modx->getOption('core_path') . 'components/localizator3/'
-        ) . 'Localizator3VueControllerTrait.php';
         parent::initialize();
     }
 
