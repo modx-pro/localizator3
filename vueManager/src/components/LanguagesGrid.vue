@@ -3,13 +3,13 @@
     <Toast />
     <ConfirmDialog />
 
-    <div class="flex justify-content-between align-items-center mb-3">
-      <h2 class="m-0">{{ lexicon.localizator_languages || 'Localization' }}</h2>
-      <div class="flex gap-2">
+    <div class="languages-grid__header">
+      <h2 class="languages-grid__title">{{ lexicon.localizator_languages || 'Localization' }}</h2>
+      <div class="languages-grid__header-actions">
         <InputText
           v-model="searchQuery"
           :placeholder="lexicon.localizator_grid_search || 'Search'"
-          class="w-16rem"
+          class="languages-grid__search"
           @keyup.enter="loadLanguages"
         />
         <Button
@@ -41,14 +41,14 @@
       <Column field="active" :header="lexicon.localizator_active || 'Active'" sortable>
         <template #body="{ data }">
           <i
-            :class="data.active ? 'pi pi-check text-green-500' : 'pi pi-times text-gray-400'"
+            :class="data.active ? 'pi pi-check languages-grid__status--active' : 'pi pi-times languages-grid__status--inactive'"
             :title="data.active ? lexicon.localizator_item_enable : lexicon.localizator_item_disable"
           />
         </template>
       </Column>
       <Column :header="lexicon.localizator_grid_actions || 'Actions'" style="width: 10rem">
         <template #body="{ data }">
-          <div class="flex gap-1">
+          <div class="languages-grid__actions">
             <Button
               icon="pi pi-pencil"
               severity="secondary"
@@ -101,34 +101,34 @@
       appendTo="self"
       @hide="resetForm"
     >
-      <form @submit.prevent="submitForm" class="languages-form flex flex-column gap-3">
+      <form @submit.prevent="submitForm" class="languages-form languages-form--vertical">
         <div class="languages-form-grid">
           <div class="field-group">
             <label for="key" class="field-label">{{ lexicon.localizator_language_key || 'Key' }} *</label>
-            <InputText id="key" v-model="form.key" required :disabled="isEdit" class="w-full" />
+            <InputText id="key" v-model="form.key" required :disabled="isEdit" class="languages-form__input" />
           </div>
           <div class="field-group">
             <label for="name" class="field-label">{{ lexicon.localizator_language_name || 'Name' }}</label>
-            <InputText id="name" v-model="form.name" class="w-full" />
+            <InputText id="name" v-model="form.name" class="languages-form__input" />
           </div>
           <div class="field-group field-group-full">
             <label for="http_host" class="field-label">{{ lexicon.localizator_language_http_host || 'HTTP Host' }} *</label>
-            <InputText id="http_host" v-model="form.http_host" required :disabled="isEdit" class="w-full" />
+            <InputText id="http_host" v-model="form.http_host" required :disabled="isEdit" class="languages-form__input" />
           </div>
           <div class="field-group">
             <label for="cultureKey" class="field-label">{{ lexicon.localizator_language_cultureKey || 'Culture' }}</label>
-            <InputText id="cultureKey" v-model="form.cultureKey" class="w-full" />
+            <InputText id="cultureKey" v-model="form.cultureKey" class="languages-form__input" />
           </div>
           <div class="field-group field-group-full">
             <label for="description" class="field-label">{{ lexicon.localizator_language_description || 'Description' }}</label>
-            <Textarea id="description" v-model="form.description" rows="3" class="w-full" auto-resize />
+            <Textarea id="description" v-model="form.description" rows="3" class="languages-form__input" />
           </div>
         </div>
-        <div class="flex align-items-center gap-2">
+        <div class="languages-form__checkbox">
           <Checkbox id="active" v-model="form.active" :binary="true" input-id="active" />
-          <label for="active" class="field-label mb-0">{{ lexicon.localizator_active || 'Active' }}</label>
+          <label for="active" class="languages-form__checkbox-label">{{ lexicon.localizator_active || 'Active' }}</label>
         </div>
-        <div class="flex justify-content-end gap-2 pt-2 border-top-1 surface-border">
+        <div class="languages-form__footer">
           <Button type="button" :label="lexicon.localizator_cancel || 'Cancel'" severity="secondary" @click="dialogVisible = false" />
           <Button type="submit" :label="isEdit ? (lexicon.localizator_item_update || 'Update') : (lexicon.localizator_item_create || 'Create')" />
         </div>
@@ -138,7 +138,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 
@@ -365,6 +365,51 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Grid header */
+.languages-grid__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.languages-grid__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.languages-grid__header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.languages-grid__search {
+  width: 16rem;
+}
+
+/* Status icons */
+.languages-grid__status--active {
+  color: #22c55e;
+}
+
+.languages-grid__status--inactive {
+  color: #9ca3af;
+}
+
+/* Actions */
+.languages-grid__actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+/* Form layout */
+.languages-form--vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .languages-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -386,7 +431,46 @@ onMounted(() => {
   min-width: 0;
 }
 
+.languages-form__input {
+  width: 100%;
+}
+
+/* Checkbox */
+.languages-form__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.languages-form__checkbox-label {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Form footer */
+.languages-form__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--p-surface-200, #e5e7eb);
+}
+
 @media (max-width: 480px) {
+  .languages-grid__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .languages-grid__header-actions {
+    width: 100%;
+  }
+
+  .languages-grid__search {
+    width: 100%;
+  }
+
   .languages-form-grid {
     grid-template-columns: 1fr;
   }

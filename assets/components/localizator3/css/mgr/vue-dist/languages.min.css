@@ -2,28 +2,102 @@
   color-scheme: light;
 }
 
-.vueApp .languages-form-grid[data-v-e5dc6ba6] {
+/* Grid header */
+.vueApp .languages-grid__header[data-v-ce551790] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+.vueApp .languages-grid__title[data-v-ce551790] {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.vueApp .languages-grid__header-actions[data-v-ce551790] {
+  display: flex;
+  gap: 0.5rem;
+}
+.vueApp .languages-grid__search[data-v-ce551790] {
+  width: 16rem;
+}
+
+/* Status icons */
+.vueApp .languages-grid__status--active[data-v-ce551790] {
+  color: #22c55e;
+}
+.vueApp .languages-grid__status--inactive[data-v-ce551790] {
+  color: #9ca3af;
+}
+
+/* Actions */
+.vueApp .languages-grid__actions[data-v-ce551790] {
+  display: flex;
+  gap: 0.25rem;
+}
+
+/* Form layout */
+.vueApp .languages-form--vertical[data-v-ce551790] {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.vueApp .languages-form-grid[data-v-ce551790] {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem 1.5rem;
 }
-.vueApp .field-group[data-v-e5dc6ba6] {
+.vueApp .field-group[data-v-ce551790] {
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
 }
-.vueApp .field-group-full[data-v-e5dc6ba6] {
+.vueApp .field-group-full[data-v-ce551790] {
   grid-column: 1 / -1;
 }
-.vueApp .field-label[data-v-e5dc6ba6] {
+.vueApp .field-label[data-v-ce551790] {
   font-weight: 500;
   min-width: 0;
 }
+.vueApp .languages-form__input[data-v-ce551790] {
+  width: 100%;
+}
+
+/* Checkbox */
+.vueApp .languages-form__checkbox[data-v-ce551790] {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.vueApp .languages-form__checkbox-label[data-v-ce551790] {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Form footer */
+.vueApp .languages-form__footer[data-v-ce551790] {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--p-surface-200, #e5e7eb);
+}
 @media (max-width: 480px) {
-.vueApp .languages-form-grid[data-v-e5dc6ba6] {
+.vueApp .languages-grid__header[data-v-ce551790] {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+.vueApp .languages-grid__header-actions[data-v-ce551790] {
+    width: 100%;
+}
+.vueApp .languages-grid__search[data-v-ce551790] {
+    width: 100%;
+}
+.vueApp .languages-form-grid[data-v-ce551790] {
     grid-template-columns: 1fr;
 }
-.vueApp .field-group-full[data-v-e5dc6ba6] {
+.vueApp .field-group-full[data-v-ce551790] {
     grid-column: 1;
 }
 }

@@ -47,7 +47,7 @@
       <Column field="active" :header="lexicon.localizator_active || 'Active'" sortable>
         <template #body="{ data }">
           <i
-            :class="data.active ? 'pi pi-check text-green-500' : 'pi pi-times text-gray-400'"
+            :class="data.active ? 'pi pi-check content-grid__status--active' : 'pi pi-times content-grid__status--inactive'"
             :title="data.active ? lexicon.localizator_item_disable : lexicon.localizator_item_enable"
           />
         </template>
@@ -108,7 +108,7 @@
       appendTo="self"
       @hide="resetForm"
     >
-      <form v-if="formConfig" @submit.prevent="submitForm" class="flex flex-column gap-3">
+      <form v-if="formConfig" @submit.prevent="submitForm" class="content-grid__form">
         <Tabs v-model:value="activeTab" class="content-form-tabs">
           <TabList>
             <Tab v-for="tab in visibleTabs" :key="tab.id" :value="tab.id">
@@ -133,7 +133,7 @@
                   :id="'field-' + field.field"
                   v-model="form[field.field]"
                   :required="field.required"
-                  class="w-full"
+                  class="content-grid__input"
                 />
                 <Textarea
                   v-else-if="field.type === 'textarea' || field.type === 'richtext' || field.type === 'tv'"
@@ -141,9 +141,9 @@
                   v-model="form[tvFieldName(field)]"
                   :required="field.required"
                   :rows="field.field === 'content' ? 8 : 4"
-                  class="w-full"
+                  class="content-grid__input"
                 />
-                <div v-else-if="field.field === 'key'" class="flex flex-column gap-2">
+                <div v-else-if="field.field === 'key'" class="content-grid__select-group">
                   <Select
                     :id="'field-' + field.field"
                     v-model="form[field.field]"
@@ -153,9 +153,9 @@
                     :placeholder="field.caption"
                     :disabled="isEdit"
                     :empty-message="emptyLanguagesMessage"
-                    class="w-full"
+                    class="content-grid__input"
                   />
-                  <small v-if="!isEdit && languages.length === 0" class="text-color-secondary">
+                  <small v-if="!isEdit && languages.length === 0" class="content-grid__hint">
                     {{ emptyLanguagesMessage }}
                   </small>
                 </div>
@@ -553,6 +553,37 @@ watch(() => props.resourceId, () => {
 .content-grid__actions {
   display: flex;
   gap: 0.25rem;
+}
+
+/* Status icons */
+.content-grid__status--active {
+  color: #22c55e;
+}
+
+.content-grid__status--inactive {
+  color: #9ca3af;
+}
+
+/* Form layout */
+.content-grid__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.content-grid__input {
+  width: 100%;
+}
+
+.content-grid__select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.content-grid__hint {
+  color: var(--p-text-muted-color, #6b7280);
+  font-size: 0.875rem;
 }
 
 @media (max-width: 480px) {
