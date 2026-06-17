@@ -106,3 +106,6 @@ $_lang['introtext'] = 'Аннотация';
 $_lang['document'] = 'Документ';
 $_lang['tvs'] = 'Дополнительные поля';
 $_lang['uncategorized'] = 'Без категории';
+
+// VueTools dependency
+$_lang['localizator3_vuetools_required'] = 'Для работы Vue-интерфейса требуется пакет <strong>VueTools ≥ 1.1.2-pl</strong>. Установите его через <a href="https://modstore.pro/packages/utilities/vuetools" target="_blank">modstore.pro</a>.';

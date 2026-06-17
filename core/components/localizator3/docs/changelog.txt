@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8-beta] - 2026-06-17
+
+### Added
+- VueTools ≥1.1.2-pl integration: Vue-стек (Vue 3, Pinia, PrimeVue 4) через Import Map.
+- Resolver `vuetools`: автоматическая проверка и установка зависимости VueTools.
+- Trait `Localizator3VueControllerTrait` с методами `requireVueTools()` и `addVueModule()`.
+- Composables: `useConnector`, `useLexicon`, `useDataTable`, `useGridCrud`, `useConfirmAction`.
+- Shared components: `FormFieldRenderer.vue`, `GridActionsColumn.vue`.
+- Dialog components: `ContentFormDialog.vue`, `LanguageFormDialog.vue` для декомпозиции гридов.
+- Lexicon entry `localizator3_vuetools_required` для сообщения об отсутствии VueTools.
+
+### Changed
+- Vite config: `external` для `vue`, `pinia`, `primevue`, `@vuetools/*` — lean bundles (~14KB vs ~800KB).
+- `createLocalizatorApp.js`: единый bootstrap для Vue-UI без Pinia (stores пока не используются).
+- Удалён ExtJS fallback для grid-интерфейсов — теперь только Vue UI с обязательным VueTools.
+
+### Fixed
+- CSS: `index.min.css` → `content.min.css` в `OnDocFormPrerender.php`.
+- Build: `languages.min.js` теперь генерируется при сборке.
+- Vite: `inlineDynamicImports: true` — один файл на entry без code-split chunk'ов.
+
 ## [1.0.7-beta] - 2026-06-17
 
 ### Added

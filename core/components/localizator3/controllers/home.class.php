@@ -3,9 +3,13 @@
 /**
  * The home manager controller for localizator.
  *
+ * Vue-UI (languages.min.js) — lean entry, Vue-стек даёт VueTools ≥1.1.2-pl
+ * через Import Map. Без VueTools показывается lexicon-сообщение (ExtJS grid удалён).
  */
 class Localizator3homeManagerController extends modExtraManagerController
 {
+    use Localizator3VueControllerTrait;
+
     /** @var localizator $localizator */
     public $localizator;
 
@@ -21,6 +25,11 @@ class Localizator3homeManagerController extends modExtraManagerController
             $this->modx->getOption('core_path') . 'components/localizator3/'
         ) . 'model/localizator3/';
         $this->localizator = $this->modx->getService('localizator3', 'localizator', $path);
+        require_once $this->modx->getOption(
+            'localizator3_core_path',
+            null,
+            $this->modx->getOption('core_path') . 'components/localizator3/'
+        ) . 'Localizator3VueControllerTrait.php';
         parent::initialize();
     }
 
@@ -69,7 +78,7 @@ class Localizator3homeManagerController extends modExtraManagerController
             'localizator_item_remove', 'localizator_items_remove', 'localizator_items_remove_confirm',
             'localizator_cancel', 'localizator_success', 'localizator_error', 'localizator_save',
             'localizator_language_updated', 'localizator_language_created', 'localizator_deleted',
-            'localizator_enabled', 'localizator_disabled',
+            'localizator_enabled', 'localizator_disabled', 'localizator3_vuetools_required',
         );
         $lexicon = array();
         foreach ($lexiconKeys as $k) {
@@ -77,39 +86,35 @@ class Localizator3homeManagerController extends modExtraManagerController
         }
         $this->localizator->config['lexicon'] = $lexicon;
 
-        $vueDistUrl = $this->localizator->config['jsUrl'] . 'mgr/vue-dist/';
         $assetsPath = $this->modx->getOption(
             'localizator3_assets_path',
             null,
             $this->modx->getOption('assets_path') . 'components/localizator3/'
         );
         $vueLanguagesExists = is_file($assetsPath . 'js/mgr/vue-dist/languages.min.js');
+        $vueToolsOk = $this->requireVueTools();
 
-        if ($vueLanguagesExists) {
+        if ($vueLanguagesExists && $vueToolsOk) {
             $modAuth = $this->modx->user ? $this->modx->user->getUserToken('mgr') : '';
             $this->localizator->config['modAuth'] = $modAuth;
             $this->addHtml('<script type="text/javascript">
             localizator = { config: ' . json_encode($this->localizator->config) . ' };
             localizator.config.connector_url = "' . $this->localizator->config['connectorUrl'] . '";
             </script>');
+            // Component-scoped CSS entry; тема/PrimeIcons даёт VueTools (vuetools.css).
+            $this->addCss($this->localizator->versionedAsset('css/mgr/vue-dist/languages.min.css'));
+            // Lean ES-модуль: vue/pinia/primevue резолвятся через Import Map VueTools.
             $langJsUrl = $this->localizator->versionedAsset('js/mgr/vue-dist/languages.min.js');
-            $this->addHtml('<script type="module" src="' . htmlspecialchars($langJsUrl) . '"></script>');
+            $this->addVueModule($langJsUrl);
         } else {
-            $this->addJavascript($this->localizator->config['jsUrl'] . 'mgr/localizator.js');
-            $this->addJavascript($this->localizator->config['jsUrl'] . 'mgr/misc/utils.js');
-            $this->addJavascript($this->localizator->config['jsUrl'] . 'mgr/misc/combo.js');
-            $this->addJavascript($this->localizator->config['jsUrl'] . 'mgr/widgets/languages.grid.js');
-            $this->addJavascript($this->localizator->config['jsUrl'] . 'mgr/widgets/lexicon.grid.js');
-            $this->addJavascript($this->localizator->config['jsUrl'] . 'mgr/widgets/home.panel.js');
-            $this->addJavascript($this->localizator->config['jsUrl'] . 'mgr/sections/home.js');
+            // VueTools — обязательная зависимость. Без неё (или без собранного бандла)
+            // показываем понятное сообщение вместо удалённого ExtJS grid.
             $this->addHtml('<script type="text/javascript">
-            localizator.config = ' . json_encode($this->localizator->config) . ';
-            localizator.config.connector_url = "' . $this->localizator->config['connectorUrl'] . '";
-            Ext.onReady(function() {
-                MODx.load({ xtype: "localizator-page-home"});
+            document.addEventListener("DOMContentLoaded", function() {
+                var el = document.getElementById("localizator3-languages-app");
+                if (el) { el.innerHTML = "<p style=\"padding:1rem\">" + ' . json_encode($this->modx->lexicon('localizator3_vuetools_required')) . ' + "</p>"; }
             });
-            </script>
-            ');
+            </script>');
         }
     }
 
@@ -119,12 +124,7 @@ class Localizator3homeManagerController extends modExtraManagerController
      */
     public function getTemplateFile()
     {
-        $assetsPath = $this->modx->getOption(
-            'localizator3_assets_path',
-            null,
-            $this->modx->getOption('assets_path') . 'components/localizator3/'
-        );
-        $vueExists = is_file($assetsPath . 'js/mgr/vue-dist/languages.min.js');
-        return $this->localizator->config['templatesPath'] . ($vueExists ? 'home_vue.tpl' : 'home.tpl');
+        // Шаблон единственный — Vue-контейнер. ExtJS-вариант (home.tpl) удалён.
+        return $this->localizator->config['templatesPath'] . 'home_vue.tpl';
     }
 }

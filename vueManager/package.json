@@ -5,21 +5,21 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "rimraf ../assets/components/localizator3/js/mgr/vue-dist/*.min.js ../assets/components/localizator3/css/mgr/vue-dist/*.min.css",
-    "build": "vite build",
+    "prebuild": "rimraf \"../assets/components/localizator3/js/mgr/vue-dist/*\" \"../assets/components/localizator3/css/mgr/vue-dist/*\"",
+    "build:content": "BUILD_ENTRY=content vite build",
+    "build:languages": "BUILD_ENTRY=languages vite build",
+    "build": "npm run build:content && npm run build:languages",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "@primevue/themes": "^4.3.1",
-    "pinia": "^3.0.1",
-    "primeicons": "^7.0.0",
-    "primevue": "^4.3.1",
-    "vue": "^3.5.13"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@primevue/themes": "^4.3.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "postcss-prefix-selector": "^2.1.1",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.3.1",
     "rimraf": "^3.0.2",
-    "vite": "^6.4.1"
+    "vite": "^6.4.1",
+    "vue": "^3.5.13"
   }
 }

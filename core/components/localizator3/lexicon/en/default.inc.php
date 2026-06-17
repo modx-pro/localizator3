@@ -106,3 +106,6 @@ $_lang['introtext'] = 'Summary';
 $_lang['document'] = 'Document';
 $_lang['tvs'] = 'Template Variables';
 $_lang['uncategorized'] = 'Uncategorized';
+
+// VueTools dependency
+$_lang['localizator3_vuetools_required'] = 'The <strong>VueTools ≥ 1.1.2-pl</strong> package is required for the Vue interface. Install it from <a href="https://modstore.pro/packages/utilities/vuetools" target="_blank">modstore.pro</a>.';

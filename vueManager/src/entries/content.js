@@ -1,9 +1,15 @@
+/**
+ * Entry: вкладка локализации ресурса (ContentGrid).
+ * Vue-стек предоставляется VueTools через Import Map, поэтому здесь только
+ * регистрация нужных PrimeVue-компонентов и монтирование корневого компонента.
+ */
 import '../base.css'
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import PrimeVue from 'primevue/config'
-import Aura from '@primevue/themes/aura'
-import 'primeicons/primeicons.css'
+
+import { createLocalizatorApp } from '../app/createLocalizatorApp.js'
+import ConfirmationService from 'primevue/confirmationservice'
+import ToastService from 'primevue/toastservice'
+import Toast from 'primevue/toast'
+import ConfirmDialog from 'primevue/confirmdialog'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
@@ -17,12 +23,26 @@ import TabList from 'primevue/tablist'
 import Tab from 'primevue/tab'
 import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
-import Toast from 'primevue/toast'
-import ConfirmDialog from 'primevue/confirmdialog'
-import ConfirmationService from 'primevue/confirmationservice'
-import ToastService from 'primevue/toastservice'
 
 import ContentGrid from '../components/ContentGrid.vue'
+
+const components = {
+  Toast,
+  ConfirmDialog,
+  DataTable,
+  Column,
+  Button,
+  InputText,
+  InputNumber,
+  Textarea,
+  Dialog,
+  Select,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+}
 
 function mountContentApp(container) {
   const resourceId = parseInt(container.dataset.resourceId || '0', 10)
@@ -30,43 +50,13 @@ function mountContentApp(container) {
   const modAuth = container.dataset.modAuth || (typeof localizator !== 'undefined' && localizator?.config?.modAuth) || (typeof MODx !== 'undefined' && MODx?.config?.modAuth) || ''
   const lexicon = typeof localizator !== 'undefined' && localizator?.config?.lexicon ? localizator.config.lexicon : {}
 
-  const app = createApp(ContentGrid, {
-    resourceId,
-    connectorUrl,
-    modAuth,
-    lexicon,
-  })
-  app.use(createPinia())
-  app.use(PrimeVue, {
-    theme: {
-      preset: Aura,
-      options: {
-        darkModeSelector: false,
-        cssLayer: false,
-      },
-    },
-    ripple: false,
-  })
-
+  const app = createLocalizatorApp(
+    ContentGrid,
+    { resourceId, connectorUrl, modAuth, lexicon },
+    { components }
+  )
   app.use(ConfirmationService)
   app.use(ToastService)
-
-  app.component('DataTable', DataTable)
-  app.component('Column', Column)
-  app.component('Button', Button)
-  app.component('InputText', InputText)
-  app.component('InputNumber', InputNumber)
-  app.component('Textarea', Textarea)
-  app.component('Dialog', Dialog)
-  app.component('Select', Select)
-  app.component('Tabs', Tabs)
-  app.component('TabList', TabList)
-  app.component('Tab', Tab)
-  app.component('TabPanels', TabPanels)
-  app.component('TabPanel', TabPanel)
-  app.component('Toast', Toast)
-  app.component('ConfirmDialog', ConfirmDialog)
-
   app.mount(container)
 }
 
@@ -76,6 +66,7 @@ const container = document.getElementById('localizator3-content-app')
 if (container) {
   mountContentApp(container)
 } else {
+  // Вкладка добавляется в ExtJS-табы асинхронно — ждём появления контейнера.
   const observer = new MutationObserver(() => {
     const el = document.getElementById('localizator3-content-app')
     if (el) {

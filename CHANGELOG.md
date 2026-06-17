@@ -13,6 +13,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.0.8-beta]
+
+### Added
+- VueTools ≥1.1.2-pl — обязательная зависимость для Vue-UI (Import Map для Vue 3, Pinia, PrimeVue 4)
+- Resolver `vuetools` — автоматическая проверка и установка VueTools
+- Trait `Localizator3VueControllerTrait` с `requireVueTools()` и `addVueModule()`
+- Composables: `useConnector`, `useLexicon`, `useDataTable`, `useGridCrud`, `useConfirmAction`
+- Shared компоненты: `FormFieldRenderer.vue`, `GridActionsColumn.vue`
+- Диалоги форм: `ContentFormDialog.vue`, `LanguageFormDialog.vue`
+
+### Changed
+- Vite config: `external` для Vue-стека — lean bundles (~14KB вместо ~800KB)
+- `createLocalizatorApp.js` — единый bootstrap без мёртвых зависимостей (Pinia)
+- Удалён ExtJS fallback — теперь только Vue UI
+
+### Fixed
+- CSS: `index.min.css` → `content.min.css`
+- Build: генерация `languages.min.js`
+- Vite: `inlineDynamicImports: true`
+
+---
+
 ## [1.0.7-beta]
 
 ### Changed

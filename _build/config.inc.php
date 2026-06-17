@@ -23,7 +23,7 @@ if (!defined('MODX_ASSETS_URL')) {
 return [
     'name' => 'Localizator3',
     'name_lower' => 'localizator3',
-    'version' => '1.0.7',
+    'version' => '1.0.8',
     'release' => 'beta',
     // Install package to site right after build
     'install' => true,
@@ -47,6 +47,7 @@ return [
     ],
     // Resolvers to add (in order)
     'resolvers' => [
+        'vuetools',        // VueTools dependency check (must be first)
         'extension',
         'setup.modx.com',
         'setup',

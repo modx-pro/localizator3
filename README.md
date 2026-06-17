@@ -4,16 +4,21 @@
 
 **Только для MODX 3** — для MODX 2.x используйте [Localizator](https://github.com/modx-pro/localizator).
 
-**Текущая версия:** 1.0.7-beta
+**Текущая версия:** 1.0.8-beta
 
 ---
 
 ## Требования
 
-- MODX Revolution 3.0+
-- PHP 8.2+ (компонент: PHP 8.1+)
-- pdoTools (устанавливается автоматически)
-- Node.js 18+ — только для сборки Vue UI из исходников
+| Компонент | Версия | Обязательность |
+|-----------|--------|----------------|
+| MODX Revolution | 3.0+ | Да |
+| PHP | 8.2+ (компонент: 8.1+) | Да |
+| **VueTools** | **≥1.1.2-pl** | **Да** (предоставляет Vue-стек через Import Map) |
+| pdoTools | актуальная | Да (ставится с пакетом) |
+| Node.js | 18+ | Только для сборки Vue UI |
+
+VueTools устанавливается автоматически при наличии ModStore провайдера или вручную с [modstore.pro](https://modstore.pro/packages/utilities/vuetools).
 
 ---
 

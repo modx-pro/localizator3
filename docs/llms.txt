@@ -1,8 +1,8 @@
 # Localizator3
-> Мультиязычность для MODX Revolution 3. Локализация ресурсов, TV, товаров miniShop3 и опций. Версия: 1.0.7-beta.
+> Мультиязычность для MODX Revolution 3. Локализация ресурсов, TV, товаров miniShop3 и опций. Версия: 1.0.8-beta.
 
 ## Requirements
-- MODX 3.0+, PHP 8.2+ (component: 8.1+), pdoTools, Node.js 18+ (build only)
+- MODX 3.0+, PHP 8.2+ (component: 8.1+), pdoTools, VueTools ≥1.1.2-pl, Node.js 18+ (build only)
 
 ## Core Files
 - [core/components/localizator3/localizator.class.php]: Основной сервис (findLocalization, translate, versionedAsset, getLocalizedOption*)
@@ -10,9 +10,11 @@
 - [core/components/localizator3/processors/mgr/]: Процессоры API (language/*, content/*, fields, lexicon/*)
 - [core/components/localizator3/elements/snippets/]: Сниппеты (localizator→getLocalizedResources, getlocales→getLanguageList, getlocalizedfield, makelocalizedurl, getlocalizedcanonical, getlocalizedsitemap)
 - [core/components/localizator3/elements/plugins/handlers/]: Обработчики событий (OnMODXInit, OnHandleRequest, OnDocFormPrerender, OnDocFormSave, OnLoadWebDocument, OnEmptyTrash, OnPageNotFound, OnTVFormPrerender, pdoToolsOnFenomInit, mseOnBeforeIndex, mseOnGetWorkFields)
-- [vueManager/src/components/]: Vue 3 + PrimeVue 4 UI (ContentGrid.vue, LanguagesGrid.vue)
-- [vueManager/src/entries/]: Entry points (content.js, languages.js)
-- [assets/components/localizator3/js/mgr/vue-dist/]: Собранные бандлы Vue UI
+- [vueManager/src/components/]: Vue 3 + PrimeVue 4 UI (ContentGrid.vue, LanguagesGrid.vue, ContentFormDialog.vue, LanguageFormDialog.vue)
+- [vueManager/src/composables/]: Vue 3 composables (useConnector, useLexicon, useDataTable, useGridCrud, useConfirmAction)
+- [vueManager/src/app/]: createLocalizatorApp.js — единый bootstrap
+- [vueManager/src/entries/]: Lean entry points (content.js, languages.js)
+- [assets/components/localizator3/js/mgr/vue-dist/]: Собранные lean-бандлы Vue UI (~14KB)
 - [_build/build.php]: Сборка transport-пакета (основной скрипт)
 - [_build/]: Резолверы, миграции Phinx
 - [docs/]: Документация
@@ -30,6 +32,7 @@
 OnBuildLocalizationTabs, OnBeforeFindLocalization, OnFindLocalization, OnFindLocalizatorResource, OnToggleLocalizatorLanguage, OnBeforeSaveLocalization, OnSaveLocalization, OnBeforeSaveLocalizatorLanguage, OnSaveLocalizatorLanguage, OnHasLocalizatorError404
 
 ## Dependencies
+- VueTools ≥1.1.2-pl (обязательно): Vue-стек (vue, pinia, primevue) через Import Map
 - pdoTools (обязательно): pdoFetch.class = pdotools.pdofetchlocalizator3
 - miniShop3 (опционально): локализация товаров msProduct и опций msOption
 - mSearch (опционально): индексация локализованных полей (mseOnBeforeIndex, mseOnGetWorkFields)
@@ -49,10 +52,13 @@ OnBuildLocalizationTabs, OnBeforeFindLocalization, OnFindLocalization, OnFindLoc
 - localizator3_translate_fields — поля для автоперевода
 - localizator3_translate_translated, localizator3_translate_translated_fields — перезапись переводов
 
-## Vue UI
-- ContentGrid.vue → content.js → #localizator3-content-app (вкладка Локализация в ресурсе)
-- LanguagesGrid.vue → languages.js → #localizator3-languages-app (страница Localizator3 → Языки)
-- PrimeVue 4 Aura theme, Pinia, ConfirmDialog, scoped BEM + .vueApp prefix, box-sizing isolation
+## Vue UI (requires VueTools ≥1.1.2-pl)
+- ContentGrid.vue / LanguagesGrid.vue — lean orchestration components
+- ContentFormDialog.vue / LanguageFormDialog.vue — диалоги форм
+- Composables: useConnector, useLexicon, useDataTable, useGridCrud, useConfirmAction
+- createLocalizatorApp.js — единый bootstrap (Pinia не используется)
+- Entry points content.js / languages.js — lean (~15KB) без Vue-стека в bundle
+- PrimeVue 4 Aura через Import Map, scoped BEM + .vueApp prefix, box-sizing isolation
 
 ## Build
 ```bash

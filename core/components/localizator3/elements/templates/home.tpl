@@ -1,1 +1,0 @@
-<div id="localizator-panel-home-div"></div>

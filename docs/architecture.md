@@ -145,7 +145,31 @@
 | `ContentGrid.vue` | `src/entries/content.js` | `#localizator3-content-app` | `js/mgr/vue-dist/content.min.js` |
 | `LanguagesGrid.vue` | `src/entries/languages.js` | `#localizator3-languages-app` | `js/mgr/vue-dist/languages.min.js` |
 
-Стек: Vue 3, PrimeVue 4 (Aura), Pinia, Vite 6.
+Стек: Vue 3, PrimeVue 4 (Aura), Vite 6. **Зависимость: VueTools ≥1.1.2-pl** — предоставляет Vue-стек через Import Map.
+
+Архитектура Vue UI:
+```
+vueManager/src/
+├── app/
+│   └── createLocalizatorApp.js      # Единый bootstrap (без Pinia, т.к. stores не используются)
+├── composables/                      # Vue 3 Composition API
+│   ├── useConnector.js               # POST API к MODX connector
+│   ├── useLexicon.js                 # Лексикон
+│   ├── useDataTable.js               # DataTable state (pagination, sort)
+│   ├── useGridCrud.js                # CRUD операции
+│   └── useConfirmAction.js           # Confirm + toast
+├── components/
+│   ├── ContentGrid.vue               # ~350 строк (оркестрация)
+│   ├── LanguagesGrid.vue             # ~300 строк
+│   ├── ContentFormDialog.vue         # Диалог формы ресурса
+│   ├── LanguageFormDialog.vue        # Диалог формы языка
+│   └── shared/
+│       ├── FormFieldRenderer.vue     # Рендер полей формы
+│       └── GridActionsColumn.vue     # Колонка действий грида
+└── entries/
+    ├── content.js                     # Lean entry (~20 строк)
+    └── languages.js                   # Lean entry (~15 строк)
+```
 
 Изоляция стилей:
 - `main.css` — откат глобального `box-sizing` от PrimeVue через `!important`

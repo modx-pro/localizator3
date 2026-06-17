@@ -2,7 +2,7 @@
 
 **Localizator3** — компонент мультиязычности для **MODX 3 only**. Для MODX 2.x используйте оригинальный [Localizator](https://github.com/modx-pro/localizator).
 
-**Версия:** 1.0.7-beta
+**Версия:** 1.0.8-beta
 
 ---
 
@@ -12,10 +12,13 @@
 |-----------|--------|----------------|
 | MODX Revolution | 3.0+ | Да |
 | PHP | 8.2+ (компонент: 8.1+) | Да |
+| **VueTools** | **≥1.1.2-pl** | **Да** (Vue-стек через Import Map) |
 | pdoTools | актуальная | Да (ставится с пакетом) |
 | Node.js | 18+ | Только для сборки Vue UI |
 | miniShop3 | — | Опционально |
 | mSearch | — | Опционально |
+
+> **Важно:** VueTools — обязательная зависимость для Vue-интерфейса Localizator3. Устанавливается автоматически при наличии ModStore провайдера или вручную с [modstore.pro](https://modstore.pro/packages/utilities/vuetools).
 
 ---
 
