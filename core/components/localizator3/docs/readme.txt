@@ -8,9 +8,11 @@ Author: but1head <radionov@me.com>
 
 **Только MODX 3** — для MODX 2.x используйте пакет Localizator.
 
-Документация:
-- README.md, docs/api.md, docs/configuration.md, docs/architecture.md
-- docs/INSTALL_LOCALIZATOR3.md, docs/04_miniShop3_integration.md, docs/05_mSearch_integration.md
-- docs/CUSTOMIZATION.md, docs/llms.txt
+Документация (оглавление): docs/README.md
+- docs/installation.md
+- docs/configuration.md, docs/api.md, docs/architecture.md
+- docs/customization.md
+- docs/integration-minishop3.md, docs/integration-msearch.md
+- docs/roadmap.md, docs/llms.txt
 
 GitHub: https://github.com/modx-pro/localizator3

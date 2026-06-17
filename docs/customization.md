@@ -1,6 +1,8 @@
-# Кастомизация вкладки локализации
+# Кастомизация — Localizator3
 
-Вкладка локализации в форме ресурса поддерживает кастомизацию через событие **OnBuildLocalizationTabs** и конфигурацию формы.
+Вкладка «Локализация» в форме ресурса: событие **OnBuildLocalizationTabs** и конфигурация inline-формы Vue UI.
+
+**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -119,18 +121,19 @@ case 'OnBuildLocalizationTabs':
 
 ---
 
-## API getformconfig (Vue)
+## API getformconfig (Vue UI)
 
-Процессор `mgr/content/getformconfig` возвращает JSON для Vue-вкладки:
+Процессор `mgr/content/getformconfig` возвращает JSON для вкладки «Локализация»:
 
 | Поле | Тип | Описание |
 |------|-----|----------|
-| `formtabs` | array | Вкладки и поля (с учётом visible) |
-| `customization` | object | user_id, resource_id, context_key, class_key |
-| `languages` | array | Список активных языков |
-| `record` | object\|null | Данные записи (при параметре `loc_id`) |
+| `formtabs` | array | Вкладки и поля (с учётом `visible`, `rank`) |
+| `activeLanguages` | array | Активные языки для dropdown: `{ key, label, http_host, cultureKey }` |
+| `customization` | object | `user_id`, `resource_id`, `context_key`, `class_key` |
+| `languages` | array | Языки без существующей локализации (для создания) |
+| `record` | object\|null | Данные записи (при параметрах `key` или `loc_id`) |
 
-Плагины могут менять `tabs` и `customization` через событие `OnBuildLocalizationTabs`.
+Плагины меняют `tabs` и `customization` через событие `OnBuildLocalizationTabs`.
 
 ---
 
@@ -146,7 +149,9 @@ case 'OnBuildLocalizationTabs':
 
 ---
 
-## Связанные документы
+## См. также
 
-- [API Reference](./api.md) — полный список событий
-- [Архитектура](./architecture.md) — модели и процессоры
+- [Оглавление](./README.md)
+- [api.md](./api.md) — полный список событий
+- [architecture.md](./architecture.md) — процессоры и модели
+- [roadmap.md](./roadmap.md) — план доработок Vue UI (composables, RTE)

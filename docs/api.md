@@ -1,6 +1,8 @@
-# API Reference — Localizator3
+# API — Localizator3
 
-Сниппеты, Fenom-модификаторы, события и CLI.
+Сниппеты, Fenom-модификаторы, события, процессоры и CLI.
+
+**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -246,7 +248,7 @@ Canonical и hreflang-ссылки для SEO. Выводит `<link rel="canoni
 | `mgr/content/remove` | POST | Удалить локализацию |
 | `mgr/content/enable` | POST | Включить |
 | `mgr/content/disable` | POST | Отключить |
-| `mgr/content/getformconfig` | GET | Конфигурация формы для Vue UI |
+| `mgr/content/getformconfig` | GET | Конфигурация inline-формы Vue UI (`formtabs`, `activeLanguages`, `record`) |
 | `mgr/content/translate` | POST | Автоперевод полей |
 | `mgr/content/multiple` | POST | Групповые операции |
 
@@ -283,3 +285,12 @@ php translate_resources.php --ids=1,2,3 --dry-run
 |------------|----------|
 | `MODX_BASE_PATH` | Путь к корню MODX |
 | `LOCALIZATOR_CONTEXT` | Контекст ресурсов (по умолчанию `web`) |
+
+---
+
+## См. также
+
+- [Оглавление](./README.md)
+- [architecture.md](./architecture.md) — модели и плагины
+- [customization.md](./customization.md) — события формы
+- [installation.md](./installation.md) — CLI и сборка

@@ -7,7 +7,7 @@
  * {key}-description и т.д. с весами как у базовых полей.
  *
  * API mSearch: params['resource'], params['fields'] (или params['workFields']).
- * См. docs/05_mSearch_integration.md
+ * См. docs/integration-msearch.md
  *
  * @see https://docs.modx.pro/components/msearch/
  * @see https://modx.pro/howto/16466 (идея для mSearch2)

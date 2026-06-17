@@ -1,6 +1,8 @@
-# Configuration — Localizator3
+# Конфигурация — Localizator3
 
 Системные настройки компонента. Namespace: `localizator3`.
+
+**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -57,3 +59,12 @@
 | `pdotools` | `pdoFetch.class` | `pdotools.pdofetchlocalizator3` |
 
 Устанавливается автоматически резолвером при установке пакета.
+
+---
+
+## См. также
+
+- [Оглавление](./README.md)
+- [installation.md](./installation.md) — установка и первичная настройка
+- [api.md](./api.md) — сниппеты и события
+- [integration-minishop3.md](./integration-minishop3.md) — настройки переводчиков для товаров

@@ -1,6 +1,8 @@
-# Интеграция Localizator3 с miniShop3
+# Интеграция miniShop3 — Localizator3
 
-Локализация товаров, опций и их значений miniShop3.
+Локализация товаров, опций и их значений [miniShop3](https://modstore.pro/packages/ecommerce/minishop3).
+
+**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -104,17 +106,18 @@ pdoFetch.class = pdotools.pdofetchlocalizator3
 
 ---
 
-## В планах
+## Запланировано
 
-| Задача | Описание | Статус |
-|--------|----------|--------|
-| Способы оплаты/доставки | Локализация msPayment, msDelivery (name, description) | Ожидает |
-| mFilter | Подстановка locOption / locProductOption в фасетные фильтры | Ожидает |
+См. [roadmap.md](./roadmap.md):
+
+- Локализация **msPayment**, **msDelivery** (name, description)
+- Интеграция с **mFilter** (locOption / locProductOption в фасетах)
 
 ---
 
-## Связанные документы
+## См. также
 
-- [Установка](./INSTALL_LOCALIZATOR3.md)
-- [API Reference](./api.md)
-- [mSearch](./05_mSearch_integration.md)
+- [Оглавление](./README.md)
+- [installation.md](./installation.md) — установка
+- [api.md](./api.md) — сниппеты и Fenom
+- [integration-msearch.md](./integration-msearch.md) — поиск по локализованным полям

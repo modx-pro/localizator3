@@ -1,6 +1,8 @@
-# Architecture — Localizator3
+# Архитектура — Localizator3
 
 Архитектура компонента мультиязычности для MODX 3.
+
+**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -138,49 +140,70 @@
 
 ## Vue UI
 
-Интерфейс менеджера построен на Vue 3 + PrimeVue 4 (тема Aura) и встроен в ExtJS-менеджер MODX 3.
+Интерфейс менеджера: **Vue 3 + PrimeVue 4** (Aura), встроен в ExtJS MODX 3. Стек Vue/Pinia/PrimeVue загружается через **VueTools ≥1.1.2-pl** (Import Map); entry-бандлы Localizator3 — lean (~14 KB).
 
-| Компонент | Entry point | Контейнер | Сборка |
-|-----------|-------------|-----------|--------|
-| `ContentGrid.vue` | `src/entries/content.js` | `#localizator3-content-app` | `js/mgr/vue-dist/content.min.js` |
-| `LanguagesGrid.vue` | `src/entries/languages.js` | `#localizator3-languages-app` | `js/mgr/vue-dist/languages.min.js` |
+| Экран | Компонент | Entry | Контейнер | Сборка |
+|-------|-----------|-------|-----------|--------|
+| Ресурс → вкладка «Локализация» | `ContentGrid.vue` | `content.js` | `#localizator3-content-app` | `vue-dist/content.min.js` |
+| Localizator3 → Языки | `LanguagesGrid.vue` | `languages.js` | `#localizator3-languages-app` | `vue-dist/languages.min.js` |
 
-Стек: Vue 3, PrimeVue 4 (Aura), Vite 6. **Зависимость: VueTools ≥1.1.2-pl** — предоставляет Vue-стек через Import Map.
+### Поведение вкладки «Локализация»
 
-Архитектура Vue UI:
+- Dropdown **всех активных языков** (`activeLanguages` из `mgr/content/getformconfig`).
+- Inline-форма с табами **Документ** / **TV** (не grid-список переводов).
+- Действия: Save, Translate, enable/disable, delete.
+- ExtJS: вкладка с `layout: anchor`, mount через `OnDocFormPrerender` + retry в `content.js`.
+
+### Структура `vueManager/src/`
+
 ```
 vueManager/src/
 ├── app/
-│   └── createLocalizatorApp.js      # Единый bootstrap (без Pinia, т.к. stores не используются)
-├── composables/                      # Vue 3 Composition API
-│   ├── useConnector.js               # POST API к MODX connector
-│   ├── useLexicon.js                 # Лексикон
-│   ├── useDataTable.js               # DataTable state (pagination, sort)
-│   ├── useGridCrud.js                # CRUD операции
-│   └── useConfirmAction.js           # Confirm + toast
+│   └── createLocalizatorApp.js      # Bootstrap (без Pinia)
+├── composables/                      # Созданы; интеграция в grid — в roadmap
+│   ├── useConnector.js
+│   ├── useLexicon.js
+│   ├── useDataTable.js
+│   ├── useGridCrud.js
+│   └── useConfirmAction.js
 ├── components/
-│   ├── ContentGrid.vue               # ~350 строк (оркестрация)
-│   ├── LanguagesGrid.vue             # ~300 строк
-│   ├── ContentFormDialog.vue         # Диалог формы ресурса
-│   ├── LanguageFormDialog.vue        # Диалог формы языка
+│   ├── ContentGrid.vue               # ~620 строк, inline-форма
+│   ├── LanguagesGrid.vue             # ~445 строк, DataTable + Dialog
+│   ├── ContentFormDialog.vue         # Не используется (legacy декомпозиция)
+│   ├── LanguageFormDialog.vue        # Не используется
 │   └── shared/
-│       ├── FormFieldRenderer.vue     # Рендер полей формы
-│       └── GridActionsColumn.vue     # Колонка действий грида
+│       ├── FormFieldRenderer.vue
+│       └── GridActionsColumn.vue
 └── entries/
-    ├── content.js                     # Lean entry (~20 строк)
-    └── languages.js                   # Lean entry (~15 строк)
+    ├── content.js
+    └── languages.js
 ```
 
-Изоляция стилей:
-- `main.css` — откат глобального `box-sizing` от PrimeVue через `!important`
-- PostCSS prefix `.vueApp` для scoped-изоляции в ExtJS
-- BEM-префиксы `.content-grid__*`, `.languages-grid__*` в компонентах
-- `appendTo="self"` на Dialog и ConfirmDialog для изоляции порталов
+### Изоляция стилей
+
+- `assets/.../css/mgr/main.css` — `box-sizing` для mount-контейнеров в ExtJS
+- `vueManager/src/styles/mgr-ui.css` — общие паттерны UI под `.vueApp`
+- PostCSS prefix `.vueApp` в Vite; mount id `#localizator3-*` без prefix
+- BEM: `.content-grid__*`, `.languages-grid__*`
+- `appendTo="self"` на Dialog / ConfirmDialog
 
 ---
 
 ## Зависимости
 
-- **pdoTools** — обязательно (getLocalizedResources, getLanguageList)
-- **miniShop3** — опционально (локализация товаров и опций)
-- **mSearch** — опционально (индексация локализованных полей)
+| Пакет | Обязательность | Назначение |
+|-------|----------------|------------|
+| **VueTools** ≥1.1.2-pl | Да | Vue 3, Pinia, PrimeVue через Import Map |
+| **pdoTools** | Да | `getLocalizedResources`, `getLanguageList` |
+| **miniShop3** | Нет | Локализация товаров и опций → [integration-minishop3.md](./integration-minishop3.md) |
+| **mSearch** | Нет | Индексация локализованных полей → [integration-msearch.md](./integration-msearch.md) |
+
+---
+
+## См. также
+
+- [Оглавление](./README.md)
+- [installation.md](./installation.md) — сборка и установка
+- [api.md](./api.md) — процессоры и события
+- [customization.md](./customization.md) — кастомизация формы
+- [roadmap.md](./roadmap.md) — план развития Vue UI

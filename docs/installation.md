@@ -1,8 +1,8 @@
-# Сборка и установка Localizator3
+# Установка и сборка — Localizator3
 
-**Localizator3** — компонент мультиязычности для **MODX 3 only**. Для MODX 2.x используйте оригинальный [Localizator](https://github.com/modx-pro/localizator).
+Компонент мультиязычности для **MODX 3 only**. Для MODX 2.x используйте оригинальный [Localizator](https://github.com/modx-pro/localizator).
 
-**Версия:** 1.0.8-beta
+**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -84,7 +84,7 @@ php _build/build.php
 
 Скрипт собирает transport, при необходимости запускает `composer install` в `core/components/localizator3/` и может установить пакет на локальный MODX (см. `install` в `_build/config.inc.php`).
 
-Пакет: `core/packages/localizator3-1.0.7-beta.transport.zip`
+Пакет: `core/packages/localizator3-1.0.8-beta.transport.zip`
 
 > **Примечание:** `_build/build.transport.php` — устаревший скрипт сборки. Используйте `_build/build.php`.
 
@@ -113,9 +113,9 @@ php _build/build.php
 ### 2. Локализация ресурса
 
 1. Откройте ресурс в менеджере.
-2. Вкладка **Локализация** → **Добавить перевод**.
-3. Заполните поля (pagetitle, content, TV) или воспользуйтесь автопереводом.
-4. Сохраните.
+2. Вкладка **Локализация** → выберите язык в dropdown (активные языки из Localizator3 → Языки).
+3. Заполните поля на вкладках **Документ** / **TV** или нажмите **Автоматический перевод**.
+4. Нажмите **Сохранить**.
 
 ### 3. Вывод на фронте
 
@@ -198,20 +198,22 @@ vendor/bin/phinx migrate -c phinx.php
 | 404 на страницах без локализации | Настройка `localizator3_404_if_no_localization` |
 | Автоопределение не работает | `localizator3_auto_detect_language`, cookie `localizator3_key` |
 | «Языки не настроены» | Добавьте языки в Localizator3 → Языки, `active = 1` |
-| Пустой список переводов | Записи в `localizator3_content`, включите `localizator3_debug_log` |
+| Пустая форма локализации | Проверьте VueTools ≥1.1.2-pl, очистите кэш, обновите страницу (Ctrl+F5) |
+| Пустой dropdown языков | Добавьте активные языки в Localizator3 → Языки |
 | Старый JS/CSS после обновления | Очистите кэш MODX и браузера; assets с cache busting через `filemtime()` |
 | `Could not load class: localizator3\...` | Пересоберите и переустановите пакет |
+| VueTools не установлен | Сообщение `localizator3_vuetools_required`; установите [VueTools](https://modstore.pro/packages/utilities/vuetools) |
 | Переключатель языков не работает | Используйте сниппет **`getLanguageList`**, не `getLocales` |
 
 **Отладка:** включите `localizator3_debug_log`. Логи: `core/cache/logs/error.log` с префиксом `[localizator3]`.
 
 ---
 
-## Связанные документы
+## См. также
 
-- [Конфигурация](./configuration.md)
-- [API Reference](./api.md)
-- [Архитектура](./architecture.md)
-- [Кастомизация](./CUSTOMIZATION.md)
-- [miniShop3](./04_miniShop3_integration.md)
-- [mSearch](./05_mSearch_integration.md)
+- [Оглавление](./README.md)
+- [configuration.md](./configuration.md) — системные настройки
+- [api.md](./api.md) — сниппеты и процессоры
+- [architecture.md](./architecture.md) — архитектура компонента
+- [customization.md](./customization.md) — кастомизация формы
+- [integration-minishop3.md](./integration-minishop3.md) · [integration-msearch.md](./integration-msearch.md)

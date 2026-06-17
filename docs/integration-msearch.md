@@ -1,6 +1,8 @@
-# Интеграция Localizator3 с mSearch
+# Интеграция mSearch — Localizator3
 
 Полнотекстовый поиск [mSearch](https://modstore.pro/packages/ecommerce/msearch) (MODX 3) с учётом локализованного контента.
+
+**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -75,8 +77,9 @@
 
 ---
 
-## Связанные документы
+## См. также
 
+- [Оглавление](./README.md)
 - [mSearch — документация](https://docs.modx.pro/components/msearch/)
-- [miniShop3](./04_miniShop3_integration.md)
-- [API Reference](./api.md)
+- [integration-minishop3.md](./integration-minishop3.md)
+- [api.md](./api.md)

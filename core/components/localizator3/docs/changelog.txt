@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Lexicon entry `localizator3_vuetools_required` для сообщения об отсутствии VueTools.
 
 ### Changed
+- Документация: единая структура `docs/` (kebab-case), оглавление `docs/README.md`, актуализация Vue UI и getformconfig.
 - Vite config: `external` для `vue`, `pinia`, `primevue`, `@vuetools/*` — lean bundles (~14KB vs ~800KB).
 - `createLocalizatorApp.js`: единый bootstrap для Vue-UI без Pinia (stores пока не используются).
 - Удалён ExtJS fallback для grid-интерфейсов — теперь только Vue UI с обязательным VueTools.
@@ -60,7 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Processor `mgr/content/getformconfig` — form config with customization support.
 - Event `OnBuildLocalizationTabs` extended: `resource`, `user`, `customization`.
 - Field customization: `visible` and `rank` per user.
-- mSearch integration — indexing of localized fields (`mseOnBeforeIndex`, `mseOnGetWorkFields`); fields like `ru-pagetitle`, `en-description` per language (see `docs/05_mSearch_integration.md`).
+- mSearch integration — indexing of localized fields (`mseOnBeforeIndex`, `mseOnGetWorkFields`); fields like `ru-pagetitle`, `en-description` per language (see `docs/integration-msearch.md`).
 - miniShop3 product options localization (color, size, etc.).
 - Tables `localizator3_option` (`locOption`) and `localizator3_product_option` (`locProductOption`).
 - Fenom modifiers: `locoptioncaption`, `locproductoptionvalue`.

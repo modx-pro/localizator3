@@ -24,7 +24,7 @@ VueTools устанавливается автоматически при нал
 
 ## Quick Start
 
-1. Установите пакет через [ModStore](https://modstore.pro/packages/utilities/localizator3) или соберите из `_build/` (см. [Установка](docs/INSTALL_LOCALIZATOR3.md)).
+1. Установите пакет через [ModStore](https://modstore.pro/packages/utilities/localizator3) или соберите из `_build/` (см. [Установка](docs/installation.md)).
 2. **Localizator3 → Языки** — создайте языки (`ru`, `en` и т.д.).
 3. Укажите **HTTP host** для каждого языка (мультидоменность или поддомены).
 4. Включите «TV is available in localizations» для нужных TV в форме TV.
@@ -68,7 +68,7 @@ VueTools устанавливается автоматически при нал
 | Раздел | Компонент | Назначение |
 |--------|-----------|------------|
 | Localizator3 → Языки | `LanguagesGrid.vue` | CRUD языков, активация, ранг |
-| Ресурс → вкладка Локализация | `ContentGrid.vue` | Переводы полей и TV, автоперевод |
+| Ресурс → вкладка Локализация | `ContentGrid.vue` | Dropdown языка, inline-форма полей и TV, автоперевод |
 
 UI: PrimeVue 4 (Aura), изолированные стили (`.vueApp`, BEM-префиксы), `ConfirmDialog` вместо native `confirm()`.
 
@@ -109,23 +109,26 @@ cd vueManager && npm install && npm run build
 cd .. && php _build/build.php
 ```
 
-Transport-пакет: `core/packages/localizator3-1.0.7-beta.transport.zip`
+Transport-пакет: `core/packages/localizator3-1.0.8-beta.transport.zip`
 
-Подробнее: [docs/INSTALL_LOCALIZATOR3.md](docs/INSTALL_LOCALIZATOR3.md)
+Подробнее: [docs/installation.md](docs/installation.md)
 
 ---
 
 ## Документация
 
+Полное оглавление: **[docs/README.md](docs/README.md)**
+
 | Документ | Описание |
 |----------|----------|
-| [Установка и сборка](docs/INSTALL_LOCALIZATOR3.md) | Сборка из исходников, Vue, CLI |
-| [API Reference](docs/api.md) | Сниппеты, параметры, события, процессоры |
+| [Установка и сборка](docs/installation.md) | Сборка из исходников, Vue, CLI |
+| [API](docs/api.md) | Сниппеты, параметры, события, процессоры |
 | [Конфигурация](docs/configuration.md) | Системные настройки |
 | [Архитектура](docs/architecture.md) | Модели, плагины, интеграции |
-| [Кастомизация](docs/CUSTOMIZATION.md) | Кастомизация форм через события |
-| [miniShop3](docs/04_miniShop3_integration.md) | Локализация товаров и опций |
-| [mSearch](docs/05_mSearch_integration.md) | Индексация локализованных полей |
+| [Кастомизация](docs/customization.md) | Кастомизация форм через события |
+| [miniShop3](docs/integration-minishop3.md) | Локализация товаров и опций |
+| [mSearch](docs/integration-msearch.md) | Индексация локализованных полей |
+| [Roadmap](docs/roadmap.md) | План развития, каталог фич F1–F10 |
 | [llms.txt](docs/llms.txt) | Краткий контекст для LLM |
 
 ---
