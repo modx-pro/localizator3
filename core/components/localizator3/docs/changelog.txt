@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.8-beta] - 2026-06-17
 
 ### Fixed
+- PHP 8: `findLocalization()` — убрана передача по ссылке для `$request` (аргумент не изменяется в методе); в `OnHandleRequest` и `OnMODXInit` путь запроса передаётся через переменную. Исправлен Fatal error «could not be passed by reference» на фронтенде.
 - Вкладка «Локализация» на форме ресурса: исправлен race condition mount Vue — bridge больше не выставляет `data-mounted` до `app.mount()`, добавлен retry при асинхронной загрузке ES-модуля.
 - Mount recovery: сброс «залипшего» `data-mounted` без `.content-grid`, обработчик `activate` на вкладке, `doLayout` после mount.
 - Вкладка локализации ресурса: вместо grid-списка — выбор языка и inline-форма полей (Документ / TV) с сохранением на месте.

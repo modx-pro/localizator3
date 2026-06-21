@@ -27,5 +27,6 @@ if ($modx->getOption('friendly_urls') && $isAjax && isset($_SERVER['HTTP_REFERER
     if (stripos($referer['path'], MODX_MANAGER_URL) === 0) {
         return;
     }
-    $localizator->findLocalization($referer['host'], ltrim($referer['path'], '/'));
+    $request = ltrim($referer['path'] ?? '', '/');
+    $localizator->findLocalization($referer['host'] ?? '', $request);
 }

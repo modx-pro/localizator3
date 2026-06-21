@@ -316,7 +316,7 @@ class localizator
     }
 
 
-    public function findLocalization($http_host, &$request)
+    public function findLocalization($http_host, $request)
     {
         /* @var localizatorLanguage $language */
         $language = null;
