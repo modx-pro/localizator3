@@ -52,21 +52,45 @@ $contentFields = array_diff(
     ['id', 'resource_id']
 );
 
+$localizator = $modx->getService(
+    'localizator3',
+    'localizator',
+    $modx->getOption('localizator3_core_path', null, $modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/'
+);
+$defaultFromResource = $localizator instanceof localizator && $localizator->isDefaultFromResource();
+$defaultLanguageKey = $localizator instanceof localizator ? $localizator->getDefaultLanguageKey() : '';
+
 $contents = $modx->getCollection(\localizator3\localizatorContent::class, ['resource_id' => $resource->get('id')]);
-if (empty($contents)) {
-    return;
+if (!empty($contents)) {
+    foreach ($contents as $content) {
+        if ($defaultFromResource && $defaultLanguageKey !== '' && $content->get('key') === $defaultLanguageKey) {
+            continue;
+        }
+        foreach ($indexFields as $field => $weight) {
+            if (!in_array($field, $contentFields, true)) {
+                continue;
+            }
+            $value = $content->get($field);
+            if ($value === null || $value === '') {
+                continue;
+            }
+            $fieldKey = $content->get('key') . '-' . $field;
+            $fields[$fieldKey] = $weight;
+            $resource->set($fieldKey, $value);
+        }
+    }
 }
 
-foreach ($contents as $content) {
+if ($defaultFromResource && $defaultLanguageKey !== '') {
     foreach ($indexFields as $field => $weight) {
         if (!in_array($field, $contentFields, true)) {
             continue;
         }
-        $value = $content->get($field);
+        $value = $resource->get($field);
         if ($value === null || $value === '') {
             continue;
         }
-        $fieldKey = $content->get('key') . '-' . $field;
+        $fieldKey = $defaultLanguageKey . '-' . $field;
         $fields[$fieldKey] = $weight;
         $resource->set($fieldKey, $value);
     }

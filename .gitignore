@@ -9,6 +9,8 @@ node_modules
 
 # Vue build
 vueManager/dist
+assets/components/localizator3/js/mgr/vue-dist/
+assets/components/localizator3/css/mgr/vue-dist/
 
 # Cursor
 .cursor

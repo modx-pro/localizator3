@@ -11,6 +11,7 @@
 | Ключ | Тип | Default | Описание |
 |------|-----|---------|----------|
 | `localizator3_default_language` | text | — | Ключ языка по умолчанию (например, `ru`). Если не задан, используется первый активный язык |
+| `localizator3_default_from_resource` | bool | false | Базовый язык (`default_language`) берётся из основных полей и TV ресурса; во вкладке «Локализация» доступны только переводы |
 | `localizator3_check_permissions` | bool | false | Проверять права доступа (политика LocalizatorManagerPolicy) |
 | `localizator3_disabled_templates` | text | — | ID шаблонов без вкладки Localizator (через запятую, например `3,7,12`) |
 | `localizator3_404_if_no_localization` | bool | false | Показывать 404, если нет локализации для текущего языка. Событие: `OnHasLocalizatorError404` |

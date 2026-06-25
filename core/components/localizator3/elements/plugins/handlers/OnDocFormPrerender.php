@@ -58,7 +58,7 @@ $assetsPath = $modx->getOption('localizator3_assets_path', null, $modx->getOptio
 $vueContentExists = is_file($assetsPath . 'js/mgr/vue-dist/content.min.js');
 
 $lexiconKeys = array(
-    'localizator3_tab', 'localizator_content_section_desc',
+    'localizator3_tab', 'localizator_content_section_desc', 'localizator_content_section_desc_native',
     'localizator_stats_translations', 'localizator_stats_active', 'localizator_stats_available',
     'localizator_add', 'localizator_translate', 'localizator_grid_search',
     'localizator__key', 'localizator_pagetitle', 'localizator_seotitle', 'localizator_active',

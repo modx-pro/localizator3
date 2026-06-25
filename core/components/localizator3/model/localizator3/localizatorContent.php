@@ -135,6 +135,52 @@ class localizatorContent extends xPDOSimpleObject
         return $this->tvs;
     }
 
+    /**
+     * Заполняет поля и TV из основного ресурса (режим default_from_resource).
+     *
+     * @param \MODX\Revolution\modResource $resource
+     * @return bool true, если хотя бы одно поле или TV не пустое
+     */
+    public function hydrateFromResource($resource)
+    {
+        if (!$resource) {
+            return false;
+        }
+
+        $this->set('resource_id', (int)$resource->get('id'));
+        $this->addOne($resource, 'Resource');
+
+        $translateFields = array_map('trim', explode(',', $this->xpdo->getOption(
+            'localizator3_translate_fields',
+            null,
+            'pagetitle,longtitle,menutitle,seotitle,keywords,introtext,description,content',
+            true
+        )));
+
+        $hasData = false;
+        foreach ($translateFields as $field) {
+            if ($field === '' || !isset($this->_fieldMeta[$field])) {
+                continue;
+            }
+            $value = $resource->get($field);
+            if ($value !== null && $value !== '') {
+                $this->set($field, $value);
+                $hasData = true;
+            }
+        }
+
+        $this->tvs = array();
+        foreach ($this->getTVKeys() as $tvName) {
+            $value = $resource->getTVValue($tvName);
+            if ($value !== null && $value !== '') {
+                $this->tvs[$tvName] = $value;
+                $hasData = true;
+            }
+        }
+
+        return $hasData;
+    }
+
     public function getTVKeys($force = false)
     {
         if ($this->TVKeys === null || $force) {

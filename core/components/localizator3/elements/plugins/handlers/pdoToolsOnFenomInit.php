@@ -11,7 +11,7 @@
 $pdo = $modx->getService('pdoTools');
 $loc = isset($localizator) ? $localizator : $modx->getService('localizator3', 'localizator', $modx->getOption('localizator3_core_path', null, $modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/');
 
-$fenom->addModifier('locfield', function ($id, $field = null) use ($pdo, $modx) {
+$fenom->addModifier('locfield', function ($id, $field = null) use ($pdo, $modx, $loc) {
     if (empty($id)) {
         $resource = $modx->resource;
     } elseif (!is_numeric($id)) {
@@ -22,46 +22,15 @@ $fenom->addModifier('locfield', function ($id, $field = null) use ($pdo, $modx) 
         $pdo->setStore($id, $resource, 'resource');
     }
 
-    if (!$resource) {
+    if (!$resource || !($loc instanceof localizator)) {
         return '';
     }
 
-    $id = $resource->get('id');
-    $key = $modx->getOption('localizator3_key', null, '');
-    $output = '';
-
-    if (in_array($field, array_diff(array_keys($modx->getFields(\localizator3\localizatorContent::class)), array('id', 'resource_id')))) {
-        $q = $modx->newQuery(\localizator3\localizatorContent::class)
-            ->where(array(
-                "resource_id" => $id,
-                "key" => $key,
-                "active" => 1,
-            ))
-            ->select($field);
-        if ($q->prepare() && $q->stmt->execute()) {
-            $output = $q->stmt->fetchColumn();
-        }
-    } elseif (in_array($field, array_keys($modx->getFields(\MODX\Revolution\modResource::class)))) {
-        $output = $resource->get($field);
-    } elseif ($tv = $modx->getObject(\MODX\Revolution\modTemplateVar::class, array('name' => $field))) {
-        if ($tv->get('localizator3_enabled')) {
-            $q = $modx->newQuery(\localizator3\locTemplateVarResource::class)
-                ->where(array(
-                    "contentid" => $id,
-                    "key" => $key,
-                    "tmplvarid" => $tv->get('id'),
-                ))
-                ->select('value');
-            if ($q->prepare() && $q->stmt->execute()) {
-                if ($output = $q->stmt->fetchColumn()) {
-                    $output = \localizator3\localizatorContent::renderTVOutput($modx, $tv, $output, $id);
-                }
-            }
-        } else {
-            $output = $resource->getTVValue($field);
-        }
+    if ($field === null || $field === '') {
+        return '';
     }
-    return $output;
+
+    return $loc->getLocalizedFieldValue($resource, $field);
 });
 
 // B1: Локализация caption опции msOption. Использование: {$option_id|locoptioncaption:'По умолчанию'}

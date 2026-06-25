@@ -12,6 +12,9 @@ $localizatorKey = $modx->getOption('localizator3_key', null, '');
 if ($localizatorKey === '') {
     return;
 }
+if ($localizator->shouldUseResourceFields($localizatorKey)) {
+    return;
+}
 $q = $modx->newQuery(\localizator3\localizatorContent::class);
 $q->leftJoin(\localizator3\localizatorLanguage::class, 'localizatorLanguage', 'localizatorLanguage.key = localizatorContent.key');
 $q->where(array(

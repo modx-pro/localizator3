@@ -4,7 +4,7 @@
     <ConfirmDialog />
 
     <p class="loc-section-bar">
-      {{ lexicon.localizator_content_section_desc || 'Manage resource field translations, TVs and auto-translation.' }}
+      {{ sectionDesc }}
     </p>
 
     <div class="loc-toolbar content-grid__locale-bar">
@@ -174,6 +174,7 @@ const form = ref({})
 const isEdit = ref(false)
 const languages = ref([])
 const activeTab = ref(null)
+const defaultFromResource = ref(false)
 
 const toast = useToast()
 const confirmDialog = useConfirm()
@@ -201,6 +202,17 @@ const localeOptions = computed(() => {
 })
 
 const formReady = computed(() => !!formConfig.value?.formtabs && !!selectedLocaleKey.value)
+
+const sectionDesc = computed(() => {
+  const lx = props.lexicon || {}
+  if (defaultFromResource.value) {
+    return lx.localizator_content_section_desc_native
+      || lx.localizator_content_section_desc
+      || 'Translations for other languages. Edit the default language in the main resource form.'
+  }
+  return lx.localizator_content_section_desc
+    || 'Manage resource field translations, TVs and auto-translation.'
+})
 
 const emptyLanguagesMessage = computed(() => {
   const lx = props.lexicon || {}
@@ -301,7 +313,9 @@ function applyFormConfigObject(object, includeRecord = false) {
     customization: object.customization,
     totalActiveLanguages: object.totalActiveLanguages ?? 0,
     existingCount: object.existingCount ?? 0,
+    defaultLanguageKey: object.defaultLanguageKey || '',
   }
+  defaultFromResource.value = !!object.defaultFromResource
   languages.value = object.languages || []
   if (object.activeLanguages?.length) {
     activeLanguages.value = object.activeLanguages
@@ -553,7 +567,11 @@ async function bootstrap() {
   if (activeLanguages.value.length === 0) {
     return
   }
-  const preferredKey = items.value[0]?.key || activeLanguages.value[0].key
+  const defaultKey = formConfig.value?.defaultLanguageKey || ''
+  const preferredItem = items.value.find((item) => item.key && item.key !== defaultKey)
+  const preferredKey = preferredItem?.key
+    || activeLanguages.value.find((lang) => lang.key !== defaultKey)?.key
+    || activeLanguages.value[0].key
   await selectLocaleKey(preferredKey)
 }
 

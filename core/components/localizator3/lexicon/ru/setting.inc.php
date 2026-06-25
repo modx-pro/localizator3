@@ -10,6 +10,9 @@ $_lang['setting_localizator_default_language_desc'] = 'Ключ локализа
 $_lang['setting_localizator3_default_language'] = 'Ключ локализации по умолчанию';
 $_lang['setting_localizator3_default_language_desc'] = 'Ключ локализации для основной языковой версии';
 
+$_lang['setting_localizator3_default_from_resource'] = 'Базовый язык из полей ресурса';
+$_lang['setting_localizator3_default_from_resource_desc'] = 'Если «Да», контент для языка из «Ключ локализации по умолчанию» берётся из основных полей и TV ресурса. Во вкладке «Локализация» доступны только переводы на другие языки.';
+
 $_lang['setting_localizator_key_yandex'] = 'API ключ для Яндекс';
 $_lang['setting_localizator_key_yandex_desc'] = 'API ключ для Яндекс переводчика, <a href="https://translate.yandex.ru/developers/keys" target="_blank">получить ключ</a>';
 $_lang['setting_localizator3_key_yandex'] = 'API ключ для Яндекс';

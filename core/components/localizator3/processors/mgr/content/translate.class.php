@@ -19,7 +19,11 @@ class localizatorContentTranslateProcessor extends modProcessor
         }
 
         /* @var localizatorContent $default_content */
-        $default_content = $this->modx->getObject(\localizator3\localizatorContent::class, array('key' => $default_language, 'resource_id' => $resource_id));
+        if ($this->localizator->isDefaultFromResource()) {
+            $default_content = $this->localizator->buildDefaultLanguageSource($resource_id);
+        } else {
+            $default_content = $this->modx->getObject(\localizator3\localizatorContent::class, array('key' => $default_language, 'resource_id' => $resource_id));
+        }
         if (!$default_content) {
             return $this->failure($this->modx->lexicon('localizator_item_err_no_line'));
         }

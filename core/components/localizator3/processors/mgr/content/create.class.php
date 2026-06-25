@@ -52,6 +52,18 @@ class localizatorContentCreateProcessor extends modObjectCreateProcessor
             return $this->modx->lexicon('access_denied');
         }
 
+        $localizator = $this->modx->getService(
+            'localizator3',
+            'localizator',
+            $this->modx->getOption('localizator3_core_path', null, $this->modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/'
+        );
+        if ($localizator instanceof localizator && $localizator->isDefaultFromResource()) {
+            $defaultKey = $localizator->getDefaultLanguageKey();
+            if ($defaultKey !== '' && $key === $defaultKey) {
+                return $this->modx->lexicon('localizator_content_err_default_from_resource');
+            }
+        }
+
         return parent::beforeSet();
     }
 }

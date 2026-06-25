@@ -11,6 +11,15 @@ class pdoFetchLocalizator extends pdoFetch
         parent::addTVs();
 
         if ($this->config['tvsJoin']) {
+            $localizator = $this->modx->getService(
+                'localizator3',
+                'localizator',
+                $this->modx->getOption('localizator3_core_path', null, $this->modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/'
+            );
+            if ($localizator instanceof localizator && $localizator->shouldUseResourceFields()) {
+                return;
+            }
+
             $this->config['localizator3_key'] = $this->modx->getOption('localizator3_key', $this->config, $this->modx->getOption('localizator3_key', null), true);
             $this->config['localizatorTVs'] = array();
             $where = array('name:IN' => array_keys($this->config['tvsJoin']));

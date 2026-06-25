@@ -167,6 +167,14 @@ class localizatorContentGetFormConfigProcessor extends modProcessor
             ));
         }
 
+        $defaultFromResource = (bool)$this->modx->getOption('localizator3_default_from_resource', null, false, true);
+        $defaultLanguageKey = (string)$this->modx->getOption('localizator3_default_language', null, '', true);
+        if ($defaultFromResource && $defaultLanguageKey !== '') {
+            $activeLanguages = $this->filterLanguagesByKey($activeLanguages, $defaultLanguageKey);
+            $languages = $this->filterLanguagesByKey($languages, $defaultLanguageKey);
+            $totalActiveLanguages = count($activeLanguages);
+        }
+
         $result = array(
             'formtabs' => $formtabs,
             'customization' => $customization,
@@ -174,6 +182,8 @@ class localizatorContentGetFormConfigProcessor extends modProcessor
             'activeLanguages' => $activeLanguages,
             'totalActiveLanguages' => $totalActiveLanguages,
             'existingCount' => count($usedKeys),
+            'defaultFromResource' => $defaultFromResource,
+            'defaultLanguageKey' => $defaultLanguageKey,
         );
         if ($debugLog) {
             $prefix = $this->modx->getOption('table_prefix', null, null)
@@ -346,6 +356,24 @@ class localizatorContentGetFormConfigProcessor extends modProcessor
             $this->modx->log(modX::LOG_LEVEL_DEBUG, '[localizator3 getformconfig] fetchLanguagesFallback rawLanguagesCount=' . count($rows));
         }
         return $rows;
+    }
+
+    /**
+     * @param array $languages
+     * @param string $excludeKey
+     * @return array
+     */
+    protected function filterLanguagesByKey(array $languages, $excludeKey)
+    {
+        $filtered = array();
+        foreach ($languages as $lang) {
+            $key = is_array($lang) ? ($lang['key'] ?? '') : '';
+            if ($key === '' || $key === $excludeKey) {
+                continue;
+            }
+            $filtered[] = $lang;
+        }
+        return $filtered;
     }
 }
 

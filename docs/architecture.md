@@ -11,6 +11,20 @@
 - **Язык** — запись в `localizator3_languages` (ключ, имя, HTTP host, cultureKey)
 - **Локализация** — запись в `localizator3_content` (resource_id, key, поля)
 - **Текущий язык** — `$modx->localizator3_key`, опция `localizator3_key`
+- **Native default** — при `localizator3_default_from_resource = true` базовый язык читается из полей `modResource` и TV, запись в `localizator3_content` для него не требуется
+
+---
+
+## Режим «базовый язык = поля ресурса»
+
+При включённой настройке `localizator3_default_from_resource`:
+
+1. Контент для ключа `localizator3_default_language` на фронте берётся из основной формы ресурса
+2. `OnLoadWebDocument` не подменяет поля ресурса для базового языка
+3. `locfield` / `getLocalizedField` / автоперевод используют поля ресурса как источник
+4. Во вкладке «Локализация» в manager отображаются только переводы на другие языки
+
+Существующие записи базового языка в `localizator3_content` игнорируются на фронте (можно удалить вручную).
 
 ---
 

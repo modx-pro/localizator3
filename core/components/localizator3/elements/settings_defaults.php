@@ -5,6 +5,11 @@ return [
         'xtype' => 'textfield',
         'area' => 'localizator3_main',
     ],
+    'default_from_resource' => [
+        'xtype' => 'combo-boolean',
+        'value' => false,
+        'area' => 'localizator3_main',
+    ],
     'check_permissions' => [
         'xtype' => 'combo-boolean',
         'value' => false,

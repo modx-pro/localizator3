@@ -112,6 +112,23 @@ if ($transport->xpdo) {
                 $menu->save();
             }
 
+            $settingKey = 'localizator3_default_from_resource';
+            $exists = $modx->getObject(\MODX\Revolution\modSystemSetting::class, [
+                'key' => $settingKey,
+                'namespace' => 'localizator3',
+            ]);
+            if (!$exists) {
+                $setting = $modx->newObject(\MODX\Revolution\modSystemSetting::class);
+                $setting->fromArray([
+                    'key' => $settingKey,
+                    'namespace' => 'localizator3',
+                    'value' => '0',
+                    'xtype' => 'combo-boolean',
+                    'area' => 'localizator3_main',
+                ], '', true, true);
+                $setting->save();
+            }
+
             break;
 
         case xPDOTransport::ACTION_UNINSTALL:

@@ -10,6 +10,9 @@ $_lang['setting_localizator_default_language_desc'] = 'Key localization for prim
 $_lang['setting_localizator3_default_language'] = 'The default localization key';
 $_lang['setting_localizator3_default_language_desc'] = 'Key localization for primary language version';
 
+$_lang['setting_localizator3_default_from_resource'] = 'Default language from resource fields';
+$_lang['setting_localizator3_default_from_resource_desc'] = 'If Yes, content for the default language key is read from the resource document fields and TVs. The Localization tab shows translations for other languages only.';
+
 $_lang['setting_localizator_key_yandex'] = 'API key for Yandex';
 $_lang['setting_localizator_key_yandex_desc'] = 'API key for Yandex translator, <a href="https://translate.yandex.ru/developers/keys" target="_blank">get API key</a>';
 $_lang['setting_localizator3_key_yandex'] = 'API key for Yandex';

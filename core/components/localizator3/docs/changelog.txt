@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.9-beta] - 2026-06-21
+## [1.0.9-beta] - 2026-06-25
+
+### Added
+- Настройка `localizator3_default_from_resource`: базовый язык (`localizator3_default_language`) читается из основных полей и TV ресурса; во вкладке «Локализация» — только переводы
+- Методы `localizator::shouldUseResourceFields()`, `getLocalizedFieldValue()`, `buildDefaultLanguageSource()`; `localizatorContent::hydrateFromResource()`
 
 ### Fixed
 - PHP 8: `findLocalization()` — убрана передача по ссылке для `$request` (аргумент не изменяется в методе); в `OnHandleRequest` и `OnMODXInit` путь запроса передаётся через переменную. Исправлен Fatal error «could not be passed by reference» на фронтенде.

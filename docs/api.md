@@ -104,6 +104,8 @@
 {'!getLocalizedField' | snippet : ['field' => 'pagetitle', 'language' => 'en']}
 ```
 
+При `localizator3_default_from_resource = true` для ключа `localizator3_default_language` значение берётся из основных полей ресурса.
+
 ---
 
 ### getLocalizedCanonical
@@ -167,6 +169,8 @@ Canonical и hreflang-ссылки для SEO. Выводит `<link rel="canoni
 {$resource_id | locfield : 'introtext'}
 {$tv_name | locfield}
 ```
+
+Для базового языка при `localizator3_default_from_resource = true` возвращает значение из основных полей/TV ресурса.
 
 ### locoptioncaption
 

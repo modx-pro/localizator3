@@ -23,61 +23,19 @@ if (!$resource) {
     return $default;
 }
 
-$contentFields = array_diff(array_keys($modx->getFields(\localizator3\localizatorContent::class)), array('id', 'resource_id'));
-$resourceFields = array_keys($modx->getFields(\MODX\Revolution\modResource::class));
+$localizator = $modx->getService(
+    'localizator3',
+    'localizator',
+    $modx->getOption('localizator3_core_path', null, $modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/'
+);
 
-if (in_array($field, $contentFields)) {
-    $q = $modx->newQuery(\localizator3\localizatorContent::class);
-    $q->where([
-        'resource_id' => $id,
-        'key' => $language,
-        'active' => 1,
-    ]);
-    $q->select($field);
-    if ($q->prepare() && $q->stmt->execute()) {
-        $value = $q->stmt->fetchColumn();
-        if ($value !== false && $value !== null && $value !== '') {
-            return $value;
-        }
-    }
-    return $default ?: $resource->get($field);
+if (!($localizator instanceof localizator)) {
+    return $default;
 }
 
-if (in_array($field, $resourceFields)) {
-    $q = $modx->newQuery(\localizator3\localizatorContent::class);
-    $q->where([
-        'resource_id' => $id,
-        'key' => $language,
-        'active' => 1,
-    ]);
-    $content = $modx->getObject(\localizator3\localizatorContent::class, $q);
-    if ($content) {
-        $value = $content->get($field);
-        if ($value !== null && $value !== '') {
-            return $value;
-        }
-    }
-    return $default ?: $resource->get($field);
-}
-
-$tv = $modx->getObject(\MODX\Revolution\modTemplateVar::class, array('name' => $field));
-if ($tv) {
-    if ($tv->get('localizator3_enabled')) {
-        $q = $modx->newQuery(\localizator3\locTemplateVarResource::class);
-        $q->where([
-            'contentid' => $id,
-            'key' => $language,
-            'tmplvarid' => $tv->get('id'),
-        ]);
-        $q->select('value');
-        if ($q->prepare() && $q->stmt->execute()) {
-            $value = $q->stmt->fetchColumn();
-            if ($value !== false && $value !== null && $value !== '') {
-                return \localizator3\localizatorContent::renderTVOutput($modx, $tv, $value, $id);
-            }
-        }
-    }
-    return $default ?: $resource->getTVValue($field);
+$value = $localizator->getLocalizedFieldValue($resource, $field, $language);
+if ($value !== '') {
+    return $value;
 }
 
 return $default;

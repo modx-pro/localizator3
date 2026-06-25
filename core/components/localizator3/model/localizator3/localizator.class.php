@@ -463,6 +463,199 @@ class localizator
 
 
     /**
+     * @return string
+     */
+    public function getDefaultLanguageKey()
+    {
+        return (string)$this->modx->getOption('localizator3_default_language', null, '', true);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDefaultFromResource()
+    {
+        return (bool)$this->modx->getOption('localizator3_default_from_resource', null, false, true);
+    }
+
+    /**
+     * @param string|null $key
+     * @return bool
+     */
+    public function shouldUseResourceFields($key = null)
+    {
+        if (!$this->isDefaultFromResource()) {
+            return false;
+        }
+        $defaultKey = $this->getDefaultLanguageKey();
+        if ($defaultKey === '') {
+            return false;
+        }
+        if ($key === null || $key === '') {
+            $key = (string)$this->modx->getOption('localizator3_key', null, '', true);
+        }
+        return $key === $defaultKey;
+    }
+
+    /**
+     * @param \MODX\Revolution\modResource $resource
+     * @param string $field
+     * @return string
+     */
+    public function getResourceFieldValue($resource, $field)
+    {
+        if (!$resource || $field === '') {
+            return '';
+        }
+
+        $contentFields = array_diff(
+            array_keys($this->modx->getFields(\localizator3\localizatorContent::class)),
+            array('id', 'resource_id')
+        );
+        $resourceFields = array_keys($this->modx->getFields(\MODX\Revolution\modResource::class));
+
+        if (in_array($field, $contentFields, true) || in_array($field, $resourceFields, true)) {
+            $value = $resource->get($field);
+            return $value !== null && $value !== '' ? (string)$value : '';
+        }
+
+        $tv = $this->modx->getObject(\MODX\Revolution\modTemplateVar::class, array('name' => $field));
+        if ($tv) {
+            $value = $resource->getTVValue($field);
+            if ($value !== null && $value !== '') {
+                return (string)\localizator3\localizatorContent::renderTVOutput(
+                    $this->modx,
+                    $tv,
+                    $value,
+                    (int)$resource->get('id')
+                );
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * @param \MODX\Revolution\modResource $resource
+     * @param string $field
+     * @param string|null $key
+     * @return string
+     */
+    public function getLocalizedFieldValue($resource, $field, $key = null)
+    {
+        if (!$resource || $field === '') {
+            return '';
+        }
+
+        $id = (int)$resource->get('id');
+        if ($key === null || $key === '') {
+            $key = (string)$this->modx->getOption('localizator3_key', null, '', true);
+        }
+
+        if ($this->shouldUseResourceFields($key)) {
+            return $this->getResourceFieldValue($resource, $field);
+        }
+
+        $contentFields = array_diff(
+            array_keys($this->modx->getFields(\localizator3\localizatorContent::class)),
+            array('id', 'resource_id')
+        );
+        $resourceFields = array_keys($this->modx->getFields(\MODX\Revolution\modResource::class));
+
+        if (in_array($field, $contentFields, true)) {
+            $q = $this->modx->newQuery(\localizator3\localizatorContent::class);
+            $q->where(array(
+                'resource_id' => $id,
+                'key' => $key,
+                'active' => 1,
+            ));
+            $q->select($field);
+            if ($q->prepare() && $q->stmt->execute()) {
+                $value = $q->stmt->fetchColumn();
+                if ($value !== false && $value !== null && $value !== '') {
+                    return (string)$value;
+                }
+            }
+            return $this->getResourceFieldValue($resource, $field);
+        }
+
+        if (in_array($field, $resourceFields, true)) {
+            $q = $this->modx->newQuery(\localizator3\localizatorContent::class);
+            $q->where(array(
+                'resource_id' => $id,
+                'key' => $key,
+                'active' => 1,
+            ));
+            $content = $this->modx->getObject(\localizator3\localizatorContent::class, $q);
+            if ($content) {
+                $value = $content->get($field);
+                if ($value !== null && $value !== '') {
+                    return (string)$value;
+                }
+            }
+            return $this->getResourceFieldValue($resource, $field);
+        }
+
+        $tv = $this->modx->getObject(\MODX\Revolution\modTemplateVar::class, array('name' => $field));
+        if ($tv) {
+            if ($tv->get('localizator3_enabled')) {
+                $q = $this->modx->newQuery(\localizator3\locTemplateVarResource::class);
+                $q->where(array(
+                    'contentid' => $id,
+                    'key' => $key,
+                    'tmplvarid' => $tv->get('id'),
+                ));
+                $q->select('value');
+                if ($q->prepare() && $q->stmt->execute()) {
+                    $value = $q->stmt->fetchColumn();
+                    if ($value !== false && $value !== null && $value !== '') {
+                        return (string)\localizator3\localizatorContent::renderTVOutput(
+                            $this->modx,
+                            $tv,
+                            $value,
+                            $id
+                        );
+                    }
+                }
+            }
+            return $this->getResourceFieldValue($resource, $field);
+        }
+
+        return '';
+    }
+
+    /**
+     * @param int $resourceId
+     * @return \localizator3\localizatorContent|null
+     */
+    public function buildDefaultLanguageSource($resourceId)
+    {
+        $defaultKey = $this->getDefaultLanguageKey();
+        if ($defaultKey === '' || !$resourceId) {
+            return null;
+        }
+
+        $resource = $this->modx->getObject(\MODX\Revolution\modResource::class, (int)$resourceId);
+        if (!$resource) {
+            return null;
+        }
+
+        /** @var \localizator3\localizatorContent $content */
+        $content = $this->modx->newObject(\localizator3\localizatorContent::class);
+        $content->set('resource_id', (int)$resourceId);
+        $content->set('key', $defaultKey);
+        $content->set('active', 1);
+        $content->addOne($resource, 'Resource');
+
+        if (!$content->hydrateFromResource($resource)) {
+            return null;
+        }
+
+        return $content;
+    }
+
+
+    /**
      * Возвращает локализованный caption опции msOption для текущего языка.
      *
      * @param int $option_id ID опции (msOption)
@@ -471,6 +664,9 @@ class localizator
      */
     public function getLocalizedOptionCaption($option_id, $default = null)
     {
+        if ($this->shouldUseResourceFields()) {
+            return $default !== null ? (string)$default : '';
+        }
         $key = $this->modx->getOption('localizator3_key', null, '', true);
         if (empty($key) || empty($option_id)) {
             return $default !== null ? (string)$default : '';
@@ -491,6 +687,9 @@ class localizator
      */
     public function getLocalizedOptionDescription($option_id, $default = null)
     {
+        if ($this->shouldUseResourceFields()) {
+            return $default !== null ? (string)$default : '';
+        }
         $key = $this->modx->getOption('localizator3_key', null, '', true);
         if (empty($key) || empty($option_id)) {
             return $default !== null ? (string)$default : '';
@@ -511,6 +710,9 @@ class localizator
      */
     public function getLocalizedProductOptionValue($product_option_id, $default = null)
     {
+        if ($this->shouldUseResourceFields()) {
+            return $default !== null ? (string)$default : '';
+        }
         $key = $this->modx->getOption('localizator3_key', null, '', true);
         if (empty($key) || empty($product_option_id)) {
             return $default !== null ? (string)$default : '';
