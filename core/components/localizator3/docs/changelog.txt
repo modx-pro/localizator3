@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.9-beta] - 2026-06-25
+## [1.0.9-beta] - 2026-07-07
 
 ### Added
 - Настройка `localizator3_default_from_resource`: базовый язык (`localizator3_default_language`) читается из основных полей и TV ресурса; во вкладке «Локализация» — только переводы
@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - PHP 8: `findLocalization()` — убрана передача по ссылке для `$request` (аргумент не изменяется в методе); в `OnHandleRequest` и `OnMODXInit` путь запроса передаётся через переменную. Исправлен Fatal error «could not be passed by reference» на фронтенде.
+- Установка пакета на PHP 8.2: Symfony 7 вместо 8 в vendor (platform PHP 8.2), исправлен `platform_check.php` (#8)
+- Resolver VueTools: корректный вызов `modTransportProvider::request()` для MODX 3, установка через общий helper; ошибки не прерывают установку Localizator3 (#8)
 
 ## [1.0.8-beta] - 2026-06-17
 
