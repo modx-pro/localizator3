@@ -14,6 +14,7 @@
 - Установка на PHP 8.2: Symfony 7 вместо 8 в vendor, platform PHP 8.2, исправлен `platform_check.php` (#8).
 - Resolver VueTools: корректный вызов `modTransportProvider::request()` в MODX 3, установка через общий helper. Сбой VueTools не прерывает установку Localizator3 (#8).
 - Phinx-миграции: убрано двойное добавление MODX `table_prefix` к именам таблиц. Журнал миграций создаётся как `{table_prefix}localizator3_migrations`. Перед Phinx запускается repair для уже сломанных установок (#9).
+- Удаление пакета: плагин `localizator3` и его события удаляются через resolver и атрибуты transport (`UNINSTALL_OBJECT`) (#10).
 
 ## [1.0.8-beta] - 2026-06-17
 
