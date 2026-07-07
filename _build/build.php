@@ -340,12 +340,14 @@ class Localizator3Package
         $this->category_attributes[xPDOTransport::RELATED_OBJECT_ATTRIBUTES]['Plugins'] = [
             xPDOTransport::UNIQUE_KEY => 'name',
             xPDOTransport::PRESERVE_KEYS => false,
-            xPDOTransport::UPDATE_OBJECT => !empty($this->config['update']['plugins']),
+            xPDOTransport::UPDATE_OBJECT => true,
+            xPDOTransport::UNINSTALL_OBJECT => true,
             xPDOTransport::RELATED_OBJECTS => true,
             xPDOTransport::RELATED_OBJECT_ATTRIBUTES => [
                 'PluginEvents' => [
                     xPDOTransport::PRESERVE_KEYS => true,
                     xPDOTransport::UPDATE_OBJECT => true,
+                    xPDOTransport::UNINSTALL_OBJECT => true,
                     xPDOTransport::UNIQUE_KEY => ['pluginid', 'event'],
                 ],
             ],
