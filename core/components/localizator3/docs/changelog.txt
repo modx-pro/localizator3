@@ -1,121 +1,120 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Формат основан на [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+версионирование — [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.0.9-beta] - 2026-07-07
 
-### Added
-- Настройка `localizator3_default_from_resource`: базовый язык (`localizator3_default_language`) читается из основных полей и TV ресурса; во вкладке «Локализация» — только переводы
-- Методы `localizator::shouldUseResourceFields()`, `getLocalizedFieldValue()`, `buildDefaultLanguageSource()`; `localizatorContent::hydrateFromResource()`
+### Добавлено
+- Настройка `localizator3_default_from_resource`: контент базового языка (`localizator3_default_language`) берётся из полей и TV ресурса. Во вкладке «Локализация» остаются только переводы.
+- Методы `localizator::shouldUseResourceFields()`, `getLocalizedFieldValue()`, `buildDefaultLanguageSource()` и `localizatorContent::hydrateFromResource()`.
 
-### Fixed
-- PHP 8: `findLocalization()` — убрана передача по ссылке для `$request` (аргумент не изменяется в методе); в `OnHandleRequest` и `OnMODXInit` путь запроса передаётся через переменную. Исправлен Fatal error «could not be passed by reference» на фронтенде.
-- Установка пакета на PHP 8.2: Symfony 7 вместо 8 в vendor (platform PHP 8.2), исправлен `platform_check.php` (#8)
-- Resolver VueTools: корректный вызов `modTransportProvider::request()` для MODX 3, установка через общий helper; ошибки не прерывают установку Localizator3 (#8)
+### Исправлено
+- PHP 8: в `findLocalization()` убрана передача `$request` по ссылке. В `OnHandleRequest` и `OnMODXInit` путь запроса передаётся через переменную. Устранён Fatal error «could not be passed by reference» на фронтенде.
+- Установка на PHP 8.2: Symfony 7 вместо 8 в vendor, platform PHP 8.2, исправлен `platform_check.php` (#8).
+- Resolver VueTools: корректный вызов `modTransportProvider::request()` в MODX 3, установка через общий helper. Сбой VueTools не прерывает установку Localizator3 (#8).
+- Phinx-миграции: убрано двойное добавление MODX `table_prefix` к именам таблиц. Журнал миграций создаётся как `{table_prefix}localizator3_migrations`. Перед Phinx запускается repair для уже сломанных установок (#9).
 
 ## [1.0.8-beta] - 2026-06-17
 
-### Fixed
-- Вкладка «Локализация» на форме ресурса: исправлен race condition mount Vue — bridge больше не выставляет `data-mounted` до `app.mount()`, добавлен retry при асинхронной загрузке ES-модуля.
+### Исправлено
+- Вкладка «Локализация» на форме ресурса: race condition при mount Vue. Bridge не выставляет `data-mounted` до `app.mount()`, добавлен retry при асинхронной загрузке ES-модуля.
 - Mount recovery: сброс «залипшего» `data-mounted` без `.content-grid`, обработчик `activate` на вкладке, `doLayout` после mount.
-- Вкладка локализации ресурса: вместо grid-списка — выбор языка и inline-форма полей (Документ / TV) с сохранением на месте.
-- Dropdown локали: все активные языки из настроек Localizator3; переключение между существующими переводами и создание нового по ключу языка.
-- Полная ширина вкладки локализации в форме ресурса: ExtJS `layout: anchor` + `anchor: 100%`, CSS для цепочки `#localizator3-resource-tab` → `#localizator3-content-app`.
+- Вкладка локализации: выбор языка и inline-форма полей (Документ / TV) вместо grid-списка, сохранение на месте.
+- Dropdown локали: все активные языки из настроек Localizator3, переключение между переводами и создание нового по ключу языка.
+- Полная ширина вкладки локализации: ExtJS `layout: anchor` + `anchor: 100%`, CSS для цепочки `#localizator3-resource-tab` → `#localizator3-content-app`.
 
-### Added
-- VueTools ≥1.1.2-pl integration: Vue-стек (Vue 3, Pinia, PrimeVue 4) через Import Map.
-- Resolver `vuetools`: автоматическая проверка и установка зависимости VueTools.
+### Добавлено
+- Интеграция VueTools ≥1.1.2-pl: Vue 3, Pinia, PrimeVue 4 через Import Map.
+- Resolver `vuetools`: проверка и установка VueTools.
 - Trait `Localizator3VueControllerTrait` с методами `requireVueTools()` и `addVueModule()`.
 - Composables: `useConnector`, `useLexicon`, `useDataTable`, `useGridCrud`, `useConfirmAction`.
-- Shared components: `FormFieldRenderer.vue`, `GridActionsColumn.vue`.
-- Dialog components: `ContentFormDialog.vue`, `LanguageFormDialog.vue` для декомпозиции гридов.
+- Shared-компоненты: `FormFieldRenderer.vue`, `GridActionsColumn.vue`.
+- Dialog-компоненты: `ContentFormDialog.vue`, `LanguageFormDialog.vue`.
 - Lexicon entry `localizator3_vuetools_required` для сообщения об отсутствии VueTools.
 
-### Changed
+### Изменено
 - Документация: единая структура `docs/` (kebab-case), оглавление `docs/README.md`, актуализация Vue UI и getformconfig.
-- Vite config: `external` для `vue`, `pinia`, `primevue`, `@vuetools/*` — lean bundles (~14KB vs ~800KB).
-- `createLocalizatorApp.js`: единый bootstrap для Vue-UI без Pinia (stores пока не используются).
-- Удалён ExtJS fallback для grid-интерфейсов — теперь только Vue UI с обязательным VueTools.
+- Vite config: `external` для `vue`, `pinia`, `primevue`, `@vuetools/*` — lean bundles (~14 KB вместо ~800 KB).
+- `createLocalizatorApp.js`: единый bootstrap для Vue UI без Pinia (stores пока не используются).
+- Удалён ExtJS fallback для grid-интерфейсов. Только Vue UI с обязательным VueTools.
 
-### Fixed
+### Исправлено
 - CSS: `index.min.css` → `content.min.css` в `OnDocFormPrerender.php`.
-- Build: `languages.min.js` теперь генерируется при сборке.
+- Build: `languages.min.js` генерируется при сборке.
 - Vite: `inlineDynamicImports: true` — один файл на entry без code-split chunk'ов.
 
 ## [1.0.7-beta] - 2026-06-17
 
-### Added
-- Vue UI: scoped styles with BEM prefixes (`.content-grid__*`, `.languages-grid__*`).
-- Vue UI: PrimeVue `ConfirmDialog` instead of native `confirm()`.
-- Vue UI: `appendTo="self"` on Dialog portals for isolation from ExtJS host styles.
+### Добавлено
+- Vue UI: scoped-стили с BEM-префиксами (`.content-grid__*`, `.languages-grid__*`).
+- Vue UI: PrimeVue `ConfirmDialog` вместо native `confirm()`.
+- Vue UI: `appendTo="self"` на Dialog для изоляции порталов от стилей ExtJS.
 
-### Changed
-- CSS: revert global `box-sizing` from PrimeVue via `!important` in `main.css`.
-- Removed legacy ExtJS styles from `main.css`.
-- Removed duplicate PrimeVue component imports in `ContentGrid.vue`.
-- Documentation: README.md, `docs/*`, `llms.txt`, `readme.txt`.
-- Documented build via `php _build/build.php` and `vue-dist` asset paths.
-- Package version synced in `_build/config.inc.php`.
-- Cursor rules updated for Localizator3.
+### Изменено
+- CSS: откат глобального `box-sizing` от PrimeVue через `!important` в `main.css`.
+- Удалены legacy ExtJS-стили из `main.css`.
+- Убраны дублирующие импорты PrimeVue в `ContentGrid.vue`.
+- Документация: README.md, `docs/*`, `llms.txt`, `readme.txt`.
+- Описана сборка через `php _build/build.php` и пути ассетов `vue-dist`.
+- Версия пакета синхронизирована в `_build/config.inc.php`.
+- Обновлены Cursor rules для Localizator3.
 
-### Fixed
-- Documentation: language switcher snippet name corrected to `getLanguageList` (was incorrectly documented as `getLocales`).
+### Исправлено
+- Документация: сниппет переключателя языков — `getLanguageList` (ранее ошибочно указан `getLocales`).
 
 ## [1.0.6-beta]
 
-### Added
-- Lexicons for CIS languages: Ukrainian (uk), Kazakh (kk), Uzbek (uz), Azerbaijani (az).
-- Vue localization tab in resource form (`ContentGrid.vue`).
-- Processor `mgr/content/getformconfig` — form config with customization support.
-- Event `OnBuildLocalizationTabs` extended: `resource`, `user`, `customization`.
-- Field customization: `visible` and `rank` per user.
-- mSearch integration — indexing of localized fields (`mseOnBeforeIndex`, `mseOnGetWorkFields`); fields like `ru-pagetitle`, `en-description` per language (see `docs/integration-msearch.md`).
-- miniShop3 product options localization (color, size, etc.).
-- Tables `localizator3_option` (`locOption`) and `localizator3_product_option` (`locProductOption`).
-- Fenom modifiers: `locoptioncaption`, `locproductoptionvalue`.
-- Service methods: `getLocalizedOptionCaption`, `getLocalizedOptionDescription`, `getLocalizedProductOptionValue`.
+### Добавлено
+- Лексиконы для языков СНГ: украинский (uk), казахский (kk), узбекский (uz), азербайджанский (az).
+- Vue-вкладка локализации в форме ресурса (`ContentGrid.vue`).
+- Процессор `mgr/content/getformconfig` — конфиг формы с поддержкой кастомизации.
+- Событие `OnBuildLocalizationTabs`: параметры `resource`, `user`, `customization`.
+- Кастомизация полей: `visible` и `rank` для пользователя.
+- Интеграция mSearch — индексация локализованных полей (`mseOnBeforeIndex`, `mseOnGetWorkFields`). Поля вида `ru-pagetitle`, `en-description` по языкам (см. `docs/integration-msearch.md`).
+- Локализация опций товаров miniShop3 (цвет, размер и т.д.).
+- Таблицы `localizator3_option` (`locOption`) и `localizator3_product_option` (`locProductOption`).
+- Fenom-модификаторы: `locoptioncaption`, `locproductoptionvalue`.
+- Методы сервиса: `getLocalizedOptionCaption`, `getLocalizedOptionDescription`, `getLocalizedProductOptionValue`.
 
 ## [1.0.5-beta]
 
-### Removed
-- mSearch2 / mFilter2 support — use [mFilter](https://docs.modx.pro/components/mfilter/) for faceted filtering.
+### Удалено
+- Поддержка mSearch2 / mFilter2. Для фасетной фильтрации используйте [mFilter](https://docs.modx.pro/components/mfilter/).
 
 ## [1.0.4-beta]
 
-### Added
-- miniShop3 integration: Localizator tab for `msProduct`, `getLocalizedResources` with `msProducts` / `ms3Products`.
+### Добавлено
+- Интеграция miniShop3: вкладка Localizator для `msProduct`, `getLocalizedResources` с `msProducts` / `ms3Products`.
 
 ## [1.0.3-beta]
 
-### Added
-- Snippet `getLocalizedField` — output resource field in specified language.
-- CLI script `translate_resources.php` — mass translation from console.
-- Setting `localizator3_auto_detect_language` — auto-detect visitor language via Accept-Language / cookie.
+### Добавлено
+- Сниппет `getLocalizedField` — вывод поля ресурса на указанном языке.
+- CLI-скрипт `translate_resources.php` — массовый перевод из консоли.
+- Настройка `localizator3_auto_detect_language` — автодетект языка посетителя по Accept-Language / cookie.
 
 ## [1.0.2-beta]
 
-### Added
-- Event `OnToggleLocalizatorLanguage` — fired when language is determined (validation, cache, integrations).
-- Snippet `getLocalizedSitemap` — `sitemap.xml` with hreflang for multilingual pages (SEO).
+### Добавлено
+- Событие `OnToggleLocalizatorLanguage` — при определении языка (валидация, кэш, интеграции).
+- Сниппет `getLocalizedSitemap` — `sitemap.xml` с hreflang для мультиязычных страниц (SEO).
 
 ## [1.0.1-beta]
 
-### Added
-- Parameter `onlyWithLocalization` in `getLocalizedResources` — exclude resources without localization for current language (INNER JOIN).
-- Snippet `makeLocalizedUrl` — build resource URL with language prefix.
-- Extended `getLanguageList`: `outputMode` (list/dropdown), `showActive`, `activeClass`; chunk `languages.dropdown.tpl`.
-- Setting `localizator3_404_if_no_localization` — 404 for documents without localization; event `OnHasLocalizatorError404`.
-- Field `rank` in `localizator3_languages` — sort order (`sortby`, `sortdir` in `getLanguageList`).
-- Snippet `getLocalizedCanonical` — canonical and hreflang links for SEO.
+### Добавлено
+- Параметр `onlyWithLocalization` в `getLocalizedResources` — исключение ресурсов без локализации для текущего языка (INNER JOIN).
+- Сниппет `makeLocalizedUrl` — URL ресурса с языковым префиксом.
+- Расширен `getLanguageList`: `outputMode` (list/dropdown), `showActive`, `activeClass`. Chunk `languages.dropdown.tpl`.
+- Настройка `localizator3_404_if_no_localization` — 404 для документов без локализации. Событие `OnHasLocalizatorError404`.
+- Поле `rank` в `localizator3_languages` — порядок сортировки (`sortby`, `sortdir` в `getLanguageList`).
+- Сниппет `getLocalizedCanonical` — canonical и hreflang для SEO.
 
 ## [1.0.0-beta]
 
-### Added
-- Initial release for MODX 3 only.
-- Fork of Localizator adapted exclusively for MODX Revolution 3.
-- Separate package name (`localizator3`) and tables (`localizator3_*`) to avoid conflicts with original Localizator.
-- MODX 3 namespaces (`\MODX\Revolution\*`, `\xPDO\Transport\*`).
-- Native MODX 3 support only — no MODX 2 compatibility layer.
+### Добавлено
+- Первый релиз только для MODX 3.
+- Форк Localizator, адаптированный под MODX Revolution 3.
+- Отдельное имя пакета (`localizator3`) и таблицы (`localizator3_*`) без конфликта с оригинальным Localizator.
+- Namespace MODX 3 (`\MODX\Revolution\*`, `\xPDO\Transport\*`).
+- Только MODX 3, без слоя совместимости с MODX 2.
