@@ -38,13 +38,16 @@ $dbConfig = [
     'table_prefix' => $modx->getOption('table_prefix', null, ''),
 ];
 
+$tablePrefix = $modx->getOption('table_prefix', null, '');
+$migrationTable = $tablePrefix . 'localizator3_migrations';
+
 return [
     'paths' => [
         'migrations' => __DIR__ . '/migrations',
         'seeds' => __DIR__ . '/seeds'
     ],
     'environments' => [
-        'default_migration_table' => 'localizator3_migrations',
+        'default_migration_table' => $migrationTable,
         'default_environment' => 'production',
         'production' => $dbConfig,
         'development' => $dbConfig,

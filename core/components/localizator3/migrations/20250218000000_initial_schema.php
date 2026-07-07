@@ -6,13 +6,19 @@ use Phinx\Migration\AbstractMigration;
 
 final class InitialSchema extends AbstractMigration
 {
+    private const TABLES = [
+        'localizator3_languages',
+        'localizator3_content',
+        'localizator3_tmplvar_contentvalues',
+        'localizator3_option',
+        'localizator3_product_option',
+    ];
+
     public function up(): void
     {
-        $prefix = $this->adapter->getOption('table_prefix') ?? '';
-
-        // localizator3_languages
-        if (!$this->hasTable($prefix . 'localizator3_languages')) {
-            $this->table($prefix . 'localizator3_languages', [
+        // Phinx TablePrefixAdapter adds MODX table_prefix automatically — do not prepend it here.
+        if (!$this->hasTable('localizator3_languages')) {
+            $this->table('localizator3_languages', [
                 'id' => true,
                 'primary_key' => ['id'],
                 'engine' => 'MyISAM',
@@ -31,9 +37,8 @@ final class InitialSchema extends AbstractMigration
                 ->create();
         }
 
-        // localizator3_content
-        if (!$this->hasTable($prefix . 'localizator3_content')) {
-            $this->table($prefix . 'localizator3_content', [
+        if (!$this->hasTable('localizator3_content')) {
+            $this->table('localizator3_content', [
                 'id' => true,
                 'primary_key' => ['id'],
                 'engine' => 'MyISAM',
@@ -56,9 +61,8 @@ final class InitialSchema extends AbstractMigration
                 ->create();
         }
 
-        // localizator3_tmplvar_contentvalues
-        if (!$this->hasTable($prefix . 'localizator3_tmplvar_contentvalues')) {
-            $this->table($prefix . 'localizator3_tmplvar_contentvalues', [
+        if (!$this->hasTable('localizator3_tmplvar_contentvalues')) {
+            $this->table('localizator3_tmplvar_contentvalues', [
                 'id' => true,
                 'primary_key' => ['id'],
                 'engine' => 'MyISAM',
@@ -76,9 +80,8 @@ final class InitialSchema extends AbstractMigration
                 ->create();
         }
 
-        // localizator3_option
-        if (!$this->hasTable($prefix . 'localizator3_option')) {
-            $this->table($prefix . 'localizator3_option', [
+        if (!$this->hasTable('localizator3_option')) {
+            $this->table('localizator3_option', [
                 'id' => true,
                 'primary_key' => ['id'],
                 'engine' => 'MyISAM',
@@ -93,9 +96,8 @@ final class InitialSchema extends AbstractMigration
                 ->create();
         }
 
-        // localizator3_product_option
-        if (!$this->hasTable($prefix . 'localizator3_product_option')) {
-            $this->table($prefix . 'localizator3_product_option', [
+        if (!$this->hasTable('localizator3_product_option')) {
+            $this->table('localizator3_product_option', [
                 'id' => true,
                 'primary_key' => ['id'],
                 'engine' => 'MyISAM',
@@ -112,20 +114,9 @@ final class InitialSchema extends AbstractMigration
 
     public function down(): void
     {
-        $prefix = $this->adapter->getOption('table_prefix') ?? '';
-
-        $tables = [
-            'localizator3_product_option',
-            'localizator3_option',
-            'localizator3_tmplvar_contentvalues',
-            'localizator3_content',
-            'localizator3_languages',
-        ];
-
-        foreach ($tables as $table) {
-            $fullName = $prefix . $table;
-            if ($this->hasTable($fullName)) {
-                $this->table($fullName)->drop()->save();
+        foreach (array_reverse(self::TABLES) as $table) {
+            if ($this->hasTable($table)) {
+                $this->table($table)->drop()->save();
             }
         }
     }

@@ -36,6 +36,9 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
                 require_once $vendorAutoload;
             }
 
+            require_once $componentPath . 'phinx_repair.php';
+            localizator3RepairPhinxTablePrefixes($modx);
+
             $configArray = require $phinxConfig;
 
             if (!isset($configArray['paths']['migrations'])) {
@@ -76,7 +79,7 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
 
     case xPDOTransport::ACTION_UNINSTALL:
         $modx->log(modX::LOG_LEVEL_INFO, '[Localizator3] Database tables preserved during uninstall');
-        $modx->log(modX::LOG_LEVEL_INFO, '[Localizator3] To remove tables: DROP TABLE localizator3_*');
+        $modx->log(modX::LOG_LEVEL_INFO, '[Localizator3] To remove tables: DROP TABLE {table_prefix}localizator3_*');
         break;
 }
 
