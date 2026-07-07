@@ -12,5 +12,8 @@ vueManager/dist
 assets/components/localizator3/js/mgr/vue-dist/
 assets/components/localizator3/css/mgr/vue-dist/
 
+# Composer (component vendor — собирается через `php _build/build.php`)
+core/components/localizator3/vendor/
+
 # Cursor
 .cursor
