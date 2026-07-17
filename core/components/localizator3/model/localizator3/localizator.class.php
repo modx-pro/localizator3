@@ -388,51 +388,7 @@ class localizator
         }
 
         if ($language) {
-            if (preg_match("/^(http(s):\/\/)/i", $language->http_host)) {
-                $site_url = $language->http_host;
-            } else {
-                $site_url = MODX_URL_SCHEME . $language->http_host;
-            }
-
-            if (substr($site_url, -1) != '/') {
-                $site_url .= '/';
-            }
-
-            $base_url = '/';
-            $parse_url = parse_url($site_url);
-            if (isset($parse_url['path'])) {
-                $base_url = $parse_url['path'];
-                if (substr($base_url, -1) != '/') {
-                    $base_url .= '/';
-                }
-            }
-
-            $this->modx->localizator3_key = $language->key;
-            $this->modx->setOption('localizator3_key', $this->modx->localizator3_key);
-            $this->modx->setOption('cache_resource_key', 'resource/' . $this->modx->localizator3_key);
-
-            $this->modx->cultureKey = $cultureKey = ($language->cultureKey ?: $language->key);
-            $this->modx->setOption('cultureKey', $cultureKey);
-            $this->modx->setOption('site_url', $site_url);
-            $this->modx->setOption('base_url', $base_url);
-
-            $this->modx->setPlaceholders(array(
-                'localizator3_key' => $language->key,
-                'cultureKey' => $cultureKey,
-                'site_url' => $site_url,
-                'base_url' => $base_url,
-            ), '+');
-
-            $this->modx->lexicon->load($cultureKey . ':localizator3:site');
-
-            setcookie('localizator3_key', $language->key, time() + 31536000, '/', '', !empty($_SERVER['HTTPS']), true);
-
-            $this->modx->invokeEvent('OnToggleLocalizatorLanguage', array(
-                'language' => $language,
-                'language_key' => $language->key,
-                'http_host' => $http_host,
-                'request' => $request,
-            ));
+            $this->applyLanguage($language, $http_host, $request, true);
         }
 
         $this->invokeEvent('OnFindLocalization', array(
@@ -442,6 +398,143 @@ class localizator
         ));
 
         return false;
+    }
+
+    /**
+     * Apply language options: localizator3_key, cultureKey, site_url, base_url.
+     *
+     * @param \localizator3\localizatorLanguage $language
+     * @param string $http_host
+     * @param string $request
+     * @param bool $setCookie
+     * @return bool
+     */
+    public function applyLanguage($language, $http_host = '', $request = '', $setCookie = true)
+    {
+        if (!$language) {
+            return false;
+        }
+
+        if (preg_match("/^(http(s):\/\/)/i", $language->http_host)) {
+            $site_url = $language->http_host;
+        } else {
+            $site_url = MODX_URL_SCHEME . $language->http_host;
+        }
+
+        if (substr($site_url, -1) != '/') {
+            $site_url .= '/';
+        }
+
+        $base_url = '/';
+        $parse_url = parse_url($site_url);
+        if (isset($parse_url['path'])) {
+            $base_url = $parse_url['path'];
+            if (substr($base_url, -1) != '/') {
+                $base_url .= '/';
+            }
+        }
+
+        $this->modx->localizator3_key = $language->key;
+        $this->modx->setOption('localizator3_key', $this->modx->localizator3_key);
+        $this->modx->setOption('cache_resource_key', 'resource/' . $this->modx->localizator3_key);
+
+        $this->modx->cultureKey = $cultureKey = ($language->cultureKey ?: $language->key);
+        $this->modx->setOption('cultureKey', $cultureKey);
+        $this->modx->setOption('site_url', $site_url);
+        $this->modx->setOption('base_url', $base_url);
+
+        $this->modx->setPlaceholders(array(
+            'localizator3_key' => $language->key,
+            'cultureKey' => $cultureKey,
+            'site_url' => $site_url,
+            'base_url' => $base_url,
+        ), '+');
+
+        $this->modx->lexicon->load($cultureKey . ':localizator3:site');
+
+        if ($setCookie) {
+            setcookie('localizator3_key', $language->key, time() + 31536000, '/', '', !empty($_SERVER['HTTPS']), true);
+        }
+
+        $this->modx->invokeEvent('OnToggleLocalizatorLanguage', array(
+            'language' => $language,
+            'language_key' => $language->key,
+            'http_host' => $http_host,
+            'request' => $request,
+        ));
+
+        return true;
+    }
+
+    /**
+     * Sync cultureKey from cookie localizator3_key (connectors / AJAX without language path).
+     *
+     * @param string|null $cookieKey
+     * @return bool
+     */
+    public function applyLanguageFromCookie($cookieKey = null)
+    {
+        if ($cookieKey === null) {
+            $cookieKey = isset($_COOKIE['localizator3_key']) ? trim((string) $_COOKIE['localizator3_key']) : '';
+        } else {
+            $cookieKey = trim((string) $cookieKey);
+        }
+        if ($cookieKey === '') {
+            return false;
+        }
+
+        $language = $this->modx->getObject(\localizator3\localizatorLanguage::class, [
+            'key' => $cookieKey,
+            'active' => 1,
+        ]);
+        if (!$language) {
+            return false;
+        }
+
+        $cultureKey = (string) ($language->cultureKey ?: $language->key);
+        $currentKey = (string) $this->modx->getOption('localizator3_key', null, '', true);
+        $currentCulture = (string) $this->modx->getOption('cultureKey', null, '', true);
+        if ($currentKey === $cookieKey && $currentCulture === $cultureKey) {
+            return true;
+        }
+
+        return $this->applyLanguage($language, (string) ($_SERVER['HTTP_HOST'] ?? ''), '', false);
+    }
+
+    /**
+     * Resolve language for connector / AJAX: Referer path → cookie → HTTP host.
+     *
+     * Full page requests still use OnHandleRequest → findLocalization(URL).
+     * Package connectors often never send X-Requested-With and have empty `q`,
+     * so cultureKey stayed at the system default (e.g. ru) while the UI was en.
+     *
+     * @return bool
+     */
+    public function resolveConnectorLanguage()
+    {
+        $host = (string) ($_SERVER['HTTP_HOST'] ?? '');
+        $request = '';
+
+        if (!empty($_SERVER['HTTP_REFERER'])) {
+            $referer = parse_url((string) $_SERVER['HTTP_REFERER']);
+            $refPath = (string) ($referer['path'] ?? '');
+            if ($refPath === '' || stripos($refPath, MODX_MANAGER_URL) !== 0) {
+                $host = (string) ($referer['host'] ?? $host);
+                $request = ltrim($refPath, '/');
+            }
+        }
+
+        if ($request !== '') {
+            $this->findLocalization($host, $request);
+            return (string) $this->modx->getOption('localizator3_key', null, '') !== '';
+        }
+
+        if ($host !== '') {
+            $this->findLocalization($host, '');
+        }
+
+        // Prefer cookie when URL has no language segment (typical for /assets/.../connector.php).
+        return $this->applyLanguageFromCookie();
     }
 
 

@@ -13,6 +13,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.0.10-beta] - 2026-07-17
+
+### Added
+- `localizator::applyLanguage()`, `applyLanguageFromCookie()`, `resolveConnectorLanguage()` for language sync outside full page requests.
+
+### Fixed
+- Connector / AJAX: `OnMODXInit` → `resolveConnectorLanguage()` (Referer path or cookie `localizator3_key`). Previously only `X-Requested-With: XMLHttpRequest` + Referer worked, so package connectors kept the system `cultureKey` (often `ru`) while the storefront UI was already `en`.
+
+### Changed
+- Language application extracted from `findLocalization()` into `applyLanguage()` for reuse.
+
+---
+
 ## [1.0.8-beta]
 
 ### Added

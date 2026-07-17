@@ -1,7 +1,11 @@
 <?php
 
 /**
- * OnMODXInit handler — loads xPDO map and handles AJAX referer localization.
+ * OnMODXInit handler — loads xPDO map and syncs language for AJAX / connectors.
+ *
+ * Full pages: OnHandleRequest → findLocalization(URL).
+ * Connectors: often no `q`, no X-Requested-With — resolve via Referer / cookie
+ * so cultureKey matches the storefront language (not only system cultureKey).
  *
  * @var \MODX\Revolution\modX $modx
  * @var localizator $localizator
@@ -21,12 +25,16 @@ if (is_array($include)) {
     }
 }
 
-$isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
-if ($modx->getOption('friendly_urls') && $isAjax && isset($_SERVER['HTTP_REFERER'])) {
-    $referer = parse_url($_SERVER['HTTP_REFERER']);
-    if (stripos($referer['path'], MODX_MANAGER_URL) === 0) {
-        return;
-    }
-    $request = ltrim($referer['path'] ?? '', '/');
-    $localizator->findLocalization($referer['host'] ?? '', $request);
+$ctx = isset($modx->context) ? (string) $modx->context->key : '';
+if ($ctx === 'mgr' || !$modx->getOption('friendly_urls')) {
+    return;
+}
+
+$script = (string) ($_SERVER['SCRIPT_NAME'] ?? $_SERVER['SCRIPT_FILENAME'] ?? '');
+$isConnector = stripos($script, 'connector.php') !== false;
+$isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+    && strcasecmp((string) $_SERVER['HTTP_X_REQUESTED_WITH'], 'XMLHttpRequest') === 0;
+
+if ($isAjax || $isConnector) {
+    $localizator->resolveConnectorLanguage();
 }

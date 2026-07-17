@@ -3,6 +3,17 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 версионирование — [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.10-beta] - 2026-07-17
+
+### Добавлено
+- Методы `localizator::applyLanguage()`, `applyLanguageFromCookie()` и `resolveConnectorLanguage()` для синхронизации языка вне полноценного page request.
+
+### Исправлено
+- Connector / AJAX: `OnMODXInit` вызывает `resolveConnectorLanguage()` (Referer path или cookie `localizator3_key`). Раньше язык выставлялся только при `X-Requested-With: XMLHttpRequest` + Referer, поэтому пакетные `connector.php` оставляли системный `cultureKey` (часто `ru`), пока витрина уже была на `en`.
+
+### Изменено
+- Логика применения языка вынесена из `findLocalization()` в `applyLanguage()` для повторного использования.
+
 ## [1.0.9-beta] - 2026-07-07
 
 ### Добавлено
