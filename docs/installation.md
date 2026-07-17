@@ -197,6 +197,7 @@ vendor/bin/phinx migrate -c phinx.php
 | pdoResources не учитывает локализацию | `pdoFetch.class` = `pdotools.pdofetchlocalizator3` |
 | 404 на страницах без локализации | Настройка `localizator3_404_if_no_localization` |
 | Автоопределение не работает | `localizator3_auto_detect_language`, cookie `localizator3_key` |
+| Connector/API на «чужом» языке | Localizator3 ≥ fix `resolveConnectorLanguage`: Referer или cookie на `connector.php`; проверьте, что cookie `localizator3_key` совпадает с языком витрины |
 | «Языки не настроены» | Добавьте языки в Localizator3 → Языки, `active = 1` |
 | Пустая форма локализации | Проверьте VueTools ≥1.1.2-pl, очистите кэш, обновите страницу (Ctrl+F5) |
 | Пустой dropdown языков | Добавьте активные языки в Localizator3 → Языки |

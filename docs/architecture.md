@@ -71,11 +71,20 @@
 
 ## Поток определения языка
 
-1. **OnHandleRequest** — вызов `findLocalization(HTTP_HOST, request)`
+1. **OnHandleRequest** — вызов `findLocalization(HTTP_HOST, request)` (полноценные страницы)
 2. Поиск по HTTP host + первый сегмент URL
-3. При `auto_detect_language` — cookie `localizator3_key`, Accept-Language
-4. Установка `localizator3_key`, cultureKey, site_url, base_url
+3. При `auto_detect_language` — cookie `localizator3_key`, Accept-Language (редирект на URL языка)
+4. Установка `localizator3_key`, **cultureKey**, site_url, base_url
 5. **OnToggleLocalizatorLanguage** — интеграции, кэш
+
+### Connector / AJAX
+
+`OnMODXInit` вызывает `resolveConnectorLanguage()` для `connector.php` и XHR:
+
+1. Referer path (если не mgr) → `findLocalization`
+2. иначе host → `findLocalization`, затем cookie `localizator3_key` → `applyLanguageFromCookie`
+
+Так `cultureKey` совпадает с языком витрины даже без `X-Requested-With` и без параметра `q`.
 
 ---
 
@@ -95,7 +104,7 @@
 
 | Событие | Handler | Назначение |
 |---------|---------|------------|
-| `OnMODXInit` | OnMODXInit.php | Загрузка xPDO map, обработка AJAX referer |
+| `OnMODXInit` | OnMODXInit.php | xPDO map; connector/AJAX → `resolveConnectorLanguage()` (Referer / cookie → cultureKey) |
 | `OnHandleRequest` | OnHandleRequest.php | Определение языка из URL/host |
 | `OnPageNotFound` | OnPageNotFound.php | Роутинг URL локализации |
 | `OnDocFormPrerender` | OnDocFormPrerender.php | Вкладка Localizator в форме ресурса |
