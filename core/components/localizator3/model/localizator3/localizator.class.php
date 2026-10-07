@@ -354,7 +354,8 @@ class localizator
                 }
                 $hasLangInPath = in_array($firstSegment, $langKeys, true);
                 if (!$hasLangInPath) {
-                    $preferredKey = $_COOKIE['localizator3_key'] ?? null;
+                    // Explicit `?language=xx` beats the HttpOnly cookie and Accept-Language.
+                    $preferredKey = $this->getRequestLanguageKey() ?: ($_COOKIE['localizator3_key'] ?? null);
                     if (!$preferredKey && !empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                         $preferredKey = localizator_detect_language_from_accept($_SERVER['HTTP_ACCEPT_LANGUAGE'], $langKeys);
                     }
@@ -467,24 +468,21 @@ class localizator
     }
 
     /**
-     * Sync cultureKey from cookie localizator3_key (connectors / AJAX without language path).
+     * Sync cultureKey / localizator3_key from a language key (cookie, request param, …).
      *
-     * @param string|null $cookieKey
+     * @param string $key
+     * @param bool $setCookie
      * @return bool
      */
-    public function applyLanguageFromCookie($cookieKey = null)
+    public function applyLanguageFromKey($key, $setCookie = false)
     {
-        if ($cookieKey === null) {
-            $cookieKey = isset($_COOKIE['localizator3_key']) ? trim((string) $_COOKIE['localizator3_key']) : '';
-        } else {
-            $cookieKey = trim((string) $cookieKey);
-        }
-        if ($cookieKey === '') {
+        $key = trim((string) $key);
+        if ($key === '') {
             return false;
         }
 
         $language = $this->modx->getObject(\localizator3\localizatorLanguage::class, [
-            'key' => $cookieKey,
+            'key' => $key,
             'active' => 1,
         ]);
         if (!$language) {
@@ -494,15 +492,56 @@ class localizator
         $cultureKey = (string) ($language->cultureKey ?: $language->key);
         $currentKey = (string) $this->modx->getOption('localizator3_key', null, '', true);
         $currentCulture = (string) $this->modx->getOption('cultureKey', null, '', true);
-        if ($currentKey === $cookieKey && $currentCulture === $cultureKey) {
+        if ($currentKey === $key && $currentCulture === $cultureKey) {
             return true;
         }
 
-        return $this->applyLanguage($language, (string) ($_SERVER['HTTP_HOST'] ?? ''), '', false);
+        return $this->applyLanguage($language, (string) ($_SERVER['HTTP_HOST'] ?? ''), '', $setCookie);
     }
 
     /**
-     * Resolve language for connector / AJAX: Referer path → cookie → HTTP host.
+     * Sync cultureKey from cookie localizator3_key (connectors / AJAX without language path).
+     *
+     * @param string|null $cookieKey
+     * @return bool
+     */
+    public function applyLanguageFromCookie($cookieKey = null)
+    {
+        if ($cookieKey === null) {
+            $cookieKey = isset($_COOKIE['localizator3_key']) ? trim((string) $_COOKIE['localizator3_key']) : '';
+        }
+
+        return $this->applyLanguageFromKey($cookieKey, false);
+    }
+
+    /**
+     * Explicit `language` request param (GET/POST). Highest priority: a switcher
+     * or a demo link `?language=ru` must beat the HttpOnly cookie localizator3_key.
+     *
+     * @return string '' when the param is missing / not an active language key
+     */
+    public function getRequestLanguageKey()
+    {
+        $param = trim((string) $this->modx->getOption('localizator3_request_language_param', null, 'language', true));
+        if ($param === '') {
+            return '';
+        }
+
+        $key = isset($_REQUEST[$param]) && is_string($_REQUEST[$param]) ? trim($_REQUEST[$param]) : '';
+        if ($key === '' || !preg_match('/^[a-z]{2}(-[a-z0-9]{2,8})?$/i', $key)) {
+            return '';
+        }
+
+        $exists = (bool) $this->modx->getCount(\localizator3\localizatorLanguage::class, [
+            'key' => $key,
+            'active' => 1,
+        ]);
+
+        return $exists ? $key : '';
+    }
+
+    /**
+     * Resolve language for connector / AJAX: `language` param → Referer path → cookie → HTTP host.
      *
      * Full page requests still use OnHandleRequest → findLocalization(URL).
      * Package connectors often never send X-Requested-With and have empty `q`,
@@ -512,6 +551,13 @@ class localizator
      */
     public function resolveConnectorLanguage()
     {
+        // Explicit request param beats Referer / cookie (HttpOnly cookie must not
+        // override an intentional `language=xx` in the connector payload).
+        $requestKey = $this->getRequestLanguageKey();
+        if ($requestKey !== '' && $this->applyLanguageFromKey($requestKey, false)) {
+            return true;
+        }
+
         $host = (string) ($_SERVER['HTTP_HOST'] ?? '');
         $request = '';
 

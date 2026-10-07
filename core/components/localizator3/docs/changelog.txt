@@ -3,6 +3,16 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 версионирование — [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.11-beta] - 2026-10-07
+
+### Добавлено
+- Настройка `localizator3_request_language_param` (по умолчанию `language`): GET/POST-параметр с явным ключом языка. Приоритетнее cookie `localizator3_key` в connector/AJAX и в auto-detect редиректах. Пустое значение отключает переопределение. Пример: `?language=ru` при cookie `en`.
+- Методы `localizator::getRequestLanguageKey()` и `applyLanguageFromKey()` для чтения параметра и синхронизации `cultureKey` / `localizator3_key`.
+
+### Изменено
+- `resolveConnectorLanguage()`: порядок резолва — параметр запроса → Referer path → cookie → HTTP host.
+- `applyLanguageFromCookie()` делегирует в `applyLanguageFromKey()`.
+
 ## [1.0.10-beta] - 2026-07-17
 
 ### Добавлено

@@ -30,6 +30,11 @@ return [
         'value' => false,
         'area' => 'localizator3_main',
     ],
+    'request_language_param' => [
+        'xtype' => 'textfield',
+        'value' => 'language',
+        'area' => 'localizator3_main',
+    ],
     'debug_log' => [
         'xtype' => 'combo-boolean',
         'value' => false,

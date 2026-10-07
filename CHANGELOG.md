@@ -13,16 +13,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.0.11-beta] - 2026-10-07
+
+### Added
+- Explicit `language` request param (GET/POST) now has the highest priority when resolving connector/AJAX language and in auto-detect redirects — it beats the HttpOnly `localizator3_key` cookie. Param name is configurable via `localizator3_request_language_param` (default `language`, empty disables). Use case: demo/stand links like `?language=ru` while the visitor's cookie is `en`.
+- `applyLanguageFromKey()` / `getRequestLanguageKey()` — sync `cultureKey` / `localizator3_key` from any language key (request param, cookie, custom source).
+
+### Changed
+- `resolveConnectorLanguage()` order: request param → Referer path → cookie → HTTP host.
+- `applyLanguageFromCookie()` delegates to `applyLanguageFromKey()`.
+
+---
+
 ## [1.0.10-beta] - 2026-07-17
 
 ### Added
 - `localizator::applyLanguage()`, `applyLanguageFromCookie()`, `resolveConnectorLanguage()` for language sync outside full page requests.
 
 ### Fixed
-- Connector / AJAX: `OnMODXInit` → `resolveConnectorLanguage()` (Referer path or cookie `localizator3_key`). Previously only `X-Requested-With: XMLHttpRequest` + Referer worked, so package connectors kept the system `cultureKey` (often `ru`) while the storefront UI was already `en`.
+- Connector / AJAX requests now sync `cultureKey` and `localizator3_key` from Referer path or cookie `localizator3_key` (`OnMODXInit` → `resolveConnectorLanguage`). Previously only `X-Requested-With: XMLHttpRequest` + Referer worked, so package connectors kept the system `cultureKey` (often `ru`) while the page UI was already `en`.
 
 ### Changed
-- Language application extracted from `findLocalization()` into `applyLanguage()` for reuse.
+- Extracted `applyLanguage()` / `applyLanguageFromCookie()` from `findLocalization()` for reuse.
 
 ---
 
