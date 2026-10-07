@@ -75,6 +75,8 @@ $_lang['setting_localizator3_404_if_no_localization_desc'] = 'При включ�
 
 $_lang['setting_localizator3_auto_detect_language'] = 'Автоопределение языка посетителя';
 $_lang['setting_localizator3_auto_detect_language_desc'] = 'При включении перенаправлять новых посетителей на версию по Accept-Language или cookie.';
+$_lang['setting_localizator3_request_language_param'] = 'Параметр запроса с языком';
+$_lang['setting_localizator3_request_language_param_desc'] = 'GET/POST-параметр с явным ключом языка (по умолчанию «language»). Приоритетнее cookie localizator3_key в connector/AJAX-запросах и auto-detect редиректах. Пустое значение отключает переопределение.';
 
 $_lang['setting_localizator3_debug_log'] = 'Отладочное логирование';
 $_lang['setting_localizator3_debug_log_desc'] = 'Логировать вызовы getformconfig/getlist в error.log для диагностики пустого списка языков или переводов.';

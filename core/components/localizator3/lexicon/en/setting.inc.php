@@ -75,6 +75,8 @@ $_lang['setting_localizator3_404_if_no_localization_desc'] = 'When enabled, show
 
 $_lang['setting_localizator3_auto_detect_language'] = 'Auto-detect visitor language';
 $_lang['setting_localizator3_auto_detect_language_desc'] = 'When enabled, redirect first-time visitors to the language version based on Accept-Language header or cookie.';
+$_lang['setting_localizator3_request_language_param'] = 'Language request parameter';
+$_lang['setting_localizator3_request_language_param_desc'] = 'GET/POST parameter with an explicit language key (default "language"). Beats the localizator3_key cookie in connector/AJAX requests and auto-detect redirects. Empty value disables the override.';
 
 $_lang['setting_localizator3_debug_log'] = 'Debug logging';
 $_lang['setting_localizator3_debug_log_desc'] = 'Log getformconfig/getlist calls to MODX error log for troubleshooting empty languages or translation list.';

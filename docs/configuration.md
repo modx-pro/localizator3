@@ -16,6 +16,7 @@
 | `localizator3_disabled_templates` | text | — | ID шаблонов без вкладки Localizator (через запятую, например `3,7,12`) |
 | `localizator3_404_if_no_localization` | bool | false | Показывать 404, если нет локализации для текущего языка. Событие: `OnHasLocalizatorError404` |
 | `localizator3_auto_detect_language` | bool | false | Автоопределение языка по Accept-Language / cookie `localizator3_key` |
+| `localizator3_request_language_param` | string | `language` | GET/POST-параметр с явным ключом языка; приоритетнее cookie в connector/AJAX и auto-detect. Пустое значение отключает |
 | `localizator3_debug_log` | bool | false | Отладочное логирование в `core/cache/logs/error.log` с префиксом `[localizator3]` |
 | `localizator3_tv_fields` | text | — | Список TV через запятую для вкладки локализации. Пусто — все TV, доступные для локализации |
 
