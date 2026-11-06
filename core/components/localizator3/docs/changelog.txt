@@ -3,6 +3,12 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 версионирование — [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Исправлено
+- TV-поля во вкладке «Локализация» рендерятся по своему типу: number, listbox, listbox-multiple, checkbox, radio и др. — нативными контролами PrimeVue; MIGX, tvmedia3x и прочие кастомные типы — штатным рендером MODX. Раньше все TV выводились простыми textarea.
+- Значения кастомных TV (MIGX, tvmedia3x и др.) корректно собираются и сохраняются для каждой локализации; сгенерированные id полей не конфликтуют с TV основной формы ресурса.
+
 ## [1.0.11-beta] - 2026-10-07
 
 ### Добавлено

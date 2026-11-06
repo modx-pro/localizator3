@@ -174,6 +174,7 @@
 
 - Dropdown **всех активных языков** (`activeLanguages` из `mgr/content/getformconfig`).
 - Inline-форма с табами **Документ** / **TV** (не grid-список переводов).
+- TV рендерятся по типу: number/listbox/checkbox/radio и др. — контролами PrimeVue, MIGX/TVMedia3x и прочие кастомные типы — штатным рендером MODX (`renderMode`).
 - Действия: Save, Translate, enable/disable, delete.
 - ExtJS: вкладка с `layout: anchor`, mount через `OnDocFormPrerender` + retry в `content.js`.
 
