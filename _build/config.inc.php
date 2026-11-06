@@ -31,7 +31,7 @@ if (!defined('MODX_CORE_PATH')) {
 return [
     'name' => 'Localizator3',
     'name_lower' => 'localizator3',
-    'version' => '1.0.12',
+    'version' => '1.0.13',
     'release' => 'beta',
     'install' => true,
     'update' => [

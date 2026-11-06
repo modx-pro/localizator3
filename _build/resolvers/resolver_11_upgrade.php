@@ -22,55 +22,73 @@ if ($transport->xpdo) {
 
             $manager = $modx->getManager();
 
-            $include = include_once($modx->getOption('core_path') . 'components/localizator3/model/localizator3/plugin.mysql.inc.php');
+            $include = include($modx->getOption('core_path') . 'components/localizator3/model/localizator3/plugin.mysql.inc.php');
             if (is_array($include)) {
+                $processed = array();
                 foreach ($include as $class => $map) {
-                    if (!isset($modx->map[$class])) {
-                        $modx->loadClass($class);
+                    $mappedClass = $modx->loadClass($class);
+                    if (!$mappedClass) {
+                        $mappedClass = $class;
                     }
-                    if (isset($modx->map[$class])) {
-                        foreach ($map as $key => $values) {
-                            $modx->map[$class][$key] = array_merge($modx->map[$class][$key], $values);
-                        }
+                    if (isset($processed[$mappedClass])) {
+                        continue;
+                    }
+                    if (!isset($modx->map[$mappedClass])) {
+                        continue;
+                    }
+                    $processed[$mappedClass] = true;
 
-                        $tableFields = array();
-                        $c = $modx->prepare("SHOW COLUMNS IN {$modx->getTableName($class)}");
-                        $c->execute();
-                        while ($cl = $c->fetch(PDO::FETCH_ASSOC)) {
-                            $tableFields[$cl['Field']] = $cl['Field'];
-                        }
-                        foreach ($map['fieldMeta'] as $field => $v) {
-                            if (in_array($field, $tableFields)) {
-                                unset($tableFields[$field]);
-                                $manager->alterField($class, $field);
-                            } else {
-                                $manager->addField($class, $field);
-                            }
-                        }
+                    // MODX 3: xPDOMap — вложенное присваивание не сохраняется,
+                    // merge на копии + запись обратно всей карты (см. OnMODXInit).
+                    $currentMap = $modx->map[$mappedClass];
+                    foreach ($map as $key => $values) {
+                        $current = $currentMap[$key] ?? array();
+                        $currentMap[$key] = array_merge($current, $values);
+                    }
+                    $modx->map[$mappedClass] = $currentMap;
 
-                        $indexes = array();
-                        $c = $modx->prepare("SHOW INDEX FROM {$modx->getTableName($class)}");
-                        $c->execute();
-                        while ($cl = $c->fetch(PDO::FETCH_ASSOC)) {
-                            $indexes[$cl['Key_name']] = $cl['Key_name'];
+                    $tableFields = array();
+                    $table = $modx->getTableName($mappedClass);
+                    $c = $modx->prepare("SHOW COLUMNS IN {$table}");
+                    $c->execute();
+                    while ($cl = $c->fetch(PDO::FETCH_ASSOC)) {
+                        $tableFields[$cl['Field']] = $cl['Field'];
+                    }
+                    foreach ($map['fieldMeta'] as $field => $v) {
+                        if (in_array($field, $tableFields)) {
+                            unset($tableFields[$field]);
+                            $manager->alterField($mappedClass, $field);
+                        } else {
+                            $manager->addField($mappedClass, $field);
                         }
-                        foreach ($map['indexes'] as $name => $meta) {
-                            if (in_array($name, $indexes)) {
-                                unset($indexes[$name]);
-                            } else {
-                                $manager->addIndex($class, $name);
-                            }
+                    }
+
+                    $indexes = array();
+                    $c = $modx->prepare("SHOW INDEX FROM {$table}");
+                    $c->execute();
+                    while ($cl = $c->fetch(PDO::FETCH_ASSOC)) {
+                        $indexes[$cl['Key_name']] = $cl['Key_name'];
+                    }
+                    foreach ($map['indexes'] as $name => $meta) {
+                        if (in_array($name, $indexes)) {
+                            unset($indexes[$name]);
+                        } else {
+                            $manager->addIndex($mappedClass, $name);
                         }
                     }
                 }
             }
 
+            // Миграция только для старых установок localizator v1:
+            // прежняя настройка localizator_tv_fields задавала список TV.
+            // Если настройки нет — ничего не трогаем: новые TV по умолчанию
+            // выключены (localizator3_enabled=0), не включаем всё подряд.
             $fields_in = $fields_out = $criteria = array();
             if ($fields = $modx->getOption('localizator_tv_fields', null, false, true)) {
                 $fields = array_map('trim', explode(',', $fields));
 
                 foreach ($fields as $v) {
-                    if (is_numeric($v)) {
+                    if (is_numeric($v) || $v === '') {
                         continue;
                     }
 
@@ -88,16 +106,18 @@ if ($transport->xpdo) {
                 }
             }
 
-            $c = $modx->newQuery(\MODX\Revolution\modTemplateVar::class);
-            $c->command('update');
-            $c->set(array(
-                'localizator3_enabled' => 1
-            ));
-            if ($criteria) {
+            if (!empty($criteria)) {
+                $c = $modx->newQuery(\MODX\Revolution\modTemplateVar::class);
+                $c->command('update');
+                $c->set(array(
+                    'localizator3_enabled' => 1
+                ));
                 $c->where($criteria);
+                $c->prepare();
+                if ($c->stmt) {
+                    $c->stmt->execute();
+                }
             }
-            $c->prepare();
-            $c->stmt->execute();
 
             $modx->removeCollection(\MODX\Revolution\modSystemSetting::class, [
                 'key' => 'localizator3_tv_fields',

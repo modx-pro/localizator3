@@ -23,11 +23,10 @@ class pdoFetchLocalizator extends pdoFetch
             $this->config['localizator3_key'] = $this->modx->getOption('localizator3_key', $this->config, $this->modx->getOption('localizator3_key', null), true);
             $this->config['localizatorTVs'] = array();
             $where = array('name:IN' => array_keys($this->config['tvsJoin']));
-            $columns = $this->modx->getFields('modTemplateVar');
-            if (isset($columns['localizator3_enabled'])) {
+            if (\localizator3\localizatorContent::hasLocalizator3EnabledField($this->modx)) {
                 $where['localizator3_enabled'] = 1;
             }
-            $q = $this->modx->newQuery('modTemplateVar')
+            $q = $this->modx->newQuery(\MODX\Revolution\modTemplateVar::class)
                 ->where($where)
                 ->select('name');
             if ($q->prepare() && $q->stmt->execute()) {
@@ -86,9 +85,9 @@ class pdoFetchLocalizator extends pdoFetch
 
                     foreach ($processloctvs as $tv) {
 
-                        /** @var modTemplateVar $templateVar */
+                        /** @var \MODX\Revolution\modTemplateVar $templateVar */
                         if (!$templateVar = $this->getStore($tv, 'tv')) {
-                            if ($templateVar = $this->modx->getObject('modTemplateVar', array('name' => $tv))) {
+                            if ($templateVar = $this->modx->getObject(\MODX\Revolution\modTemplateVar::class, array('name' => $tv))) {
                                 $sourceCache = isset($prepareTypes[$templateVar->type])
                                     ? $templateVar->getSourceCache($this->modx->context->get('key'))
                                     : null;

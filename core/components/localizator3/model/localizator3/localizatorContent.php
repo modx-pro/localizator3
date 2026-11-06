@@ -64,6 +64,32 @@ class localizatorContent extends xPDOSimpleObject
         return self::getTemplateVarCollection($this);
     }
 
+    /**
+     * Есть ли поле localizator3_enabled и в карте xPDO, и физически в БД.
+     * Если колонки ещё нет (старая установка до resolver), фильтр
+     * по enabled не применяем — показываем все TV, как раньше, без SQL-ошибок.
+     */
+    public static function hasLocalizator3EnabledField($xpdo)
+    {
+        static $hasField = null;
+        if ($hasField !== null) {
+            return $hasField;
+        }
+        $hasField = false;
+        try {
+            $columns = $xpdo->getFields(\MODX\Revolution\modTemplateVar::class);
+            if (!isset($columns['localizator3_enabled'])) {
+                return $hasField;
+            }
+            $table = $xpdo->getTableName(\MODX\Revolution\modTemplateVar::class);
+            $c = $xpdo->prepare("SHOW COLUMNS IN {$table} LIKE 'localizator3_enabled'");
+            $hasField = ($c && $c->execute() && (bool)$c->fetch(\PDO::FETCH_ASSOC));
+        } catch (\Throwable $e) {
+            $hasField = false;
+        }
+        return $hasField;
+    }
+
     public static function prepareTVListCriteria(self $content)
     {
         $resource = $content->getOne('Resource');
@@ -82,8 +108,7 @@ class localizatorContent extends xPDOSimpleObject
             'tvtpl.templateid' => $resource->get('template'),
         ));
         $c->groupby('modTemplateVar.id');
-        $columns = $content->xpdo->getFields(\MODX\Revolution\modTemplateVar::class);
-        if (isset($columns['localizator3_enabled'])) {
+        if (self::hasLocalizator3EnabledField($content->xpdo)) {
             $c->where(array(
                 'modTemplateVar.localizator3_enabled' => 1,
             ));
@@ -328,7 +353,7 @@ class localizatorContent extends xPDOSimpleObject
 
     public static function renderTVOutput($xpdo, $tv, $value = '', $resourceId = 0)
     {
-        if (!localizator_is_mod_template_var($tv)) {
+        if (!($tv instanceof \MODX\Revolution\modTemplateVar)) {
             $byName = !is_numeric($tv);
             $tv = $xpdo->getObject(\MODX\Revolution\modTemplateVar::class, $byName ? array('name' => $tv) : $tv);
             if ($tv == null) {

@@ -131,8 +131,7 @@ class localizatorFormProcessor extends modProcessor
                 'tvtpl.tmplvarid = modTemplateVar.id',
                 'tvtpl.templateid' => $templateId,
             ));
-            $columns = $this->modx->getFields(\MODX\Revolution\modTemplateVar::class);
-            if (isset($columns['localizator3_enabled'])) {
+            if (\localizator3\localizatorContent::hasLocalizator3EnabledField($this->modx)) {
                 $c->where(array('modTemplateVar.localizator3_enabled' => 1));
             }
             $c->sortby('tvtpl.rank', 'ASC');

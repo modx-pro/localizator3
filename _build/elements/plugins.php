@@ -6,6 +6,7 @@ return [
         'description' => 'localizator3_plugin_desc',
         'events' => [
             'OnTVFormPrerender' => [],
+            'OnTVFormSave' => [],
             'OnDocFormPrerender' => [],
             'OnMODXInit' => [],
             'OnHandleRequest' => [],
