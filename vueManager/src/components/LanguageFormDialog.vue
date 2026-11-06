@@ -142,6 +142,7 @@ watch(() => props.initialData, (data) => {
     form.value = {
       ...data,
       http_host: normalizeHttpHost(data.http_host),
+      active: data.active === true || data.active === 1 || data.active === '1',
     }
   } else {
     resetForm()
