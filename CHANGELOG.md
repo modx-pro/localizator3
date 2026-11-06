@@ -6,10 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [Unreleased]
-
-### Changed
-- (pending changes)
+## [1.0.12-beta] - 2026-11-06
 
 ### Fixed
 - TV-поля на вкладке «Локализация» теперь рендерятся по своему типу: number, listbox, listbox-multiple, checkbox, radio и др. — нативными контролами PrimeVue, а MIGX, tvmedia3x и прочие кастомные типы — штатным рендером MODX. Раньше все TV выводились простыми textarea.
