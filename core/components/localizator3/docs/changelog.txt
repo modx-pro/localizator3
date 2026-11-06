@@ -3,6 +3,18 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 версионирование — [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.13-beta] - Unreleased
+
+### Исправлено
+- Участие TV в локализации: новые TV по умолчанию выключены (`localizator3_enabled=0`), в локализации видны и сохраняются только включённые в форме TV. Раньше установка включала все TV подряд.
+- Исправлено слияние xPDO-карты `modTemplateVar` в MODX 3: ключ `MODX\Revolution\modTemplateVar` вместо legacy `modTemplateVar` (`OnMODXInit` + resolver) и запись всей карты обратно — вложенное `$modx->map[$class][$key]` в MODX 3 не сохраняется (xPDOMap возвращает копию). Колонка `localizator3_enabled` теперь гарантированно добавляется при установке/обновлении.
+- Чекбокс «TV доступно в локализациях» сохраняется: добавлен обработчик `OnTVFormSave` (снимание чекбокса шлёт 0, ExtJS 0 не отправляет, без обработчика TV нельзя было выключить).
+- Фильтры `getformconfig` / `localizatorContent` / `fields` / `pdofetchlocalizator3` проверяют физическую колонку, не только карту; на старых установках без колонки поведение прежнее, без SQL-ошибок.
+- Исправлен `localizatorContent::renderTVOutput()`: отсутствующая `localizator_is_mod_template_var()` заменена на `instanceof modTemplateVar` — подстановка локализованных TV завершалась фатальной ошибкой.
+
+### Изменено
+- Resolver `resolver_11_upgrade.php`: убран безусловный bulk-enable всех TV; явная миграция сохраняется только при наличии legacy-настройки `localizator_tv_fields` (localizator v1).
+
 ## [1.0.12-beta] - 2026-11-06
 
 ### Исправлено

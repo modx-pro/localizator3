@@ -11,17 +11,30 @@
  * @var localizator $localizator
  */
 
-$include = include_once($localizator->config['modelPath'] . 'localizator3/plugin.mysql.inc.php');
+$include = include($localizator->config['modelPath'] . 'localizator3/plugin.mysql.inc.php');
 if (is_array($include)) {
+    $processed = array();
     foreach ($include as $class => $map) {
-        if (!isset($modx->map[$class])) {
-            $modx->loadClass($class);
+        $mappedClass = $modx->loadClass($class);
+        if (!$mappedClass) {
+            $mappedClass = $class;
         }
-        if (isset($modx->map[$class])) {
-            foreach ($map as $key => $values) {
-                $modx->map[$class][$key] = array_merge($modx->map[$class][$key], $values);
-            }
+        if (isset($processed[$mappedClass])) {
+            continue;
         }
+        if (!isset($modx->map[$mappedClass])) {
+            continue;
+        }
+        $processed[$mappedClass] = true;
+        // MODX 3: $modx->map is xPDOMap (ArrayAccess); nested
+        // $modx->map[$class][$key] = ... does NOT persist (offsetGet
+        // returns by value). Merge on a copy, then write back whole map.
+        $currentMap = $modx->map[$mappedClass];
+        foreach ($map as $key => $values) {
+            $current = $currentMap[$key] ?? array();
+            $currentMap[$key] = array_merge($current, $values);
+        }
+        $modx->map[$mappedClass] = $currentMap;
     }
 }
 
