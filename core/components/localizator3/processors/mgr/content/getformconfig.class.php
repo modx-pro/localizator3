@@ -8,6 +8,46 @@
  */
 class localizatorContentGetFormConfigProcessor extends modProcessor
 {
+    /**
+     * TV types, которые Vue-форма рисует своими контролами.
+     * Остальные типы (migx, migxdb, кастомные рендеры и т.п.) рендерит MODX,
+     * а Vue только вставляет готовую разметку в форму.
+     *
+     * @var array
+     */
+    protected $nativeTvTypes = array(
+        'text',
+        'textarea',
+        'number',
+        'date',
+        'checkbox',
+        'listbox',
+        'listbox-multiple',
+        'richtext',
+        'email',
+        'url',
+        'tag',
+        'autotag',
+        'image',
+        'file',
+        'radio',
+        'hidden',
+    );
+
+    /** @var bool */
+    protected $tvRenderReady = false;
+
+    /**
+     * Смещение для id при рендере TV на сервере.
+     *
+     * Кастомные рендеры (tvmedia3x и др.) приводят id к int и строят по нему
+     * DOM/ExtJS-идентификаторы вида tv{id}. Числовой id со смещением остаётся
+     * числом (рендер работает), но не конфликтует с id TV основной формы ресурса.
+     *
+     * @var int
+     */
+    protected $tvRenderIdOffset = 5000000;
+
     public function process()
     {
         $debugLog = $this->modx->getOption('localizator3_debug_log', null, false) || (defined('LOCALIZATOR3_DEBUG_LOG') && LOCALIZATOR3_DEBUG_LOG);
@@ -54,9 +94,14 @@ class localizatorContentGetFormConfigProcessor extends modProcessor
         $richtext = $resource->get('richtext');
         $localizator->working_context = $resource->get('context_key');
 
+        $loc = null;
+        if ($locId) {
+            $loc = $this->modx->getObject(\localizator3\localizatorContent::class, $locId);
+        }
+
         $resourcefields = $this->getResourceFields($classKey, $richtext);
         try {
-            $tvtabs = $this->getTvTabs($resource);
+            $tvtabs = $this->getTvTabs($resource, $loc);
             if ($debugLog) {
                 $this->modx->log(modX::LOG_LEVEL_DEBUG, '[localizator3 getformconfig] getTvTabs OK, tabs=' . count($tvtabs));
             }
@@ -112,8 +157,8 @@ class localizatorContentGetFormConfigProcessor extends modProcessor
         if (!$locId) {
             $existing = $this->modx->getCollection(\localizator3\localizatorContent::class, ['resource_id' => $resourceId]);
             $existing = $existing ?? [];
-            foreach ($existing as $loc) {
-                $usedKeys[] = $loc->get('key');
+            foreach ($existing as $existingLoc) {
+                $usedKeys[] = $existingLoc->get('key');
             }
         }
         $fallbackUsed = false;
@@ -198,22 +243,19 @@ class localizatorContentGetFormConfigProcessor extends modProcessor
             );
         }
 
-        if ($locId) {
-            $loc = $this->modx->getObject(\localizator3\localizatorContent::class, $locId);
-            if ($loc) {
-                try {
-                    $record = $loc->toArray();
-                    foreach ($loc->getTemplateVars() as $tv) {
-                        $record['tvlocalizator_' . $tv->get('name')] = $tv->get('value');
-                    }
-                    $result['record'] = $record;
-                    if ($debugLog) {
-                        $this->modx->log(modX::LOG_LEVEL_DEBUG, '[localizator3 getformconfig] record loaded for loc_id=' . $locId);
-                    }
-                } catch (\Exception $e) {
-                    $this->modx->log(modX::LOG_LEVEL_ERROR, '[localizator3 getformconfig] getTemplateVars for record exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-                    $this->modx->log(modX::LOG_LEVEL_ERROR, '[localizator3 getformconfig] record load trace: ' . $e->getTraceAsString());
+        if ($loc) {
+            try {
+                $record = $loc->toArray();
+                foreach ($loc->getTemplateVars() as $tv) {
+                    $record['tvlocalizator_' . $tv->get('name')] = $tv->get('value');
                 }
+                $result['record'] = $record;
+                if ($debugLog) {
+                    $this->modx->log(modX::LOG_LEVEL_DEBUG, '[localizator3 getformconfig] record loaded for loc_id=' . $locId);
+                }
+            } catch (\Exception $e) {
+                $this->modx->log(modX::LOG_LEVEL_ERROR, '[localizator3 getformconfig] getTemplateVars for record exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+                $this->modx->log(modX::LOG_LEVEL_ERROR, '[localizator3 getformconfig] record load trace: ' . $e->getTraceAsString());
             }
         }
 
@@ -257,7 +299,7 @@ class localizatorContentGetFormConfigProcessor extends modProcessor
         return $fields;
     }
 
-    protected function getTvTabs($resource)
+    protected function getTvTabs($resource, $loc = null)
     {
         $debugLog = $this->modx->getOption('localizator3_debug_log', null, false) || (defined('LOCALIZATOR3_DEBUG_LOG') && LOCALIZATOR3_DEBUG_LOG);
         if ($debugLog) {
@@ -305,17 +347,209 @@ class localizatorContentGetFormConfigProcessor extends modProcessor
                     'fields' => array(),
                 );
             }
-            $tvtabs[$catId]['fields'][] = array(
-                'field' => $tv->get('name'),
-                'caption' => $tv->get('caption') ?: $tv->get('name'),
+
+            $tvName = (string)$tv->get('name');
+            $tvType = (string)$tv->get('type');
+            $renderMode = $this->getTvRenderMode($tvType);
+            $value = $loc ? $loc->get($tvName) : $tv->get('default_text');
+
+            $field = array(
+                'field' => $tvName,
+                'caption' => $tv->get('caption') ?: $tvName,
                 'description' => $tv->get('description'),
                 'type' => 'tv',
-                'inputTV' => $tv->get('name'),
+                'tvType' => $tvType,
+                'renderMode' => $renderMode,
+                'inputTV' => $tvName,
                 'visible' => true,
             );
+
+            if (in_array($tvType, array('checkbox', 'listbox', 'listbox-multiple', 'radio'), true)) {
+                $field['options'] = $this->getTvOptions($tv, $resource);
+            }
+
+            if ($renderMode === 'html') {
+                try {
+                    $renderId = $this->tvRenderIdOffset + (int)$tv->get('id');
+                    $field['renderTvId'] = $renderId;
+                    $formElement = $this->renderTvInput($tv, $resource, $value, $renderId);
+                    if ($formElement !== '') {
+                        $field['formElement'] = $formElement;
+                    }
+                } catch (\Throwable $e) {
+                    $this->modx->log(
+                        modX::LOG_LEVEL_ERROR,
+                        '[localizator3 getformconfig] TV render failed for ' . $tvName . ' (' . $tvType . '): '
+                        . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
+                    );
+                }
+            }
+
+            $tvtabs[$catId]['fields'][] = $field;
         }
 
         return array_values($tvtabs);
+    }
+
+    /**
+     * @param string $type
+     * @return string native|html
+     */
+    protected function getTvRenderMode($type)
+    {
+        return in_array($type, $this->nativeTvTypes, true) ? 'native' : 'html';
+    }
+
+    /**
+     * Возвращает элементы listbox/checkbox/radio в виде [{label, value}].
+     *
+     * @param \MODX\Revolution\modTemplateVar $tv
+     * @param \MODX\Revolution\modResource $resource
+     * @return array
+     */
+    protected function getTvOptions($tv, $resource)
+    {
+        $elements = $tv->get('elements');
+        if (!is_array($elements)) {
+            $elements = $tv->processBindings((string)$elements, (int)$resource->get('id'));
+        }
+        if (is_string($elements) && $elements === '') {
+            return array();
+        }
+
+        $options = $tv->parseInputOptions($elements);
+        $result = array();
+        foreach ((array)$options as $option) {
+            if (is_array($option)) {
+                $label = $option['text'] ?? $option['label'] ?? $option['name'] ?? null;
+                $value = $option['value'] ?? $option['key'] ?? null;
+                if ($label === null && $value === null) {
+                    $values = array_values($option);
+                    $label = $values[0] ?? '';
+                    $value = $values[1] ?? $label;
+                }
+                if ($value === null) {
+                    $value = $label;
+                }
+            } else {
+                $parts = explode('==', (string)$option, 2);
+                $label = $parts[0];
+                $value = $parts[1] ?? $parts[0];
+            }
+
+            $label = (string)$label;
+            $value = (string)$value;
+            if ($label === '' && $value === '') {
+                continue;
+            }
+            $result[] = array(
+                'label' => $label,
+                'value' => $value,
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Рендерит штатный input TV через MODX, с уникальным id формы локализации.
+     *
+     * @param \MODX\Revolution\modTemplateVar $tv
+     * @param \MODX\Revolution\modResource $resource
+     * @param mixed $value
+     * @param int|null $renderId
+     * @return string
+     */
+    protected function renderTvInput($tv, $resource, $value, $renderId = null)
+    {
+        $this->initTvRenderEnvironment();
+
+        $name = (string)$tv->get('name');
+        if ($renderId === null) {
+            $renderId = $this->tvRenderIdOffset + (int)$tv->get('id');
+        }
+        $renderId = (int)$renderId;
+
+        // Клонируем TV, чтобы не менять закэшированный в xPDO объект.
+        $renderTv = clone $tv;
+        $renderTv->set('id', $renderId);
+        $renderTv->set('resourceId', (int)$resource->get('id'));
+        $renderTv->set('value', $value);
+
+        $html = (string)$renderTv->renderInput($resource);
+
+        // Кастомный рендер строит name по своему (числовому) id.
+        // Переименовываем только name, id оставляем прежним: рендеры ищут
+        // свои поля через getElementById('tv' + id) и должны продолжать работать.
+        $html = $this->renameTvInputName($html, $renderId, 'tvlocalizator_' . $name);
+
+        // Не даём полям локализации попасть в ExtJS-форму ресурса:
+        // иначе required-TV переводов участвуют в валидации основной формы.
+        $html = str_replace(array(
+            "Ext.getCmp('modx-panel-resource').getForm().add(fld);",
+            'Ext.getCmp("modx-panel-resource").getForm().add(fld);',
+        ), '', $html);
+
+        return $html;
+    }
+
+    /**
+     * Переименовывает name="tv{id}" в name="tvlocalizator_{name}".
+     *
+     * @param string $html
+     * @param int $renderId
+     * @param string $targetName
+     * @return string
+     */
+    protected function renameTvInputName($html, $renderId, $targetName)
+    {
+        $pattern = '/\bname\s*=\s*(["\'])tv' . (int)$renderId . '(\[\])?\1/';
+
+        return (string)preg_replace_callback(
+            $pattern,
+            static function ($matches) use ($targetName) {
+                return 'name=' . $matches[1] . $targetName . ($matches[2] ?? '') . $matches[1];
+            },
+            $html
+        );
+    }
+
+    /**
+     * Готовит Smarty и контроллер, нужные рендерам TV (migx и др.).
+     *
+     * @return void
+     */
+    protected function initTvRenderEnvironment()
+    {
+        if ($this->tvRenderReady) {
+            return;
+        }
+
+        if (!$this->modx->controller || !method_exists($this->modx->controller, 'fetchTemplate')) {
+            $corePath = $this->modx->getOption('localizator3_core_path', null,
+                $this->modx->getOption('core_path') . 'components/localizator3/'
+            );
+            require_once $corePath . 'model/localizator3/localizatorformcontroller.class.php';
+            $controller = new LocalizatorFormController($this->modx);
+            $this->modx->controller = &$controller;
+        }
+        if (method_exists($this->modx->controller, 'loadTemplatesPath')) {
+            $this->modx->controller->loadTemplatesPath();
+        }
+
+        if (!isset($this->modx->smarty)) {
+            $this->modx->getService(
+                'smarty',
+                \MODX\Revolution\Smarty\modSmarty::class,
+                '',
+                array(
+                    'template_dir' => $this->modx->getOption('manager_path') . 'templates/'
+                        . $this->modx->getOption('manager_theme', null, 'default') . '/',
+                )
+            );
+        }
+
+        $this->tvRenderReady = true;
     }
 
     /**

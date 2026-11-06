@@ -133,6 +133,18 @@ case 'OnBuildLocalizationTabs':
 | `languages` | array | Языки без существующей локализации (для создания) |
 | `record` | object\|null | Данные записи (при параметрах `key` или `loc_id`) |
 
+TV-поля (`field` с `inputTV`) содержат дополнительные признаки рендера:
+
+| Поле | Тип | Описание |
+|------|-----|----------|
+| `tvType` | string | MODX-тип TV (`number`, `listbox`, `migx`, `tvmedia3x`, …) |
+| `renderMode` | string | `native` — контрол PrimeVue, `html` — штатный рендер MODX |
+| `options` | array\|null | `[{ label, value }]` для checkbox/radio/listbox* |
+| `formElement` | string\|null | Готовая разметка для `renderMode = html` |
+| `renderTvId` | int\|null | id рендер-копии TV (`5000000 + id`), для полей `html` |
+
+Стандартные типы рисуются нативными контролами Vue; MIGX/TVMedia3x и прочие кастомные типы рендерятся MODX на сервере, а клиент переименовывает `name` полей в `tvlocalizator_{name}`.
+
 Плагины меняют `tabs` и `customization` через событие `OnBuildLocalizationTabs`.
 
 ---

@@ -80,7 +80,7 @@
     <div v-else-if="!formReady && activeLanguages.length === 0" class="content-grid__empty">
       {{ emptyLanguagesMessage }}
     </div>
-    <form v-else-if="formReady" class="loc-panel loc-form content-grid__form" @submit.prevent="submitForm">
+    <form v-else-if="formReady" ref="formEl" class="loc-panel loc-form content-grid__form" @submit.prevent="submitForm">
       <div v-if="!isEdit" class="content-grid__active-row">
         <Checkbox v-model="form.active" :binary="true" input-id="content-active" />
         <label for="content-active" class="loc-form-checkbox__label">
@@ -101,22 +101,31 @@
                 v-for="field in visibleFields(tab)"
                 :key="field.field"
                 class="loc-form-field"
-                :class="{ 'loc-form-field--full': field.field === 'content' || field.type === 'textarea' || field.type === 'richtext' }"
+                :class="fieldClasses(field)"
               >
-                <label v-if="field.caption" :for="'field-' + field.field" class="loc-form-label">
+                <label
+                  v-if="field.caption && field.tvType !== 'hidden'"
+                  :for="'field-' + field.field"
+                  class="loc-form-label"
+                >
                   {{ field.caption }}
                   <span v-if="field.required" class="loc-form-label__required">*</span>
                 </label>
+                <TvFieldControl
+                  v-if="field.type === 'tv'"
+                  :field="field"
+                  v-model="form[tvFieldName(field)]"
+                />
                 <InputText
-                  v-if="field.type === 'text'"
+                  v-else-if="field.type === 'text'"
                   :id="'field-' + field.field"
                   v-model="form[field.field]"
                   :required="field.required"
                 />
                 <Textarea
-                  v-else-if="field.type === 'textarea' || field.type === 'richtext' || field.type === 'tv'"
+                  v-else-if="field.type === 'textarea' || field.type === 'richtext'"
                   :id="'field-' + field.field"
-                  v-model="form[tvFieldName(field)]"
+                  v-model="form[field.field]"
                   :required="field.required"
                   :rows="field.field === 'content' ? 12 : 4"
                 />
@@ -152,6 +161,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useToast, useConfirm } from 'primevue'
+import TvFieldControl from './shared/TvFieldControl.vue'
 
 const props = defineProps({
   resourceId: { type: Number, required: true },
@@ -171,6 +181,7 @@ const formConfig = ref(null)
 const formConfigLoading = ref(false)
 const formConfigError = ref(null)
 const form = ref({})
+const formEl = ref(null)
 const isEdit = ref(false)
 const languages = ref([])
 const activeTab = ref(null)
@@ -263,13 +274,143 @@ function tvFieldName(field) {
   return field.field
 }
 
-function buildParams(extra = {}) {
-  const params = { ...extra }
-  if (props.modAuth) {
-    params.HTTP_MODAUTH = props.modAuth
-    params.modAuth = props.modAuth
+function fieldClasses(field) {
+  const textTypes = ['textarea', 'richtext']
+  const isLongTv = field.type === 'tv'
+    && (textTypes.includes(field.tvType) || field.renderMode === 'html')
+  return {
+    'loc-form-field--full': field.field === 'content'
+      || textTypes.includes(field.type)
+      || isLongTv,
+    'loc-form-field--hidden': field.type === 'tv' && field.tvType === 'hidden',
   }
-  return new URLSearchParams(params)
+}
+
+function tvFields() {
+  const tabs = formConfig.value?.formtabs?.tvs?.tabs || []
+  const fields = []
+  for (const tab of tabs) {
+    for (const field of tab.fields || []) {
+      if (field.type === 'tv') {
+        fields.push(field)
+      }
+    }
+  }
+  return fields
+}
+
+function emptyTvValue(field) {
+  if (field.tvType === 'checkbox' || field.tvType === 'listbox-multiple') {
+    return []
+  }
+  if (field.tvType === 'number') {
+    return null
+  }
+  return ''
+}
+
+function normalizeTvRecord(record) {
+  const normalized = { ...record }
+  for (const field of tvFields()) {
+    const key = tvFieldName(field)
+    if (!(key in normalized)) {
+      continue
+    }
+    const value = normalized[key]
+    if (field.tvType === 'checkbox' || field.tvType === 'listbox-multiple') {
+      normalized[key] = value === '' || value === null || value === undefined
+        ? []
+        : (Array.isArray(value) ? value : String(value).split('||'))
+    } else if (field.tvType === 'number') {
+      normalized[key] = value === '' || value === null || value === undefined
+        ? null
+        : Number(value)
+    }
+  }
+  return normalized
+}
+
+/**
+ * Собирает значения TV, отрисованных штатными рендерами MODX (migx и др.).
+ * Обычные TV приходят из v-model и здесь не участвуют.
+ */
+function collectRenderedTvValues(payload) {
+  const root = formEl.value
+  if (!root) {
+    return payload
+  }
+
+  const grouped = new Map()
+  const controls = root.querySelectorAll(
+    'input[name^="tvlocalizator_"], textarea[name^="tvlocalizator_"], select[name^="tvlocalizator_"]'
+  )
+  for (const el of controls) {
+    const rawName = el.getAttribute('name')
+    if (!rawName || el.disabled) {
+      continue
+    }
+    const name = rawName.replace(/\[\]$/, '')
+    let entry = grouped.get(name)
+    if (!entry) {
+      entry = { single: null, values: [], many: false }
+      grouped.set(name, entry)
+    }
+    if (el.type === 'checkbox') {
+      entry.many = true
+      if (el.checked) {
+        entry.values.push(el.value)
+      }
+    } else if (el.type === 'radio') {
+      if (el.checked) {
+        entry.single = el.value
+      }
+    } else if (el.tagName === 'SELECT' && el.multiple) {
+      entry.many = true
+      entry.values = Array.from(el.selectedOptions).map((option) => option.value)
+    } else {
+      entry.single = el.value
+    }
+  }
+
+  const result = { ...payload }
+  for (const [name, entry] of grouped) {
+    if (entry.many) {
+      result[name] = entry.values
+    } else if (entry.single !== null) {
+      result[name] = entry.single
+    }
+  }
+  return result
+}
+
+function buildParams(extra = {}) {
+  const params = new URLSearchParams()
+  if (props.modAuth) {
+    params.append('HTTP_MODAUTH', props.modAuth)
+    params.append('modAuth', props.modAuth)
+  }
+  for (const [key, value] of Object.entries(extra)) {
+    if (value === undefined) {
+      continue
+    }
+    if (value === null) {
+      params.append(key, '')
+      continue
+    }
+    if (Array.isArray(value)) {
+      if (value.length === 0) {
+        params.append(key, '')
+        continue
+      }
+      const arrayKey = key.endsWith('[]') ? key : `${key}[]`
+      for (const item of value) {
+        params.append(arrayKey, item)
+      }
+    } else {
+      params.append(key, value)
+    }
+  }
+  return params
 }
 
 function getConnectorUrl() {
@@ -321,7 +462,7 @@ function applyFormConfigObject(object, includeRecord = false) {
     activeLanguages.value = object.activeLanguages
   }
   if (includeRecord && object.record) {
-    form.value = { ...object.record, resource_id: props.resourceId }
+    form.value = normalizeTvRecord({ ...object.record, resource_id: props.resourceId })
     isEdit.value = true
     selectedLocaleKey.value = object.record.key || selectedLocaleKey.value
   }
@@ -393,6 +534,9 @@ function initEmptyForm() {
         form.value[f.field] = form.value[f.field] ?? ''
       }
     }
+  }
+  for (const field of tvFields()) {
+    form.value[tvFieldName(field)] = emptyTvValue(field)
   }
   isEdit.value = false
 }
@@ -477,7 +621,8 @@ async function submitForm() {
   saving.value = true
   const action = isEdit.value ? 'mgr/content/update' : 'mgr/content/create'
   try {
-    await postConnector({ action, ...form.value })
+    const payload = collectRenderedTvValues({ action, ...form.value })
+    await postConnector(payload)
     const lx = props.lexicon || {}
     toast.add({
       severity: 'success',
@@ -624,6 +769,10 @@ watch(() => props.resourceId, () => {
 
 .content-grid__form {
   padding: 0;
+}
+
+.loc-form-field--hidden {
+  display: none;
 }
 
 .content-grid__loading,
