@@ -1,0 +1,15 @@
+### Summary
+
+- **Issue #37** – `getLocalizedSitemap`: `array_filter` без callback отбрасывал строку `'0'`, поэтому `parents=0` давал пустую карту. Добавлен фильтр `'strlen'` для сохранения `0`. `getChildIds` вызывается для каждого родителя отдельно (MODX 3 не принимает массив), глубина обхода работает корректно (#37).
+- **Issue #35** – `getLanguageList` (`snippet.getlocales.php`): значение `outerClass` (запасное `languages`) теперь передаётся в чанк через `$data['outerClass']`. Шаблон `chunk.languages.tpl` корректно получает `{$outerClass}` без явной передачи параметра (#35).
+- **Issue #34** – Сборка transport: `snippets.php` и `chunks.php` теперь используют префиксы `snippet.` и `chunk.` в поле `file`, что совпадает с реальными именами файлов (`snippet.getlocales.php`, `chunk.languages.tpl`). Сниппеты и чанки теперь собираются с правильным содержимым (#34).
+
+### Tested
+- Пакет `php _build/build.php` собирается без ошибок.
+- Сниппеты и чанки содержат корректный код.
+- `outerClass` корректно попадает в чанк.
+- `getLocalizedSitemap` работает с `parents=0` и с несколькими родителями через запятую.
+
+### Checklist
+- [x] Код отформатирован.
+- [x] Обновлен changelog.
