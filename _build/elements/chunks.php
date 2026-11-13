@@ -2,11 +2,11 @@
 
 return [
     'languages.tpl' => [
-        'file' => 'languages',
+        'file' => 'chunk.languages',
         'description' => 'localizator_chunk_languages_desc',
     ],
     'languages.dropdown.tpl' => [
-        'file' => 'languages.dropdown',
+        'file' => 'chunk.languages.dropdown',
         'description' => 'localizator_chunk_languages_dropdown_desc',
     ],
 ];

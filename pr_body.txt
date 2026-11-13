@@ -1,0 +1,13 @@
+### Summary
+
+- **Issue #31** – добавлен класс `ModxPro\PdoTools\FetchLocalizator` (PSR-4) и резолвер теперь задаёт `pdotools_fetch_class = ModxPro\PdoTools\FetchLocalizator`. Удалён устаревший `pdofetchlocalizator3.class.php`.
+- **Issue #32** – процессоры `mgr/content/translate`, `mgr/lexicon/translate` и CLI-скрипт `translate_resources.php` используют `localizator::getDefaultLanguageKey()` (fallback на первый активный язык), поэтому `localizator3_default_language` больше не обязателен.
+- Обновлен `composer.json` (PSR-4 autoload) и `changelog.txt`.
+
+### Tested
+- Пакет собирается без ошибок, `pdotools_fetch_class` корректно установлен.
+- CLI-скрипт и процессоры работают без указания `localizator3_default_language`.
+
+### Checklist
+- [x] Код отформатирован.
+- [x] Обновлен changelog.
