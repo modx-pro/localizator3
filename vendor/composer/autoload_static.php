@@ -16,6 +16,10 @@ class ComposerStaticInit6b9bf254c7e3f327127fbd6bfa589caa
         array (
             'PhpParser\\' => 10,
         ),
+        'M' =>
+        array (
+            'ModxPro\\PdoTools\\' => 17,
+        ),
         'D' =>
         array (
             'DeepCopy\\' => 9,
@@ -26,6 +30,10 @@ class ComposerStaticInit6b9bf254c7e3f327127fbd6bfa589caa
         'PhpParser\\' =>
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
+        ),
+        'ModxPro\\PdoTools\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/core/components/localizator3/src',
         ),
         'DeepCopy\\' =>
         array (

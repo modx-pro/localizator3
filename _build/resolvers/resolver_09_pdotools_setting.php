@@ -16,7 +16,7 @@ if (!$transport->xpdo) {
 $modx = $transport->xpdo;
 $settingKey = 'pdotools_fetch_class';
 $settingNamespace = 'pdotools';
-$settingValue = 'pdotools.pdofetchlocalizator3';
+$settingValue = 'ModxPro\\PdoTools\\FetchLocalizator';
 
 $action = $options[\xPDO\Transport\xPDOTransport::PACKAGE_ACTION] ?? null;
 $isInstallOrUpgrade = $action === \xPDO\Transport\xPDOTransport::ACTION_INSTALL
