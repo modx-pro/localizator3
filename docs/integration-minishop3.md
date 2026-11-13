@@ -2,7 +2,7 @@
 
 Локализация товаров, опций и их значений [miniShop3](https://modstore.pro/packages/ecommerce/minishop3).
 
-**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
+**Версия:** 1.1.0-beta · [Оглавление документации](./README.md)
 
 ---
 

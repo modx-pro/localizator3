@@ -8,7 +8,6 @@
   <InputNumber
     v-else-if="field.tvType === 'number'"
     :model-value="numberValue"
-    :placeholder="field.caption"
     fluid
     @update:model-value="updateValue"
   />
@@ -19,7 +18,6 @@
     :options="options"
     option-label="label"
     option-value="value"
-    :placeholder="field.caption"
     show-clear
     fluid
     @update:model-value="updateValue"
@@ -31,7 +29,6 @@
     :options="options"
     option-label="label"
     option-value="value"
-    :placeholder="field.caption"
     display="chip"
     fluid
     @update:model-value="updateValue"
@@ -62,7 +59,6 @@
   <Textarea
     v-else-if="isTextarea"
     :model-value="stringValue"
-    :placeholder="field.caption"
     :rows="textareaRows"
     fluid
     @update:model-value="updateValue"
@@ -71,7 +67,6 @@
   <InputText
     v-else
     :model-value="stringValue"
-    :placeholder="field.caption"
     fluid
     @update:model-value="updateValue"
   />

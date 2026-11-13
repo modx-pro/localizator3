@@ -8,7 +8,7 @@ import { ref, computed } from 'vue'
 
 const DEFAULT_TIMEOUT = 30000
 
-class ConnectorError extends Error {
+export class ConnectorError extends Error {
   constructor(message, response = null, status = null) {
     super(message)
     this.name = 'ConnectorError'
@@ -31,11 +31,26 @@ export function useConnector(connectorUrl, modAuth) {
   function buildFormData(params) {
     const data = new URLSearchParams()
     for (const [key, value] of Object.entries(params)) {
-      if (value !== undefined && value !== null) {
-        data.append(key, String(value))
+      if (value === undefined) {
+        continue
       }
+      if (value === null) {
+        data.append(key, '')
+        continue
+      }
+      if (Array.isArray(value)) {
+        if (value.length === 0) {
+          data.append(key, '')
+          continue
+        }
+        const arrayKey = key.endsWith('[]') ? key : `${key}[]`
+        for (const item of value) {
+          data.append(arrayKey, String(item))
+        }
+        continue
+      }
+      data.append(key, String(value))
     }
-    // Add authentication
     if (authToken.value) {
       data.append('modAuth', authToken.value)
     }

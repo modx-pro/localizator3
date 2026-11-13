@@ -27,9 +27,6 @@ $_lang['setting_localizator_translate_translated_fields_desc'] = 'Avtomatik tarj
 $_lang['setting_localizator_translate_fields'] = 'Tarjima maydonlari ro\'yxati';
 $_lang['setting_localizator_translate_fields_desc'] = 'Ko\'rsatilgan maydonlar avtomatik tarjima paytida tarjima qilinadi';
 
-$_lang['setting_localizator_tv_fields'] = 'Qo\'shimcha maydonlar ro\'yxati (TV)';
-$_lang['setting_localizator_tv_fields_desc'] = 'Ko\'rsatilgan qo\'shimcha maydonlar lokalizatsiyada tahrirlash uchun mavjud';
-
 $_lang['setting_localizator_check_permissions'] = 'Tahrirlash ruxsatini tekshirish';
 $_lang['setting_localizator_check_permissions_desc'] = 'Resurs lokalizatsiyalarini tahrirlash ruxsatini tekshirish';
 

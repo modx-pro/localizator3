@@ -1,8 +1,8 @@
 # Roadmap — Localizator3
 
-План развития на основе текущего состояния (**1.0.8-beta**), технического долга и анализа решений в аналогичных CMS.
+План развития на основе текущего состояния (**1.1.0-beta**), технического долга и анализа решений в аналогичных CMS.
 
-**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
+**Версия:** 1.1.0-beta · [Оглавление документации](./README.md)
 
 **См. также:** [architecture.md](./architecture.md), [changelog](../core/components/localizator3/docs/changelog.txt)
 
@@ -66,7 +66,7 @@ Localizator3 использует модель **«один ресурс — N �
 | **XLIFF / CSV export-import** | ❌ | ❌ | ✅ | ✅ Pro | ✅ |
 | **Duplicate → новый язык** | ⚙️ SimpleCopy | ✅ create | ✅ | ✅ | ✅ |
 | **Bulk translate / queue** | ⚙️ CLI | ❌ | ✅ | ❌ | ✅ TMGMT |
-| **Richtext в manager** | ❌ | ✅ native | ✅ | ✅ | ✅ |
+| **Richtext в manager** | ✅ RTE / Ace | ✅ native | ✅ | ✅ | ✅ |
 | **E-commerce options** | ✅ MS3 | ❌ | ✅ WC | add-on | ⚙️ |
 | **Поиск по локали** | ✅ mSearch | ❌ | ⚙️ | ⚙️ | ⚙️ |
 | **Sync shared fields** | ❌ | ✅ TV sync | ⚙️ | ❌ | ⚙️ |
@@ -80,7 +80,7 @@ Localizator3 использует модель **«один ресурс — N �
 
 Фичи сгруппированы по доменам. ID используется в issues/MR и релизах.
 
-**Приоритет:** P0 критично · P1 релиз 1.1–1.2 · P2 средний · P3 backlog
+**Приоритет:** P0 критично · P1 следующий релиз после 1.1.0-beta · P2 средний · P3 backlog
 **Статус:** ✅ done · 🔶 partial · ⬜ planned
 
 ---
@@ -97,6 +97,7 @@ Localizator3 использует модель **«один ресурс — N �
 | F1-06 | Валидация уникальности `http_host` | ⬜ | P2 | — | Client + server validation |
 | F1-07 | Массовое enable/disable языков | ⬜ | P2 | WPML | Checkbox + bulk actions |
 | F1-08 | Context groups (несколько сайтов) | ⬜ | P3 | Babel | Out of scope для overlay-модели; документировать ограничение |
+| F1-09 | Request param language override | ✅ | — | — | `localizator3_request_language_param` в connector/AJAX и auto-detect |
 
 ---
 
@@ -108,13 +109,15 @@ Localizator3 использует модель **«один ресурс — N �
 | F2-02 | Save / enable / delete локализации | ✅ | — | — | Toolbar ContentGrid |
 | F2-03 | Кастомизация полей (`OnBuildLocalizationTabs`) | ✅ | — | Drupal | visible, rank, events |
 | F2-04 | **Compact overview переводов** | ⬜ | P1 | WPML TM | Таблица: язык · active · % заполненности · дата |
-| F2-05 | **Rich text (MODX RTE)** | ⬜ | P1 | Babel native | `which_editor` для content и richtext-TV |
+| F2-05 | Rich text (MODX RTE) | ✅ | — | Babel native | content и richtext-TV через `MODx.loadRTE` / Ace (`TvRenderedInput`) |
 | F2-06 | **Duplicate localization** | ⬜ | P1 | Polylang | «Скопировать с языка X» (SimpleCopy+) |
 | F2-07 | **Sync shared TV/fields** | ⬜ | P2 | Babel TV sync | Поля «одинаковые для всех языков» |
 | F2-08 | Unsaved changes warning | ⬜ | P2 | WPML | При смене языка в dropdown |
-| F2-09 | Фильтр `localizator3_tv_fields` в UI | 🔶 | P2 | — | Backend есть; подсказка в форме |
-| F2-11 | **Native default language** | ✅ | P1 | Polylang/Lingua | `localizator3_default_from_resource` — базовый язык из полей ресурса |
-| F2-10 | Vue composables + декомпозиция | 🔶 | P0 | — | `useConnector` и др. не подключены; gate <400 строк |
+| F2-09 | Фильтр TV на вкладке (`localizator3_enabled`) | ✅ | — | — | Чекбокс на форме TV; список в getformconfig |
+| F2-10 | Vue composables + декомпозиция | ✅ | — | — | composables в grids; ContentGrid ≤400 через `useContentForm` |
+| F2-11 | Native default language | ✅ | — | Polylang/Lingua | `localizator3_default_from_resource` |
+| F2-12 | TV по типу (PrimeVue / MODX render) | ✅ | — | — | `TvFieldControl` / `TvRenderedInput`; MIGX и custom — `renderMode: html` |
+| F2-13 | Nested MIGX auto-translate | ✅ | — | — | `configs` / `formtabs` в nested TV перед `translateTV()` |
 
 ---
 
@@ -197,13 +200,14 @@ Localizator3 использует модель **«один ресурс — N �
 
 | ID | Фича | Статус | P | Референс | Описание |
 |----|------|--------|---|----------|----------|
-| F9-01 | VueTools Import Map + lean bundles | ✅ | — | — | ~14 KB entries |
-| F9-02 | События OnBuild*, OnSave*, OnToggle* | ✅ | — | Drupal hooks | CUSTOMIZATION.md |
+| F9-01 | VueTools Import Map + lean bundles | ✅ | — | — | ~14–21 KB entries |
+| F9-02 | События OnBuild*, OnSave*, OnRemove*, OnToggle* | ✅ | — | Drupal hooks | [customization.md](./customization.md), [api.md](./api.md) |
 | F9-03 | REST-like processors mgr/* | ✅ | — | — | api.md |
-| F9-04 | VueTools ≥1.1.2 hard check | 🔶 | P1 | — | Warn only; нужен block UI |
-| F9-05 | PHPUnit processors + Vitest composables | ⬜ | P2 | — | 3 теста переводчиков сейчас |
+| F9-04 | VueTools ≥1.1.2 hard check | 🔶 | P1 | — | Resolver warn + install attempt; нужен block UI без VueTools |
+| F9-05 | PHPUnit processors + Vitest composables | ⬜ | P2 | — | Есть тесты переводчиков; processors/composables — нет |
 | F9-06 | TypeScript vueManager | ⬜ | P3 | — | Поэтапная миграция |
 | F9-07 | OpenAPI / docs api для mgr/* | ⬜ | P3 | — | Postman collection |
+| F9-08 | ModxManagerTheme only | ✅ | — | — | `getActiveTheme('modx')` в `primevueTheme.js`; `vuetools.theme` не влияет |
 
 ---
 
@@ -211,11 +215,12 @@ Localizator3 использует модель **«один ресурс — N �
 
 | ID | Задача | Статус | P | Связанные фичи |
 |----|--------|--------|---|----------------|
-| F10-01 | Подключить composables в grids | 🔶 | P0 | F2-10 |
-| F10-02 | Удалить или интегрировать *FormDialog.vue | 🔶 | P0 | F2-10 |
-| F10-03 | FormFieldRenderer в ContentGrid | 🔶 | P0 | F2-05 |
-| F10-04 | ContentGrid / LanguagesGrid < 400 строк | 🔶 | P0 | F2-10 |
-| F10-05 | Единый error/toast слой | 🔶 | P0 | F3-* |
+| F10-01 | Подключить composables в grids | ✅ | — | F2-10 |
+| F10-02 | Удалить неиспользуемые *FormDialog.vue | ✅ | — | F2-10 |
+| F10-03 | FormFieldRenderer для полей Document | 🔶 | P0 | F2-12 |
+| F10-04 | ContentGrid / LanguagesGrid < 400 строк | ✅ | — | F2-10 |
+| F10-05 | Единый error/toast слой | ✅ | — | F3-* |
+| F10-06 | Manager chrome / mgr-ui.css | ✅ | — | F9-08 |
 
 ---
 
@@ -225,42 +230,50 @@ Localizator3 использует модель **«один ресурс — N �
 gantt
   title Localizator3 feature releases
   dateFormat YYYY-MM
-  section 1.0.9
-  F10 Vue refactor           :2026-06, 1M
-  section 1.1
-  F2-04 Overview             :2026-07, 1M
-  F2-05 RTE                  :2026-07, 1M
-  F2-06 Duplicate            :2026-08, 2w
-  F3-04 Batch translate      :2026-08, 2w
-  F4-04 Localized alias      :2026-08, 1M
-  section 1.2
-  F5-04 MS Payment/Delivery  :2026-09, 1M
-  F5-05 mFilter              :2026-10, 1M
-  F8-01 XLIFF                :2026-10, 1M
-  section 1.3
-  F3-05 Translation queue    :2026-11, 2M
-  F7-02 Lexicon UI           :2026-12, 1M
+  section shipped_1_1_0
+  F2-05 RTE                  :done, 2026-11, 1d
+  F2-09 TV enabled flag      :done, 2026-11, 1d
+  F2-12 TV by type           :done, 2026-11, 1d
+  F9-08 ModxManagerTheme     :done, 2026-11, 1d
+  F10-02 Remove FormDialogs  :done, 2026-11, 1d
+  section next
+  F10 Vue composables        :2026-12, 1M
+  F2-04 Overview             :2027-01, 1M
+  F2-06 Duplicate            :2027-01, 2w
+  F3-04 Batch translate      :2027-02, 2w
+  F4-04 Localized alias      :2027-02, 1M
+  section later
+  F5-04 MS Payment/Delivery  :2027-03, 1M
+  F5-05 mFilter              :2027-04, 1M
+  F8-01 XLIFF                :2027-04, 1M
+  F3-05 Translation queue    :2027-05, 2M
+  F7-02 Lexicon UI           :2027-06, 1M
 ```
 
-### 1.0.9-beta — «Vue refactor» (ближайший)
+### 1.1.0-beta — «Manager theme + TV/RTE» (выпущен 2026-11-13)
 
-**Epic:** F10
-**Цель:** стабильная кодовая база UI без смены UX.
+| Сделано | ID |
+|---------|-----|
+| ModxManagerTheme only | F9-08 |
+| Richtext MODX RTE / Ace | F2-05 |
+| TV по типу + custom render | F2-12 |
+| Фильтр TV `localizator3_enabled` | F2-09 |
+| Nested MIGX translate | F2-13 |
+| Удалены *FormDialog.vue | F10-02 |
+| Manager chrome / toolbar polish | F10-06 |
 
-- [ ] F10-01 … F10-05
-- [ ] F9-04 VueTools hard check
-- [ ] Docs sync (architecture, llms)
+**Открытый долг F10:** F10-03 (FormFieldRenderer для Document-полей).
 
 ---
 
-### 1.1.0 — «Manager UX + SEO slugs»
+### Далее — «Manager UX + SEO slugs»
 
-**Epics:** F2, F3, F4
+**Epics:** F2, F3, F4, F10
 
 | Фича | ID |
 |------|-----|
+| FormFieldRenderer для Document | F10-03 |
 | Compact overview переводов | F2-04 |
-| Rich text в форме | F2-05 |
 | Duplicate с другого языка | F2-06 |
 | Batch translate | F3-04 |
 | Локализованный alias | F4-04 |
@@ -304,7 +317,7 @@ F1-08 · F3-07 · F3-08 · F4-06 · F5-06 · F7-03 … F7-05 · F8-03 · F9-06 �
 
 ---
 
-## Текущее состояние (1.0.8-beta)
+## Текущее состояние (1.1.0-beta, 2026-11-13)
 
 | Область | Статус |
 |---------|--------|
@@ -312,22 +325,27 @@ F1-08 · F3-07 · F3-08 · F4-06 · F5-06 · F7-03 … F7-05 · F8-03 · F9-06 �
 | Frontend snippets, Fenom, SEO, CLI | ✅ |
 | miniShop3 товары + опции | ✅ |
 | mSearch | ✅ |
-| Vue UI «Языки» | ✅ |
-| Vue UI вкладка «Локализация» | ✅ inline-форма |
-| VueTools ≥1.1.2-pl | 🔶 resolver warn |
-| Lean bundles | ✅ |
+| Vue UI «Языки» | ✅ DataTable + Dialog |
+| Vue UI вкладка «Локализация» | ✅ inline Document/TV, toolbar |
+| ModxManagerTheme | ✅ forced `getActiveTheme('modx')` |
+| TV: типы + richtext + `localizator3_enabled` | ✅ |
+| VueTools ≥1.1.2-pl | 🔶 resolver warn / auto-install |
+| Lean bundles | ✅ content ~21 KB, languages ~14 KB |
+| Composables в grids | ✅ `useConnector` / `useContentForm` / `useGridCrud` и др. |
+| Размер ContentGrid / LanguagesGrid | ✅ ≤400 строк (gate) |
 
 ---
 
 ## Риски
 
-| Рisk | Влияние | Митигация |
+| Risk | Влияние | Митигация |
 |------|---------|-----------|
 | Конкуренция с Babel по «разной структуре сайта» | Отказ enterprise-клиентов | Документировать модель; не дублировать Babel |
 | Alias per language ломает роутинг | 404, duplicate content | Feature flag; fallback на текущий uri |
-| XLIFF без RTE | Неполный export HTML | F2-05 до F8-01 |
+| XLIFF export HTML | Неполный markup | F2-05 ✅; проверить richtext при F8-01 |
 | VueTools < 1.1.2 | Broken UI | F9-04 |
-| Scope creep WPML-parity | Задержка 1.0.0 | Приоритет P1/P2; P3 в backlog |
+| ContentGrid без декомпозиции | Сложность правок | F10-01 / F10-04 |
+| Scope creep WPML-parity | Задержка stable 1.x | Приоритет P1/P2; P3 в backlog |
 
 ---
 
@@ -349,7 +367,7 @@ F1-08 · F3-07 · F3-08 · F4-06 · F5-06 · F7-03 … F7-05 · F8-03 · F9-06 �
 3. После анализа конкурентов — секция «Референс», не обязательный scope.
 4. Версия из `_build/config.inc.php`.
 
-*Последнее обновление: 2026-06-17 (1.0.8-beta).*
+*Последнее обновление: 2026-11-13 (релиз 1.1.0-beta; сверка с кодом и changelog).*
 
 ---
 

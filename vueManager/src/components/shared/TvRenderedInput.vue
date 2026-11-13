@@ -130,7 +130,46 @@ function render() {
   host.value.innerHTML = props.html || ''
   runScripts(host.value)
   renameControls()
+  initManagerRichtext(host.value)
   startNameObserver()
+}
+
+/**
+ * RTE (TinyMCE / Ace) сканирует .modx-richtext один раз при открытии ресурса.
+ * Поля локализации появляются позже, поэтому редактор поднимаем вручную.
+ */
+function initManagerRichtext(container) {
+  const areas = Array.from(container.querySelectorAll('textarea.modx-richtext'))
+  if (!areas.length) {
+    return
+  }
+
+  const which = window.MODx?.config?.which_editor || ''
+  if (/tinymce/i.test(which) && typeof window.MODx?.loadRTE === 'function') {
+    for (const area of areas) {
+      if (!area.id || window.tinymce?.get?.(area.id)) {
+        continue
+      }
+      window.MODx.loadRTE(area.id)
+    }
+    return
+  }
+
+  if (typeof window.MODx?.ux?.Ace?.replaceTextAreas === 'function') {
+    const pending = areas.filter((area) => area.name)
+    if (pending.length) {
+      window.MODx.ux.Ace.replaceTextAreas(pending)
+    }
+    return
+  }
+
+  if (typeof window.MODx?.loadRTE === 'function') {
+    for (const area of areas) {
+      if (area.id) {
+        window.MODx.loadRTE(area.id)
+      }
+    }
+  }
 }
 
 /**

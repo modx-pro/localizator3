@@ -57,9 +57,6 @@ $_lang['setting_localizator_translate_fields_desc'] = 'These fields will be tran
 $_lang['setting_localizator3_translate_fields'] = 'List of fields for the translation';
 $_lang['setting_localizator3_translate_fields_desc'] = 'These fields will be translated when using automatic translation';
 
-$_lang['setting_localizator_tv_fields'] = 'List of additional fields (TV)';
-$_lang['setting_localizator_tv_fields_desc'] = 'These additional fields will be available for editing in the localization. Leave the setting blank, if you need all the extra fields';
-
 $_lang['setting_localizator_check_permissions'] = 'Check permissions';
 $_lang['setting_localizator_check_permissions_desc'] = 'Check permissions to edit localization';
 $_lang['setting_localizator3_check_permissions'] = 'Check permissions';

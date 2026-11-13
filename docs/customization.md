@@ -2,7 +2,7 @@
 
 Вкладка «Локализация» в форме ресурса: событие **OnBuildLocalizationTabs** и конфигурация inline-формы Vue UI.
 
-**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
+**Версия:** 1.1.0-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -155,6 +155,8 @@ TV-поля (`field` с `inputTV`) содержат дополнительные
 |---------|----------|
 | `OnBeforeSaveLocalization` | Модификация данных перед сохранением |
 | `OnSaveLocalization` | Пост-обработка после сохранения |
+| `OnBeforeRemoveLocalization` | Перед удалением локализации |
+| `OnRemoveLocalization` | После удаления локализации |
 | `OnBeforeSaveLocalizatorLanguage` | Валидация перед сохранением языка |
 | `OnSaveLocalizatorLanguage` | Пост-обработка после сохранения языка |
 | `OnHasLocalizatorError404` | Кастомная обработка 404 (можно предотвратить) |
@@ -166,4 +168,4 @@ TV-поля (`field` с `inputTV`) содержат дополнительные
 - [Оглавление](./README.md)
 - [api.md](./api.md) — полный список событий
 - [architecture.md](./architecture.md) — процессоры и модели
-- [roadmap.md](./roadmap.md) — план доработок Vue UI (composables, RTE)
+- [roadmap.md](./roadmap.md) — план доработок Vue UI (composables)

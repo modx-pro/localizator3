@@ -27,9 +27,6 @@ $_lang['setting_localizator_translate_translated_fields_desc'] = 'Аутомат
 $_lang['setting_localizator_translate_fields'] = 'Аударма өрістерінің тізімі';
 $_lang['setting_localizator_translate_fields_desc'] = 'Көрсетілген өрістер аутоматты аударма кезінде аударылады';
 
-$_lang['setting_localizator_tv_fields'] = 'Қосымша өрістер тізімі (TV)';
-$_lang['setting_localizator_tv_fields_desc'] = 'Көрсетілген қосымша өрістер локализацияда өңдеуге қолжетімді болады';
-
 $_lang['setting_localizator_check_permissions'] = 'Өңдеу рұқсатын тексеру';
 $_lang['setting_localizator_check_permissions_desc'] = 'Ресурс локализацияларын өңдеу рұқсатын тексеру';
 

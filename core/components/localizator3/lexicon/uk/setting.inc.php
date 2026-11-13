@@ -27,9 +27,6 @@ $_lang['setting_localizator_translate_translated_fields_desc'] = 'При вик�
 $_lang['setting_localizator_translate_fields'] = 'Список полів для перекладу';
 $_lang['setting_localizator_translate_fields_desc'] = 'Вказані поля будуть перекладені при використанні автоматичного перекладу';
 
-$_lang['setting_localizator_tv_fields'] = 'Список додаткових полів (TV)';
-$_lang['setting_localizator_tv_fields_desc'] = 'Вказані додаткові поля будуть доступні для редагування в локалізації';
-
 $_lang['setting_localizator_check_permissions'] = 'Перевіряти доступ на редагування';
 $_lang['setting_localizator_check_permissions_desc'] = 'Перевіряти доступ на редагування локалізацій ресурсу';
 

@@ -21,9 +21,6 @@ $_lang['setting_localizator_translate_translated_fields_desc'] = 'Пры вык�
 $_lang['setting_localizator_translate_fields'] = 'Спіс палёў для перакладу';
 $_lang['setting_localizator_translate_fields_desc'] = 'Гэтыя палі будуць пераведзеныя Пры выкарыстанні аўтаматычнага перакладу';
 
-$_lang['setting_localizator_tv_fields'] = 'Спіс дадатковых палёў (ТБ)';
-$_lang['setting_localizator_tv_fields_desc'] = 'Гэтыя дадатковыя поля будуць даступныя для рэдагавання ў лакалізацыі. Пакіньце гэты параметр пустым, калі вам патрэбныя ўсе дадатковыя поля';
-
 $_lang['setting_localizator_disabled_templates'] = 'Адключыць укладку лакалізацыі для шаблонаў';
 $_lang['setting_localizator_disabled_templates_desc'] = 'Пералік ID шаблонаў праз коску. Для рэсурсаў з гэтымі шаблонамі укладка «Лакалізатар» не будзе адлюстроўвацца.';
 

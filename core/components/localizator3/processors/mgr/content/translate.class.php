@@ -61,8 +61,6 @@ class localizatorContentTranslateProcessor extends modProcessor
                 continue;
             }
 
-            //$this->modx->log(1, 'Перевод на ' . $language->key . ' - ' . $resource_id);
-
             /* @var localizatorContent $content */
             $content = $this->modx->getObject(\localizator3\localizatorContent::class, array('key' => $language->key, 'resource_id' => $resource_id));
             if ($content && $translate_translated) {
@@ -96,13 +94,6 @@ class localizatorContentTranslateProcessor extends modProcessor
                     return $response->getResponse();
                 }
             } elseif (!$content) {
-                /*
-                $content = $this->modx->newObject('localizatorContent');
-                $content->fromArray(array(
-                    'key' => $language->key,
-                    'resource_id' => $resource_id,
-                    'active' => 1,
-                ));*/
                 $contentData = array(
                     'key' => $language->key,
                     'resource_id' => $resource_id,
@@ -143,70 +134,154 @@ class localizatorContentTranslateProcessor extends modProcessor
     }
 
     /**
-     * @param modTemplateVar|\MODX\Revolution\modTemplateVar $tvvar
+     * Translate a TV value. MIGX walks formtabs recursively so nested migx
+     * (inputTV or inputTVtype=migx with configs/formtabs) is translated too.
+     *
+     * @param \MODX\Revolution\modTemplateVar $tvvar
+     * @param string $default_language
+     * @param string $language
+     * @return mixed
      */
     public function translateTV($tvvar, $default_language, $language)
     {
         $type = $tvvar->get('type');
         $val = $tvvar->get('value');
-        if (in_array($type, ['text', 'textarea', 'richtext'])) {
-            return $this->localizator->translate($val, $default_language, $language);
-        } elseif ($type == 'migx') {
-            $this->modx->addPackage('migx', MODX_CORE_PATH . 'components/migx/model/');
-            $params = $tvvar->get('input_properties');
-            $formtabs = $params['formtabs'];
-            if (!empty($params['configs']) && $cfg = $this->modx->getObject('migxConfig', ['name' => $params['configs']])) {
-                $formtabs = $cfg->get('formtabs');
-            }
-            if (!is_array($formtabs)) {
-                $formtabs = json_decode($formtabs, 1);
-            }
-
-            if (!is_array($formtabs)) {
+        if (in_array($type, array('text', 'textarea', 'richtext'), true)) {
+            if ($val === null || $val === '') {
                 return $val;
             }
-
-            if (!is_array($val)) {
-                $val = json_decode($val, 1);
-            }
-
-            foreach ($formtabs as $tab) {
-                foreach ($tab['fields'] as $field) {
-                    $tv = false;
-                    if (isset($field['inputTV']) && $tv = $this->modx->getObject(\MODX\Revolution\modTemplateVar::class, array('name' => $field['inputTV']))) {
-                    }
-                    if (!empty($field['inputTVtype'])) {
-                        $tv = $this->modx->newObject(\MODX\Revolution\modTemplateVar::class);
-                        $tv->set('type', $field['inputTVtype']);
-                    }
-                    if (!$tv) {
-                        $tv = $this->modx->newObject(\MODX\Revolution\modTemplateVar::class);
-                        $tv->set('type', 'text');
-                    }
-
-                    if (!empty($field['inputOptionValues'])) {
-                        $tv->set('elements', $field['inputOptionValues']);
-                    }
-                    if (!empty($field['configs'])) {
-                        $cfg = $this->modx->fromJson($field['configs']);
-                        if (is_array($cfg)) {
-                            $params = array_merge($params, $cfg);
-                        } else {
-                            $params['configs'] = $field['configs'];
-                        }
-                    }
-
-                    foreach ($val as &$v) {
-                        $tv->set('value', $v[$field['field']]);
-                        $v[$field['field']] = $this->translateTV($tv, $default_language, $language);
-                    }
-                }
-            }
-
-            return json_encode($val);
-        } else {
+            return $this->localizator->translate($val, $default_language, $language);
+        }
+        if ($type !== 'migx') {
             return $val;
         }
+
+        $this->modx->addPackage('migx', MODX_CORE_PATH . 'components/migx/model/');
+
+        $params = $this->normalizeMigxParams($tvvar->get('input_properties'));
+        $formtabs = $this->resolveMigxFormtabs($params);
+        if (!is_array($formtabs) || $formtabs === array()) {
+            return $val;
+        }
+
+        if (!is_array($val)) {
+            $decoded = json_decode((string)$val, true);
+            if (!is_array($decoded)) {
+                return $val;
+            }
+            $val = $decoded;
+        }
+
+        foreach ($formtabs as $tab) {
+            $fields = isset($tab['fields']) ? $tab['fields'] : array();
+            if (!is_array($fields)) {
+                continue;
+            }
+            foreach ($fields as $field) {
+                if (empty($field['field'])) {
+                    continue;
+                }
+                $nestedTv = $this->buildMigxFieldTv($field);
+                foreach ($val as &$row) {
+                    if (!is_array($row) || !array_key_exists($field['field'], $row)) {
+                        continue;
+                    }
+                    $nestedTv->set('value', $row[$field['field']]);
+                    $row[$field['field']] = $this->translateTV($nestedTv, $default_language, $language);
+                }
+                unset($row);
+            }
+        }
+
+        return json_encode($val);
+    }
+
+    /**
+     * @param mixed $params
+     * @return array
+     */
+    protected function normalizeMigxParams($params)
+    {
+        if (is_array($params)) {
+            return $params;
+        }
+        if (is_string($params) && $params !== '') {
+            $decoded = $this->modx->fromJSON($params);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+        return array();
+    }
+
+    /**
+     * @param array $params
+     * @return array|null
+     */
+    protected function resolveMigxFormtabs(array $params)
+    {
+        $formtabs = isset($params['formtabs']) ? $params['formtabs'] : null;
+        if (!empty($params['configs'])) {
+            $cfg = $this->modx->getObject('migxConfig', array('name' => $params['configs']));
+            if ($cfg) {
+                $formtabs = $cfg->get('formtabs');
+            }
+        }
+        if (!is_array($formtabs)) {
+            $formtabs = json_decode((string)$formtabs, true);
+        }
+        return is_array($formtabs) ? $formtabs : null;
+    }
+
+    /**
+     * Build a TV object for one MIGX form field, including configs/formtabs
+     * needed for nested migx recursion.
+     *
+     * @param array $field
+     * @return \MODX\Revolution\modTemplateVar
+     */
+    protected function buildMigxFieldTv(array $field)
+    {
+        $tv = null;
+        if (!empty($field['inputTV'])) {
+            $tv = $this->modx->getObject(\MODX\Revolution\modTemplateVar::class, array(
+                'name' => $field['inputTV'],
+            ));
+        }
+        // inputTVtype overrides inputTV when both are set (MIGX convention).
+        if (!empty($field['inputTVtype'])) {
+            $tv = $this->modx->newObject(\MODX\Revolution\modTemplateVar::class);
+            $tv->set('type', $field['inputTVtype']);
+        }
+        if (!$tv) {
+            $tv = $this->modx->newObject(\MODX\Revolution\modTemplateVar::class);
+            $tv->set('type', 'text');
+        }
+
+        if (!empty($field['inputOptionValues'])) {
+            $tv->set('elements', $field['inputOptionValues']);
+        }
+
+        $childParams = $this->normalizeMigxParams($tv->get('input_properties'));
+        if (!empty($field['configs'])) {
+            $cfg = is_array($field['configs'])
+                ? $field['configs']
+                : $this->modx->fromJSON($field['configs']);
+            if (is_array($cfg)) {
+                $childParams = array_merge($childParams, $cfg);
+            } else {
+                // Plain string = migxConfig name.
+                $childParams['configs'] = $field['configs'];
+            }
+        }
+        if (!empty($field['formtabs'])) {
+            $childParams['formtabs'] = $field['formtabs'];
+        }
+        if ($tv->get('type') === 'migx') {
+            $tv->set('input_properties', $childParams);
+        }
+
+        return $tv;
     }
 }
 

@@ -2,7 +2,7 @@
 
 Архитектура компонента мультиязычности для MODX 3.
 
-**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
+**Версия:** 1.1.0-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -79,10 +79,12 @@
 
 ### Connector / AJAX
 
-`OnMODXInit` вызывает `resolveConnectorLanguage()` для `connector.php` и XHR:
+`OnMODXInit` вызывает `resolveConnectorLanguage()` для `connector.php` и XHR. Порядок:
 
-1. Referer path (если не mgr) → `findLocalization`
-2. иначе host → `findLocalization`, затем cookie `localizator3_key` → `applyLanguageFromCookie`
+1. GET/POST `localizator3_request_language_param` (`getRequestLanguageKey()` → `applyLanguageFromKey`)
+2. Referer path (если не mgr) → `findLocalization($host, $path)`
+3. HTTP host → `findLocalization($host, '')`
+4. cookie `localizator3_key` → `applyLanguageFromCookie()`
 
 Так `cultureKey` совпадает с языком витрины даже без `X-Requested-With` и без параметра `q`.
 
@@ -104,7 +106,7 @@
 
 | Событие | Handler | Назначение |
 |---------|---------|------------|
-| `OnMODXInit` | OnMODXInit.php | xPDO map; connector/AJAX → `resolveConnectorLanguage()` (Referer / cookie → cultureKey) |
+| `OnMODXInit` | OnMODXInit.php | xPDO map; connector/AJAX → `resolveConnectorLanguage()` (param → Referer → host → cookie) |
 | `OnHandleRequest` | OnHandleRequest.php | Определение языка из URL/host |
 | `OnPageNotFound` | OnPageNotFound.php | Роутинг URL локализации |
 | `OnDocFormPrerender` | OnDocFormPrerender.php | Вкладка Localizator в форме ресурса |
@@ -112,6 +114,7 @@
 | `OnLoadWebDocument` | OnLoadWebDocument.php | Подстановка локализованных полей |
 | `OnEmptyTrash` | OnEmptyTrash.php | Удаление данных при очистке корзины |
 | `OnTVFormPrerender` | OnTVFormPrerender.php | Чекбокс доступности TV для локализации |
+| `OnTVFormSave` | OnTVFormSave.php | Сохранение `localizator3_enabled` (в т.ч. `0` при снятии галочки) |
 | `pdoToolsOnFenomInit` | pdoToolsOnFenomInit.php | Fenom-модификаторы |
 | `mseOnBeforeIndex` | mseOnBeforeIndex.php | Индексация для mSearch |
 | `mseOnGetWorkFields` | mseOnGetWorkFields.php | Расширение полей mSearch |
@@ -131,11 +134,13 @@
 | `mgr/language/disable` | Отключение языка |
 | `mgr/content/create` | Создание локализации |
 | `mgr/content/update` | Обновление локализации |
+| `mgr/content/updatefromgrid` | Обновление из DataTable (JSON `data`) |
 | `mgr/content/get` | Получение локализации |
 | `mgr/content/getlist` | Список локализаций ресурса |
 | `mgr/content/remove` | Удаление локализации |
 | `mgr/content/enable` | Включение локализации |
 | `mgr/content/disable` | Отключение локализации |
+| `mgr/content/multiple` | Групповые операции |
 | `mgr/content/getformconfig` | Конфигурация формы для Vue UI |
 | `mgr/content/translate` | Автоперевод |
 | `mgr/fields` | Поля формы (legacy) |
@@ -155,6 +160,8 @@
 | `OnToggleLocalizatorLanguage` | key, language | При установке языка |
 | `OnBeforeSaveLocalization` | — | Перед сохранением локализации |
 | `OnSaveLocalization` | — | После сохранения |
+| `OnBeforeRemoveLocalization` | — | Перед удалением локализации |
+| `OnRemoveLocalization` | — | После удаления локализации |
 | `OnBeforeSaveLocalizatorLanguage` | — | Перед сохранением языка |
 | `OnSaveLocalizatorLanguage` | — | После сохранения языка |
 | `OnHasLocalizatorError404` | resource, language_key | Перед 404 при отсутствии локализации |
@@ -163,7 +170,9 @@
 
 ## Vue UI
 
-Интерфейс менеджера: **Vue 3 + PrimeVue 4** (Aura), встроен в ExtJS MODX 3. Стек Vue/Pinia/PrimeVue загружается через **VueTools ≥1.1.2-pl** (Import Map); entry-бандлы Localizator3 — lean (~14 KB).
+Интерфейс менеджера: **Vue 3 + PrimeVue 4**, встроен в ExtJS MODX 3. Стек Vue/Pinia/PrimeVue загружается через **VueTools ≥1.1.2-pl** (Import Map); entry-бандлы Localizator3 — lean (~14 KB).
+
+Тема всегда **ModxManagerTheme**: `getActiveTheme('modx')` в [`vueManager/src/app/primevueTheme.js`](../vueManager/src/app/primevueTheme.js). Системная настройка `vuetools.theme` (Aura) на Localizator3 не влияет. Опции: `darkModeSelector: '.modx-dark-mode'`, `cssLayer: false`. Кнопки Save/Add — `severity="success"` (`getPrimarySaveSeverity()`).
 
 | Экран | Компонент | Entry | Контейнер | Сборка |
 |-------|-----------|-------|-----------|--------|
@@ -174,7 +183,7 @@
 
 - Dropdown **всех активных языков** (`activeLanguages` из `mgr/content/getformconfig`).
 - Inline-форма с табами **Документ** / **TV** (не grid-список переводов).
-- TV рендерятся по типу: number/listbox/checkbox/radio и др. — контролами PrimeVue, MIGX/TVMedia3x и прочие кастомные типы — штатным рендером MODX (`renderMode`).
+- TV рендерятся по типу: number/listbox/checkbox/radio и др. — контролами PrimeVue; `richtext` — MODX RTE; MIGX/TVMedia3x и прочие кастомные типы — штатным рендером MODX (`renderMode`).
 - Действия: Save, Translate, enable/disable, delete.
 - ExtJS: вкладка с `layout: anchor`, mount через `OnDocFormPrerender` + retry в `content.js`.
 
@@ -182,22 +191,29 @@
 
 ```
 vueManager/src/
+├── base.css                         # Базовые стили entry
 ├── app/
-│   └── createLocalizatorApp.js      # Bootstrap (без Pinia)
-├── composables/                      # Созданы; интеграция в grid — в roadmap
+│   ├── createLocalizatorApp.js      # Bootstrap (без Pinia)
+│   └── primevueTheme.js             # ModxManagerTheme (getActiveTheme('modx'))
+├── styles/
+│   └── mgr-ui.css                   # Общие паттерны UI под .vueApp
+├── composables/                      # Подключены в ContentGrid / LanguagesGrid
+│   ├── index.js
 │   ├── useConnector.js
 │   ├── useLexicon.js
 │   ├── useDataTable.js
-│   ├── useGridCrud.js
-│   └── useConfirmAction.js
+│   ├── useGridCrud.js                # actionPrefix: mgr/content | mgr/language
+│   ├── useConfirmAction.js
+│   └── useContentForm.js             # Форма вкладки «Локализация»
 ├── components/
-│   ├── ContentGrid.vue               # ~620 строк, inline-форма
-│   ├── LanguagesGrid.vue             # ~445 строк, DataTable + Dialog
-│   ├── ContentFormDialog.vue         # Не используется (legacy декомпозиция)
-│   ├── LanguageFormDialog.vue        # Не используется
+│   ├── ContentGrid.vue               # Inline-форма Document/TV
+│   ├── LanguagesGrid.vue             # DataTable + Dialog
 │   └── shared/
+│       ├── index.js
 │       ├── FormFieldRenderer.vue
-│       └── GridActionsColumn.vue
+│       ├── GridActionsColumn.vue
+│       ├── TvFieldControl.vue        # PrimeVue-контролы TV по типу
+│       └── TvRenderedInput.vue       # MODX-рендер / richtext (MODx.loadRTE)
 └── entries/
     ├── content.js
     └── languages.js

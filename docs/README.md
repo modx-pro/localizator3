@@ -2,7 +2,7 @@
 
 Мультиязычность для **MODX Revolution 3**: локализация ресурсов, TV, товаров miniShop3 и опций.
 
-**Версия:** 1.0.8-beta · **Репозиторий:** [github.com/modx-pro/localizator3](https://github.com/modx-pro/localizator3)
+**Версия:** 1.1.0-beta · **Репозиторий:** [github.com/modx-pro/localizator3](https://github.com/modx-pro/localizator3)
 
 ---
 
@@ -39,7 +39,7 @@
 
 | Документ | Описание |
 |----------|----------|
-| [roadmap.md](./roadmap.md) | План развития, анализ CMS (Babel/WPML/Drupal), каталог фич F1–F11 |
+| [roadmap.md](./roadmap.md) | План развития, анализ CMS (Babel/WPML/Drupal), каталог фич F1–F10 |
 | [llms.txt](./llms.txt) | Краткий контекст для LLM |
 | [../core/components/localizator3/docs/changelog.txt](../core/components/localizator3/docs/changelog.txt) | История изменений (в transport-пакете) |
 

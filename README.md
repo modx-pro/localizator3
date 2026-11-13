@@ -4,7 +4,7 @@
 
 Работает только с MODX 3. Для MODX 2.x используйте [Localizator](https://github.com/modx-pro/localizator).
 
-**Версия:** 1.0.12-beta
+**Версия:** 1.1.0-beta
 
 ---
 
@@ -70,7 +70,7 @@ VueTools подтягивается при установке через ModStor
 | Localizator3 → Языки | `LanguagesGrid.vue` | CRUD языков, активация, ранг |
 | Ресурс → Локализация | `ContentGrid.vue` | Выбор языка, поля и TV, автоперевод |
 
-PrimeVue 4 (Aura). Стили изолированы (`.vueApp`, BEM-префиксы). Подтверждения через `ConfirmDialog`, не native `confirm()`.
+PrimeVue 4 + ModxManagerTheme (`getActiveTheme('modx')` в `primevueTheme.js`; настройка `vuetools.theme` не влияет). Стили изолированы (`.vueApp`, BEM-префиксы). Подтверждения через `ConfirmDialog`, не native `confirm()`.
 
 ---
 
@@ -84,6 +84,7 @@ PrimeVue 4 (Aura). Стили изолированы (`.vueApp`, BEM-префи�
 | `localizator3_disabled_templates` | ID шаблонов без вкладки (через запятую) | — |
 | `localizator3_404_if_no_localization` | 404 без локализации | false |
 | `localizator3_auto_detect_language` | Автоопределение языка посетителя | false |
+| `localizator3_request_language_param` | GET/POST-параметр ключа языка (выше cookie); пусто = выкл. | `language` |
 | `localizator3_debug_log` | Отладочное логирование | false |
 | `localizator3_default_translator` | Переводчик | Yandex |
 | `localizator3_key_yandex` | API-ключ Yandex | — |
@@ -95,9 +96,7 @@ PrimeVue 4 (Aura). Стили изолированы (`.vueApp`, BEM-префи�
 | `localizator3_translate_fields` | Поля для автоперевода | pagetitle,longtitle,... |
 | `localizator3_translate_translated` | Дополнять пустые поля в существующих локализациях | false |
 | `localizator3_translate_translated_fields` | Перезаписывать все поля при повторном переводе | false |
-| `localizator3_tv_fields` | Список TV во вкладке (пусто = все) | — |
-
-Полный список: [docs/configuration.md](docs/configuration.md)
+Полный список: [docs/configuration.md](docs/configuration.md). TV на вкладке «Локализация» — по флагу `localizator3_enabled` на форме TV.
 
 ---
 
@@ -110,7 +109,7 @@ cd vueManager && npm install && npm run build
 cd .. && php _build/build.php
 ```
 
-Transport-пакет: `core/packages/localizator3-1.0.12-beta.transport.zip`
+Transport-пакет: `core/packages/localizator3-1.1.0-beta.transport.zip`
 
 Подробнее: [docs/installation.md](docs/installation.md)
 

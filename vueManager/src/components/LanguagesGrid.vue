@@ -3,56 +3,56 @@
     <Toast />
     <ConfirmDialog />
 
-    <p class="loc-section-bar">
-      {{ lexicon.localizator_languages_section_desc || 'Manage site languages, HTTP hosts and culture keys for localization.' }}
-    </p>
+    <header class="languages-grid__intro">
+      <h1 class="languages-grid__title">
+        {{ lx.localizator_languages || 'Languages' }}
+      </h1>
+      <p class="loc-section-bar">
+        {{ lx.localizator_languages_section_desc || 'Manage site languages, HTTP hosts and culture keys for localization.' }}
+      </p>
+      <dl class="loc-stats">
+        <div class="loc-stat-card">
+          <dt class="loc-stat-card__label">{{ lx.localizator_stats_total || 'Total languages' }}</dt>
+          <dd class="loc-stat-card__value">{{ stats.total }}</dd>
+        </div>
+        <div class="loc-stat-card">
+          <dt class="loc-stat-card__label">{{ lx.localizator_stats_active || 'Active' }}</dt>
+          <dd class="loc-stat-card__value">{{ stats.active }}</dd>
+        </div>
+        <div class="loc-stat-card">
+          <dt class="loc-stat-card__label">{{ lx.localizator_stats_inactive || 'Inactive' }}</dt>
+          <dd class="loc-stat-card__value">{{ stats.inactive }}</dd>
+        </div>
+      </dl>
+    </header>
 
-    <div class="loc-stats">
-      <div class="loc-stat-card">
-        <div class="loc-stat-card__value">{{ stats.total }}</div>
-        <div class="loc-stat-card__label">{{ lexicon.localizator_stats_total || 'Total languages' }}</div>
-      </div>
-      <div class="loc-stat-card">
-        <div class="loc-stat-card__value">{{ stats.active }}</div>
-        <div class="loc-stat-card__label">{{ lexicon.localizator_stats_active || 'Active' }}</div>
-      </div>
-      <div class="loc-stat-card">
-        <div class="loc-stat-card__value">{{ stats.inactive }}</div>
-        <div class="loc-stat-card__label">{{ lexicon.localizator_stats_inactive || 'Inactive' }}</div>
-      </div>
-    </div>
-
-    <div class="loc-toolbar">
-      <div class="loc-toolbar__field">
-        <label for="languages-search" class="loc-toolbar__label">
-          {{ lexicon.localizator_grid_search || 'Search' }}
-        </label>
-        <IconField class="loc-toolbar__input">
-          <InputIcon class="pi pi-search" />
-          <InputText
-            id="languages-search"
-            v-model="searchQuery"
-            :placeholder="lexicon.localizator_grid_search || 'Search'"
-            @keyup.enter="loadLanguages"
-          />
-        </IconField>
-      </div>
-      <div class="loc-toolbar__actions">
-        <Button
-          :label="lexicon.localizator_language_create || 'Add localization'"
-          icon="pi pi-plus"
-          @click="openCreateDialog"
+    <div class="loc-toolbar languages-grid__toolbar">
+      <IconField class="languages-grid__search">
+        <InputIcon class="pi pi-search" />
+        <InputText
+          id="languages-search"
+          v-model="searchQuery"
+          :placeholder="lx.localizator_grid_search || 'Search'"
+          :aria-label="lx.localizator_grid_search || 'Search'"
+          @keyup.enter="refresh"
         />
-      </div>
+      </IconField>
+      <span class="loc-toolbar__spacer" aria-hidden="true" />
+      <Button
+        :label="lx.localizator_language_create || 'Add localization'"
+        icon="pi pi-plus"
+        :severity="saveSeverity"
+        @click="openCreateDialog"
+      />
     </div>
 
     <div class="loc-panel">
       <DataTable
-        :value="languages"
+        :value="items"
         :loading="loading"
         :lazy="true"
         :paginator="true"
-        :rows="10"
+        :rows="rows"
         :total-records="totalRecords"
         :first="first"
         data-key="id"
@@ -61,22 +61,22 @@
         @page="onPage"
         @sort="onSort"
       >
-        <Column field="key" :header="lexicon.localizator_key || 'Key'" sortable />
-        <Column field="name" :header="lexicon.localizator_language_name || 'Name'" sortable />
-        <Column field="http_host" :header="lexicon.localizator_language_http_host || 'HTTP Host'" sortable />
-        <Column field="cultureKey" :header="lexicon.localizator_language_cultureKey || 'Culture'" sortable />
-        <Column field="active" :header="lexicon.localizator_active || 'Active'" sortable style="width: 7rem">
+        <Column field="key" :header="lx.localizator_key || 'Key'" sortable />
+        <Column field="name" :header="lx.localizator_language_name || 'Name'" sortable />
+        <Column field="http_host" :header="lx.localizator_language_http_host || 'HTTP Host'" sortable />
+        <Column field="cultureKey" :header="lx.localizator_language_cultureKey || 'Culture'" sortable />
+        <Column field="active" :header="lx.localizator_active || 'Active'" sortable style="width: 7rem">
           <template #body="{ data }">
             <Tag
               :value="isActive(data)
-                ? (lexicon.localizator_item_enable || 'Active')
-                : (lexicon.localizator_item_disable || 'Inactive')"
+  ? (lx.localizator_active || 'Active')
+  : (lx.localizator_disabled || 'Inactive')"
               :severity="isActive(data) ? 'success' : 'secondary'"
               rounded
             />
           </template>
         </Column>
-        <Column :header="lexicon.localizator_grid_actions || 'Actions'" style="width: 10rem">
+        <Column :header="lx.localizator_grid_actions || 'Actions'" style="width: 10rem">
           <template #body="{ data }">
             <div class="loc-row-actions">
               <Button
@@ -85,7 +85,7 @@
                 text
                 rounded
                 size="small"
-                :title="lexicon.localizator_item_update"
+                :title="lx.localizator_item_update"
                 @click="openEditDialog(data)"
               />
               <Button
@@ -94,8 +94,8 @@
                 text
                 rounded
                 size="small"
-                :title="isActive(data) ? lexicon.localizator_item_disable : lexicon.localizator_item_enable"
-                @click="isActive(data) ? disableItems([data.id]) : enableItems([data.id])"
+                :title="isActive(data) ? lx.localizator_item_disable : lx.localizator_item_enable"
+                @click="toggleActive(data)"
               />
               <Button
                 icon="pi pi-trash"
@@ -103,7 +103,7 @@
                 text
                 rounded
                 size="small"
-                :title="lexicon.localizator_item_remove"
+                :title="lx.localizator_item_remove"
                 @click="confirmRemove([data.id])"
               />
             </div>
@@ -114,60 +114,61 @@
 
     <Dialog
       v-model:visible="dialogVisible"
-      :header="isEdit ? (lexicon.localizator_language_update || 'Update') : (lexicon.localizator_language_create || 'Create')"
+      :header="isEdit ? (lx.localizator_language_update || 'Update') : (lx.localizator_language_create || 'Create')"
       modal
       :style="{ width: 'min(92vw, 40rem)' }"
       :closable="true"
       appendTo="self"
-      @hide="resetForm"
+      @hide="closeDialog"
     >
       <form @submit.prevent="submitForm" class="loc-form">
         <div class="loc-form-grid">
           <div class="loc-form-field">
             <label for="key" class="loc-form-label">
-              {{ lexicon.localizator_language_key || 'Key' }}
+              {{ lx.localizator_language_key || 'Key' }}
               <span class="loc-form-label__required">*</span>
             </label>
-            <InputText id="key" v-model="form.key" required :disabled="isEdit" />
+            <InputText id="key" v-model="formData.key" required :disabled="isEdit" />
           </div>
           <div class="loc-form-field">
-            <label for="name" class="loc-form-label">{{ lexicon.localizator_language_name || 'Name' }}</label>
-            <InputText id="name" v-model="form.name" />
+            <label for="name" class="loc-form-label">{{ lx.localizator_language_name || 'Name' }}</label>
+            <InputText id="name" v-model="formData.name" />
           </div>
           <div class="loc-form-field loc-form-field--full">
             <label for="http_host" class="loc-form-label">
-              {{ lexicon.localizator_language_http_host || 'HTTP Host' }}
+              {{ lx.localizator_language_http_host || 'HTTP Host' }}
               <span class="loc-form-label__required">*</span>
             </label>
             <InputText
               id="http_host"
-              v-model="form.http_host"
+              v-model="formData.http_host"
               required
-              :placeholder="lexicon.localizator_language_http_host_placeholder || 'project.test/ru/'"
+              :placeholder="lx.localizator_language_http_host_placeholder || 'project.test/ru/'"
             />
             <small class="loc-form-hint">
-              {{ lexicon.localizator_language_http_host_hint || 'Without http:// or https://, e.g. project.test/ru/' }}
+              {{ lx.localizator_language_http_host_hint || 'Without http:// or https://, e.g. project.test/ru/' }}
             </small>
           </div>
           <div class="loc-form-field">
-            <label for="cultureKey" class="loc-form-label">{{ lexicon.localizator_language_cultureKey || 'Culture' }}</label>
-            <InputText id="cultureKey" v-model="form.cultureKey" />
+            <label for="cultureKey" class="loc-form-label">{{ lx.localizator_language_cultureKey || 'Culture' }}</label>
+            <InputText id="cultureKey" v-model="formData.cultureKey" />
           </div>
           <div class="loc-form-field loc-form-field--full">
-            <label for="description" class="loc-form-label">{{ lexicon.localizator_language_description || 'Description' }}</label>
-            <Textarea id="description" v-model="form.description" rows="3" />
+            <label for="description" class="loc-form-label">{{ lx.localizator_language_description || 'Description' }}</label>
+            <Textarea id="description" v-model="formData.description" rows="3" />
           </div>
         </div>
         <div class="loc-form-checkbox">
-          <Checkbox id="active" v-model="form.active" :binary="true" input-id="active" />
-          <label for="active" class="loc-form-checkbox__label">{{ lexicon.localizator_active || 'Active' }}</label>
+          <Checkbox id="active" v-model="formData.active" :binary="true" input-id="active" />
+          <label for="active" class="loc-form-checkbox__label">{{ lx.localizator_active || 'Active' }}</label>
         </div>
         <div class="loc-form-footer">
-          <Button type="button" :label="lexicon.localizator_cancel || 'Cancel'" severity="secondary" @click="dialogVisible = false" />
+          <Button type="button" :label="lx.localizator_cancel || 'Cancel'" severity="secondary" @click="closeDialog" />
           <Button
             type="submit"
-            :label="isEdit ? (lexicon.localizator_item_update || 'Update') : (lexicon.localizator_item_create || 'Create')"
+            :label="isEdit ? (lx.localizator_item_update || 'Update') : (lx.localizator_item_create || 'Create')"
             icon="pi pi-check"
+            :severity="saveSeverity"
           />
         </div>
       </form>
@@ -176,8 +177,17 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { useToast, useConfirm } from 'primevue'
+import { ref, computed, onMounted } from 'vue'
+import { getPrimarySaveSeverity } from '../app/primevueTheme.js'
+import {
+  useConnector,
+  useLexicon,
+  useDataTable,
+  useGridCrud,
+  useConfirmAction,
+} from '../composables/index.js'
+
+const saveSeverity = getPrimarySaveSeverity()
 
 const connectorUrl = typeof localizator !== 'undefined' && localizator?.config?.connector_url
   ? localizator.config.connector_url
@@ -187,87 +197,72 @@ const modAuth = typeof localizator !== 'undefined' && localizator?.config?.modAu
   ? localizator.config.modAuth
   : (typeof MODx !== 'undefined' && MODx?.config?.modAuth) || ''
 
-const lexicon = ref({})
-const languages = ref([])
-const loading = ref(false)
-const totalRecords = ref(0)
-const first = ref(0)
-const searchQuery = ref('')
-const stats = ref({ total: 0, active: 0, inactive: 0 })
-const lazyParams = ref({
-  start: 0,
-  limit: 10,
-  sort: 'rank',
-  dir: 'ASC',
-})
-const dialogVisible = ref(false)
-const isEdit = ref(false)
-const form = reactive({
-  id: null,
-  key: '',
-  name: '',
-  http_host: '',
-  cultureKey: '',
-  description: '',
-  active: true,
+const rawLexicon = ref({})
+const { lexicon, t } = useLexicon(rawLexicon)
+const lx = computed(() => lexicon.value)
+
+const connector = useConnector(connectorUrl, modAuth)
+const { showSuccess, showError, confirmAction } = useConfirmAction(lexicon)
+
+const {
+  loading,
+  items,
+  totalRecords,
+  first,
+  rows,
+  searchQuery,
+  params,
+  onPage,
+  onSort,
+  refresh,
+  setLoadFn,
+} = useDataTable({ defaultRows: 10, defaultSortField: 'rank', defaultSortOrder: 'ASC' })
+
+const {
+  dialogVisible,
+  isEdit,
+  formData,
+  openCreate,
+  openEdit,
+  closeDialog,
+  save,
+  enable,
+  disable,
+  remove,
+} = useGridCrud({
+  connector,
+  lexicon: { t },
+  actionPrefix: 'mgr/language',
+  idsFormat: 'json',
+  onSuccess: showSuccess,
+  onError: showError,
 })
 
-const confirm = useConfirm()
-const toast = useToast()
+const stats = ref({ total: 0, active: 0, inactive: 0 })
 
 function normalizeHttpHost(value) {
   if (!value) return ''
   return String(value).trim().replace(/^https?:\/\//i, '')
 }
 
-// Бэкенд отдаёт tinyint(1) (0/1), Vue — bool. Приводим оба вида + строки к строго bool,
-// чтобы статус, кнопка, статистика и форма всегда совпадали с реальностью.
 function isActive(value) {
   const v = typeof value === 'object' && value !== null ? value.active : value
   return v === true || v === 1 || v === '1'
 }
 
-async function api(action, params = {}) {
-  const bodyParams = { action, ...params }
-  if (modAuth) bodyParams.HTTP_MODAUTH = modAuth
-  const body = new URLSearchParams(bodyParams)
-  const res = await fetch(connectorUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString(),
-  })
-  const data = await res.json()
-  if (!data.success) {
-    throw new Error(data.message || 'Request failed')
-  }
-  return data
-}
-
 function loadLexicon() {
   if (typeof localizator !== 'undefined' && localizator.config?.lexicon) {
-    lexicon.value = { ...localizator.config.lexicon }
+    rawLexicon.value = { ...localizator.config.lexicon }
     return
   }
   if (typeof MODx !== 'undefined' && MODx.lexicon) {
-    const keys = [
-      'localizator_languages', 'localizator_languages_section_desc',
-      'localizator_stats_total', 'localizator_stats_active', 'localizator_stats_inactive',
-      'localizator_language_create', 'localizator_language_update',
-      'localizator_key', 'localizator_language_name', 'localizator_language_http_host',
-      'localizator_language_http_host_hint', 'localizator_language_http_host_placeholder',
-      'localizator_language_err_no_http_host',
-      'localizator_language_cultureKey', 'localizator_language_description', 'localizator_active',
-      'localizator_grid_search', 'localizator_grid_actions', 'localizator_item_update',
-      'localizator_item_create', 'localizator_item_enable', 'localizator_item_disable',
-      'localizator_item_remove', 'localizator_items_remove', 'localizator_items_remove_confirm',
-      'localizator_cancel', 'localizator_success', 'localizator_error', 'localizator_save',
-      'localizator_language_key', 'localizator_item_remove_confirm',
-      'localizator_language_updated', 'localizator_language_created', 'localizator_deleted',
-      'localizator_enabled', 'localizator_disabled',
-    ]
-    keys.forEach((k) => {
-      if (MODx.lexicon[k]) lexicon.value[k] = MODx.lexicon[k]
-    })
+    const next = {}
+    for (const [key, value] of Object.entries(MODx.lexicon)) {
+      if (key.startsWith('localizator')) {
+        next[key] = value
+      }
+    }
+    rawLexicon.value = next
   }
 }
 
@@ -281,167 +276,108 @@ function updateStatsFromList(list, total) {
 
 async function loadStats() {
   try {
-    // Статистика — по всем языкам, без фильтра поиска.
-    const params = { start: 0, limit: 9999, sort: 'rank', dir: 'ASC' }
-    const data = await api('mgr/language/getlist', params)
+    const data = await connector.post('mgr/language/getlist', {
+      start: 0,
+      limit: 9999,
+      sort: 'rank',
+      dir: 'ASC',
+    })
     updateStatsFromList(data.results || [], data.total || 0)
   } catch {
-    updateStatsFromList(languages.value, totalRecords.value)
+    updateStatsFromList(items.value, totalRecords.value)
   }
 }
 
 async function loadLanguages() {
   loading.value = true
   try {
-    const params = {
-      start: lazyParams.value.start,
-      limit: lazyParams.value.limit,
-      sort: lazyParams.value.sort,
-      dir: lazyParams.value.dir,
+    const query = { ...params.value }
+    if (!query.query) {
+      delete query.query
     }
-    if (searchQuery.value) params.query = searchQuery.value
-
-    const data = await api('mgr/language/getlist', params)
-    languages.value = data.results || []
+    const data = await connector.post('mgr/language/getlist', query)
+    items.value = data.results || []
     totalRecords.value = data.total || 0
     await loadStats()
   } catch (e) {
-    toast.add({ severity: 'error', summary: lexicon.value.localizator_error || 'Error', detail: e.message, life: 5000 })
+    showError(e.message)
   } finally {
     loading.value = false
   }
 }
 
-function onPage(event) {
-  lazyParams.value = {
-    ...lazyParams.value,
-    start: event.first,
-    limit: event.rows,
-  }
-  first.value = event.first
-  loadLanguages()
-}
-
-function onSort(event) {
-  lazyParams.value = {
-    ...lazyParams.value,
-    sort: event.sortField || 'rank',
-    dir: event.sortOrder === 1 ? 'ASC' : 'DESC',
-  }
-  loadLanguages()
-}
+setLoadFn(loadLanguages)
 
 function openCreateDialog() {
-  isEdit.value = false
-  resetForm()
-  form.active = true
-  dialogVisible.value = true
+  openCreate({
+    id: null,
+    key: '',
+    name: '',
+    http_host: '',
+    cultureKey: '',
+    description: '',
+    active: true,
+  })
 }
 
 function openEditDialog(row) {
-  isEdit.value = true
-  form.id = row.id
-  form.key = row.key
-  form.name = row.name
-  form.http_host = normalizeHttpHost(row.http_host)
-  form.cultureKey = row.cultureKey || ''
-  form.description = row.description || ''
-  form.active = isActive(row)
-  dialogVisible.value = true
-}
-
-function resetForm() {
-  form.id = null
-  form.key = ''
-  form.name = ''
-  form.http_host = ''
-  form.cultureKey = ''
-  form.description = ''
-  form.active = true
+  openEdit({
+    id: row.id,
+    key: row.key,
+    name: row.name,
+    http_host: normalizeHttpHost(row.http_host),
+    cultureKey: row.cultureKey || '',
+    description: row.description || '',
+    active: isActive(row),
+  })
 }
 
 async function submitForm() {
-  const httpHost = normalizeHttpHost(form.http_host)
+  const httpHost = normalizeHttpHost(formData.value.http_host)
   if (!httpHost) {
-    toast.add({
-      severity: 'error',
-      summary: lexicon.value.localizator_error || 'Error',
-      detail: lexicon.value.localizator_language_err_no_http_host || 'HTTP HOST is required',
-      life: 5000,
-    })
+    showError(t('localizator_language_err_no_http_host', 'HTTP HOST is required'))
     return
   }
-
-  form.http_host = httpHost
-
+  formData.value.http_host = httpHost
   try {
-    if (isEdit.value) {
-      await api('mgr/language/update', {
-        id: form.id,
-        key: form.key,
-        name: form.name,
-        http_host: httpHost,
-        cultureKey: form.cultureKey,
-        description: form.description,
-        active: form.active ? 1 : 0,
-      })
-      toast.add({ severity: 'success', summary: lexicon.value.localizator_success || 'Success', detail: lexicon.value.localizator_language_updated || 'Language updated', life: 3000 })
-    } else {
-      await api('mgr/language/create', {
-        key: form.key,
-        name: form.name,
-        http_host: httpHost,
-        cultureKey: form.cultureKey,
-        description: form.description,
-        active: form.active ? 1 : 0,
-      })
-      toast.add({ severity: 'success', summary: lexicon.value.localizator_success || 'Success', detail: lexicon.value.localizator_language_created || 'Language created', life: 3000 })
-    }
-    dialogVisible.value = false
-    loadLanguages()
-  } catch (e) {
-    toast.add({ severity: 'error', summary: lexicon.value.localizator_error || 'Error', detail: e.message, life: 5000 })
+    await save({
+      id: formData.value.id,
+      key: formData.value.key,
+      name: formData.value.name,
+      http_host: httpHost,
+      cultureKey: formData.value.cultureKey,
+      description: formData.value.description,
+      active: formData.value.active ? 1 : 0,
+    })
+    await refresh()
+  } catch {
+  // toast via onError
   }
 }
 
 function confirmRemove(ids) {
-  confirm.require({
+  confirmAction({
     message: ids.length > 1
-      ? (lexicon.value.localizator_items_remove_confirm || 'Are you sure you want to delete these entries?')
-      : (lexicon.value.localizator_item_remove_confirm || 'Are you sure you want to delete this record?'),
-    header: lexicon.value.localizator_items_remove || 'Delete',
-    icon: 'pi pi-exclamation-triangle',
-    accept: () => removeItems(ids),
+      ? t('localizator_items_remove_confirm', 'Are you sure you want to delete these entries?')
+      : t('localizator_item_remove_confirm', 'Are you sure you want to delete this record?'),
+    header: t('localizator_items_remove', 'Delete'),
+    accept: async () => {
+      await remove(ids)
+      await refresh()
+    },
   })
 }
 
-async function removeItems(ids) {
+async function toggleActive(row) {
   try {
-    await api('mgr/language/remove', { ids: JSON.stringify(ids) })
-    toast.add({ severity: 'success', summary: lexicon.value.localizator_success || 'Success', detail: lexicon.value.localizator_deleted || 'Deleted', life: 3000 })
-    loadLanguages()
-  } catch (e) {
-    toast.add({ severity: 'error', summary: lexicon.value.localizator_error || 'Error', detail: e.message, life: 5000 })
-  }
-}
-
-async function enableItems(ids) {
-  try {
-    await api('mgr/language/enable', { ids: JSON.stringify(ids) })
-    toast.add({ severity: 'success', summary: lexicon.value.localizator_success || 'Success', detail: lexicon.value.localizator_enabled || 'Enabled', life: 3000 })
-    loadLanguages()
-  } catch (e) {
-    toast.add({ severity: 'error', summary: lexicon.value.localizator_error || 'Error', detail: e.message, life: 5000 })
-  }
-}
-
-async function disableItems(ids) {
-  try {
-    await api('mgr/language/disable', { ids: JSON.stringify(ids) })
-    toast.add({ severity: 'success', summary: lexicon.value.localizator_success || 'Success', detail: lexicon.value.localizator_disabled || 'Disabled', life: 3000 })
-    loadLanguages()
-  } catch (e) {
-    toast.add({ severity: 'error', summary: lexicon.value.localizator_error || 'Error', detail: e.message, life: 5000 })
+    if (isActive(row)) {
+      await disable([row.id])
+    } else {
+      await enable([row.id])
+    }
+    await refresh()
+  } catch {
+  // toast via onError
   }
 }
 

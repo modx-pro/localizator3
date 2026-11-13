@@ -85,9 +85,4 @@ return [
         'value' => 'pagetitle,longtitle,menutitle,seotitle,keywords,introtext,description,content',
         'area' => 'localizator3_translator',
     ],
-    'tv_fields' => [
-        'xtype' => 'textfield',
-        'value' => '',
-        'area' => 'localizator3_main',
-    ],
 ];

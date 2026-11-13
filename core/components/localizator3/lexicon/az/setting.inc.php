@@ -27,9 +27,6 @@ $_lang['setting_localizator_translate_translated_fields_desc'] = 'Avtomatik tər
 $_lang['setting_localizator_translate_fields'] = 'Tərcümə sahələrinin siyahısı';
 $_lang['setting_localizator_translate_fields_desc'] = 'Göstərilən sahələr avtomatik tərcümə zamanı tərcümə olunacaq';
 
-$_lang['setting_localizator_tv_fields'] = 'Əlavə sahələrin siyahısı (TV)';
-$_lang['setting_localizator_tv_fields_desc'] = 'Göstərilən əlavə sahələr lokalizasiyada redaktə üçün mövcud olacaq';
-
 $_lang['setting_localizator_check_permissions'] = 'Redaktə icazəsini yoxlamaq';
 $_lang['setting_localizator_check_permissions_desc'] = 'Resurs lokalizasiyalarının redaktə icazəsini yoxlamaq';
 

@@ -6,37 +6,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [1.0.13-beta] - Unreleased
+## [1.1.0-beta] - 2026-11-13
 
-### Fixed
-- Участие TV в локализации: новые TV по умолчанию выключены (`localizator3_enabled=0`), в локализации видны и сохраняются только включённые в форме TV. Раньше установка включала все TV подряд.
-- Исправлено слияние xPDO-карты `modTemplateVar` в MODX 3: ключ `MODX\Revolution\modTemplateVar` вместо legacy `modTemplateVar` (`OnMODXInit` + resolver) и запись всей карты обратно — вложенное `$modx->map[$class][$key]` в MODX 3 не сохраняется (xPDOMap возвращает копию). Колонка `localizator3_enabled` теперь гарантированно добавляется при установке/обновлении.
-- Чекбокс «TV доступно в локализациях» сохраняется: добавлен обработчик `OnTVFormSave` (снимание чекбокса шлёт 0, ExtJS 0 не отправляет, без обработчика TV нельзя было выключить).
-- Фильтры `getformconfig` / `localizatorContent` / `fields` / `pdofetchlocalizator3` проверяют физическую колонку, не только карту; на старых установках без колонки поведение прежнее, без SQL-ошибок.
-- Исправлен `localizatorContent::renderTVOutput()`: отсутствующая `localizator_is_mod_template_var()` заменена на `instanceof modTemplateVar` — подстановка локализованных TV завершалась фатальной ошибкой.
-- Колонка «Активно» в списке языков: бэкенд отдаёт строгое `bool` (`getlist`), фронтенд приводит `0/1/'0'/'1'` к `bool` в гриде, кнопке и статистике; статистика считается по всем языкам без фильтра поиска.
+### Added
+- PrimeVue theme via VueTools (`@vuetools/useTheme`): always ModxManagerTheme (`getActiveTheme('modx')`). New `vueManager/src/app/primevueTheme.js` with `getManagerPrimeVueConfig()` and `getPrimarySaveSeverity()` (always `success` for Save/Add). Localizator3 ignores the VueTools `vuetools.theme` / Aura setting.
+- Lexicon keys `localizator_content_active` / `localizator_content_active_desc` for the "Publish translation" control on the Localization tab.
+
+### Removed
+- Unused Vue components `ContentFormDialog.vue` and `LanguageFormDialog.vue` (forms live in `ContentGrid` / `LanguagesGrid`).
 
 ### Changed
-- Resolver `resolver_11_upgrade.php`: убран безусловный bulk-enable всех TV; явная миграция сохраняется только при наличии legacy-настройки `localizator_tv_fields` (localizator v1).
+- Vue manager grids use shared composables (`useConnector`, `useLexicon`, `useDataTable`, `useGridCrud`, `useConfirmAction`). Content localization logic lives in `useContentForm.js` so `ContentGrid.vue` / `LanguagesGrid.vue` stay under the 400-line gate.
+- Manager Vue UI chrome matches MODX / VueTools: green `#6cb24a`, 13px type, 32px controls, resource-like form tabs, flat panels. Languages page paints `#modx-content`; the resource Localization tab does not hide the host ExtJS panel.
+- Languages page layout: page title, compact stats strip, search without a redundant label (16rem), primary action on the right.
+- Localization toolbar: constrained language select, publish checkbox next to it (description in `title`), Save uses theme severity, Translate is outlined secondary.
+- `createLocalizatorApp` uses ModxManagerTheme; theme options use `darkModeSelector: '.modx-dark-mode'` and `cssLayer: false`.
+- `resolver_11_upgrade.php` no longer bulk-enables every TV on install. New TVs stay off until `localizator3_enabled` is set on the TV form. The unused `localizator3_tv_fields` system setting is removed if present.
+- Localization tab: the language comes only from the toolbar select. The form `key` field is hidden (#19). The "Publish translation" checkbox sits in that toolbar and is checked when the value is `1`.
+- `richtext` TVs use the MODX editor (`MODx.loadRTE` or Ace), the same editor as the resource form. The TV description sits next to the label. Placeholders that repeated the field caption are removed.
+
+### Fixed
+- Nested MIGX auto-translate: `configs` / `formtabs` from a child field are written to the nested TV `input_properties` before the recursive `translateTV()` call. Sibling fields no longer inherit a polluted parent `$params` bag. Nested migx via `inputTVtype` + config name (or inline formtabs) is translated, not only `inputTV` references.
+- TV participation in localization: new TVs default to off (`localizator3_enabled=0`). The localization tab shows and saves only TVs enabled on the TV form. The installer used to enable every TV.
+- MODX 3 `modTemplateVar` xPDO map merge: the class key is `MODX\Revolution\modTemplateVar`, not the legacy `modTemplateVar` (`OnMODXInit` and the resolver). The whole map is written back, because nested `$modx->map[$class][$key]` does not persist in MODX 3 (xPDOMap returns a copy). The `localizator3_enabled` column is added on install and upgrade.
+- The "TV is available in localizations" checkbox is saved. `OnTVFormSave` stores `0` when the box is cleared. ExtJS does not post `0`, so without the handler a TV could not be turned off.
+- `getformconfig`, `localizatorContent`, `fields`, and `pdofetchlocalizator3` check the physical column, not only the map. Installations without the column keep the previous behavior and do not throw SQL errors.
+- `localizatorContent::renderTVOutput()`: the missing `localizator_is_mod_template_var()` call is replaced with `instanceof modTemplateVar`. Localized TV output no longer fatals.
+- Languages grid "Active" column: `getlist` returns a strict `bool`. The UI coerces `0/1/'0'/'1'` to `bool` in the grid, the toggle, and the stats. Stats count every language, ignoring the search filter. Status tags use Active / Disabled lexicon keys instead of Enable / Disable action labels.
+- Content form tabs sit flush with the panel top (PrimeVue `.p-tablist` padding removed).
 
 ---
 
 ## [1.0.12-beta] - 2026-11-06
 
 ### Fixed
-- TV-поля на вкладке «Локализация» теперь рендерятся по своему типу: number, listbox, listbox-multiple, checkbox, radio и др. — нативными контролами PrimeVue, а MIGX, tvmedia3x и прочие кастомные типы — штатным рендером MODX. Раньше все TV выводились простыми textarea.
-- Значения кастомных TV (MIGX, tvmedia3x и др.) корректно собираются и сохраняются для каждой локализации; id полей не конфликтуют с TV основной формы ресурса.
+- TV fields on the Localization tab render by type. `number`, `listbox`, `listbox-multiple`, `checkbox`, `radio`, and similar types use PrimeVue controls. MIGX, tvmedia3x, and other custom types use the MODX renderer. Every TV used to be a plain textarea.
+- Custom TV values (MIGX, tvmedia3x, and others) are collected and saved per localization. Generated field ids do not collide with TVs on the main resource form.
 
 ---
 
 ## [1.0.11-beta] - 2026-10-07
 
 ### Added
-- Explicit `language` request param (GET/POST) now has the highest priority when resolving connector/AJAX language and in auto-detect redirects — it beats the HttpOnly `localizator3_key` cookie. Param name is configurable via `localizator3_request_language_param` (default `language`, empty disables). Use case: demo/stand links like `?language=ru` while the visitor's cookie is `en`.
-- `applyLanguageFromKey()` / `getRequestLanguageKey()` — sync `cultureKey` / `localizator3_key` from any language key (request param, cookie, custom source).
+- Setting `localizator3_request_language_param` (default `language`): a GET/POST parameter with an explicit language key. It outranks the `localizator3_key` cookie in connector/AJAX requests and in auto-detect redirects. An empty value disables the override. Example: `?language=ru` while the cookie is `en`.
+- `localizator::getRequestLanguageKey()` and `applyLanguageFromKey()` read that parameter and sync `cultureKey` / `localizator3_key`.
 
 ### Changed
-- `resolveConnectorLanguage()` order: request param → Referer path → cookie → HTTP host.
+- `resolveConnectorLanguage()` order: request parameter, Referer path, HTTP host, cookie.
 - `applyLanguageFromCookie()` delegates to `applyLanguageFromKey()`.
 
 ---
@@ -44,119 +60,145 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.0.10-beta] - 2026-07-17
 
 ### Added
-- `localizator::applyLanguage()`, `applyLanguageFromCookie()`, `resolveConnectorLanguage()` for language sync outside full page requests.
+- `localizator::applyLanguage()`, `applyLanguageFromCookie()`, and `resolveConnectorLanguage()` sync the language outside a full page request.
 
 ### Fixed
-- Connector / AJAX requests now sync `cultureKey` and `localizator3_key` from Referer path or cookie `localizator3_key` (`OnMODXInit` → `resolveConnectorLanguage`). Previously only `X-Requested-With: XMLHttpRequest` + Referer worked, so package connectors kept the system `cultureKey` (often `ru`) while the page UI was already `en`.
+- Connector / AJAX: `OnMODXInit` calls `resolveConnectorLanguage()` (Referer path or the `localizator3_key` cookie). Language used to be set only when `X-Requested-With: XMLHttpRequest` and a Referer were both present, so package `connector.php` calls kept the system `cultureKey` (often `ru`) while the storefront was already `en`.
 
 ### Changed
-- Extracted `applyLanguage()` / `applyLanguageFromCookie()` from `findLocalization()` for reuse.
+- Language application moved out of `findLocalization()` into `applyLanguage()` so other callers can reuse it.
 
 ---
 
-## [1.0.8-beta]
+## [1.0.9-beta] - 2026-07-07
 
 ### Added
-- VueTools ≥1.1.2-pl — обязательная зависимость для Vue-UI (Import Map для Vue 3, Pinia, PrimeVue 4)
-- Resolver `vuetools` — автоматическая проверка и установка VueTools
-- Trait `Localizator3VueControllerTrait` с `requireVueTools()` и `addVueModule()`
-- Composables: `useConnector`, `useLexicon`, `useDataTable`, `useGridCrud`, `useConfirmAction`
-- Shared компоненты: `FormFieldRenderer.vue`, `GridActionsColumn.vue`
-- Диалоги форм: `ContentFormDialog.vue`, `LanguageFormDialog.vue`
-
-### Changed
-- Vite config: `external` для Vue-стека — lean bundles (~14KB вместо ~800KB)
-- `createLocalizatorApp.js` — единый bootstrap без мёртвых зависимостей (Pinia)
-- Удалён ExtJS fallback — теперь только Vue UI
+- Setting `localizator3_default_from_resource`: default-language content (`localizator3_default_language`) comes from the resource fields and TVs. The Localization tab lists translations only.
+- `localizator::shouldUseResourceFields()`, `getLocalizedFieldValue()`, `buildDefaultLanguageSource()`, and `localizatorContent::hydrateFromResource()`.
 
 ### Fixed
-- CSS: `index.min.css` → `content.min.css`
-- Build: генерация `languages.min.js`
-- Vite: `inlineDynamicImports: true`
+- PHP 8: `findLocalization()` no longer passes `$request` by reference. `OnHandleRequest` and `OnMODXInit` pass the request path through a variable. This removes the frontend fatal "could not be passed by reference".
+- Install on PHP 8.2: Symfony 7 instead of 8 in vendor, platform PHP 8.2, and a corrected `platform_check.php` (#8).
+- VueTools resolver: `modTransportProvider::request()` is called with the MODX 3 signature, through a shared helper. A VueTools failure does not abort the Localizator3 install (#8).
+- Phinx migrations: MODX `table_prefix` is no longer applied twice. The migration log table is `{table_prefix}localizator3_migrations`. A repair runs before Phinx on installations that were already broken (#9).
+- Package uninstall: the `localizator3` plugin and its events are removed by a resolver and transport attributes (`UNINSTALL_OBJECT`) (#10).
 
 ---
 
-## [1.0.7-beta]
+## [1.0.8-beta] - 2026-06-17
 
-### Changed
-- Vue UI: scoped styles с BEM-префиксами (.content-grid__*, .languages-grid__*)
-- Vue UI: замена native confirm() на PrimeVue ConfirmDialog (useConfirm)
-- Vue UI: appendTo="self" для Dialog-порталов (изоляция от ExtJS)
-- CSS: откат глобального box-sizing от PrimeVue через !important в main.css
-- Удалены legacy ExtJS-стили из main.css
-- Удалены дублирующие import-ы PrimeVue компонентов в ContentGrid.vue
-- Обновлена документация: README.md, docs/*, llms.txt, architecture.md, api.md, configuration.md, CUSTOMIZATION.md
-- Исправлено имя сниппета переключателя языков: getLanguageList
-- Cursor rules обновлены под Localizator3
-
----
-
-## [1.0.6-beta]
+### Fixed
+- Resource Localization tab: Vue mount race. The bridge does not set `data-mounted` until `app.mount()`, and retries while the ES module is still loading.
+- Mount recovery: a stuck `data-mounted` flag without `.content-grid` is cleared. The tab `activate` handler and `doLayout` run after mount.
+- Localization tab: language select and an inline Document / TV form replace the grid list. Save stays on the tab.
+- Locale dropdown: every active Localizator3 language. Switching loads an existing translation or starts a new one for that key.
+- Full width of the localization tab: ExtJS `layout: anchor` and `anchor: 100%`, plus CSS from `#localizator3-resource-tab` to `#localizator3-content-app`.
+- CSS: `index.min.css` renamed to `content.min.css` in `OnDocFormPrerender.php`.
+- Build: `languages.min.js` is emitted.
+- Vite: `inlineDynamicImports: true`. Each entry is one file, with no code-split chunks.
 
 ### Added
-- Лексиконы для языков СНГ: украинский (uk), казахский (kk), узбекский (uz), азербайджанский (az)
-- Vue-вкладка локализации в форме ресурса (ContentGrid.vue)
-- Процессор mgr/content/getformconfig — конфигурация формы с учётом кастомизации
-- OnBuildLocalizationTabs расширен: resource, user, customization
-- Поддержка visible/rank полей для кастомизации по пользователю
-- mSearch integration — индексация локализованных полей (ru-pagetitle, en-description и т.д.)
-- msProductOption — локализация опций miniShop3 (цвет, размер)
-- Таблицы localizator3_option, localizator3_product_option
-- Fenom-модификаторы: locoptioncaption, locproductoptionvalue
-- Методы: getLocalizedOptionCaption, getLocalizedOptionDescription, getLocalizedProductOptionValue
+- VueTools ≥1.1.2-pl: Vue 3, Pinia, and PrimeVue 4 through an Import Map.
+- `vuetools` resolver: checks for VueTools and installs it.
+- Trait `Localizator3VueControllerTrait` with `requireVueTools()` and `addVueModule()`.
+- Composables: `useConnector`, `useLexicon`, `useDataTable`, `useGridCrud`, `useConfirmAction`.
+- Shared components: `FormFieldRenderer.vue`, `GridActionsColumn.vue`.
+- Dialog components: `ContentFormDialog.vue`, `LanguageFormDialog.vue`.
+- Lexicon entry `localizator3_vuetools_required` when VueTools is missing.
+
+### Changed
+- Docs: one `docs/` tree (kebab-case), index in `docs/README.md`, Vue UI and getformconfig brought up to date.
+- Vite `external` for `vue`, `pinia`, `primevue`, `@vuetools/*`. Bundles are about 14 KB instead of about 800 KB.
+- `createLocalizatorApp.js`: one Vue bootstrap without Pinia (stores are unused).
+- ExtJS fallback for the grids is removed. The manager UI is Vue and requires VueTools.
 
 ---
 
-## [1.0.5-beta]
+## [1.0.7-beta] - 2026-06-17
+
+### Added
+- Vue UI: scoped styles with BEM prefixes (`.content-grid__*`, `.languages-grid__*`).
+- Vue UI: PrimeVue `ConfirmDialog` instead of native `confirm()`.
+- Vue UI: `appendTo="self"` on Dialog so portals stay out of ExtJS styles.
+
+### Changed
+- CSS: PrimeVue's global `box-sizing` is overridden with `!important` in `main.css`.
+- Legacy ExtJS styles removed from `main.css`.
+- Duplicate PrimeVue imports removed from `ContentGrid.vue`.
+- Docs: README.md, `docs/*`, `llms.txt`, `readme.txt`.
+- Build is documented as `php _build/build.php`, with asset paths under `vue-dist`.
+- Package version synced in `_build/config.inc.php`.
+- Cursor rules updated for Localizator3.
+
+### Fixed
+- Docs: the language switcher snippet is `getLanguageList` (it was documented as `getLocales`).
+
+---
+
+## [1.0.6-beta] - 2026-06-17
+
+### Added
+- Lexicons for Ukrainian (uk), Kazakh (kk), Uzbek (uz), and Azerbaijani (az).
+- Vue localization tab on the resource form (`ContentGrid.vue`).
+- Processor `mgr/content/getformconfig` for the form config, including customization.
+- Event `OnBuildLocalizationTabs` with `resource`, `user`, and `customization`.
+- Per-user field customization: `visible` and `rank`.
+- mSearch integration: localized fields are indexed (`mseOnBeforeIndex`, `mseOnGetWorkFields`). Field names look like `ru-pagetitle` and `en-description` (see `docs/integration-msearch.md`).
+- miniShop3 product option localization (color, size, and similar options).
+- Tables `localizator3_option` (`locOption`) and `localizator3_product_option` (`locProductOption`).
+- Fenom modifiers: `locoptioncaption`, `locproductoptionvalue`.
+- Service methods: `getLocalizedOptionCaption`, `getLocalizedOptionDescription`, `getLocalizedProductOptionValue`.
+
+---
+
+## [1.0.5-beta] - 2026-06-17
 
 ### Removed
-- mSearch2/mFilter2 support — использовать mFilter для фасетной фильтрации
+- mSearch2 / mFilter2 support. Use [mFilter](https://docs.modx.pro/components/mfilter/) for faceted filtering.
 
 ---
 
-## [1.0.4-beta]
+## [1.0.4-beta] - 2026-06-17
 
 ### Added
-- miniShop3 integration — вкладка Localizator для msProduct
-- getLocalizedResources с msProducts/ms3Products
+- miniShop3 integration: a Localizator tab for `msProduct`, and `getLocalizedResources` with `msProducts` / `ms3Products`.
 
 ---
 
-## [1.0.3-beta]
+## [1.0.3-beta] - 2026-06-17
 
 ### Added
-- Snippet getLocalizedField — вывод поля ресурса на указанном языке
-- CLI script translate_resources.php — массовый перевод из консоли
-- Автоопределение языка посетителя — localizator3_auto_detect_language, redirect по Accept-Language/cookie
+- Snippet `getLocalizedField`: output a resource field in a given language.
+- CLI script `translate_resources.php` for bulk translation from the console.
+- Setting `localizator3_auto_detect_language`: detect the visitor language from Accept-Language or the cookie.
 
 ---
 
-## [1.0.2-beta]
+## [1.0.2-beta] - 2026-06-17
 
 ### Added
-- Событие OnToggleLocalizatorLanguage — при определении языка (валидация, кэш, интеграции)
-- Snippet getLocalizedSitemap — sitemap.xml с hreflang для мультиязычных страниц (SEO)
+- Event `OnToggleLocalizatorLanguage` when the language is resolved (validation, cache, integrations).
+- Snippet `getLocalizedSitemap`: `sitemap.xml` with hreflang for multilingual pages.
 
 ---
 
-## [1.0.1-beta]
+## [1.0.1-beta] - 2026-06-17
 
 ### Added
-- Параметр onlyWithLocalization в getLocalizedResources — исключает ресурсы без локализации (INNER JOIN)
-- Snippet makeLocalizedUrl — формирование URL ресурса с языковым префиксом
-- Расширен getLanguageList — outputMode (list/dropdown), showActive, activeClass; chunk languages.dropdown.tpl
-- Настройка localizator3_404_if_no_localization — 404 для документов без локализации
-- Событие OnHasLocalizatorError404
-- Поле rank в localizator3_languages — сортировка языков (sortby, sortdir в getLanguageList)
-- Snippet getLocalizedCanonical — canonical и hreflang для SEO
+- `onlyWithLocalization` on `getLocalizedResources`: drop resources that have no localization for the current language (INNER JOIN).
+- Snippet `makeLocalizedUrl`: resource URL with a language prefix.
+- `getLanguageList` extended with `outputMode` (list/dropdown), `showActive`, and `activeClass`. Chunk `languages.dropdown.tpl`.
+- Setting `localizator3_404_if_no_localization`: 404 for documents without a localization. Event `OnHasLocalizatorError404`.
+- `rank` on `localizator3_languages`. `getLanguageList` accepts `sortby` and `sortdir`.
+- Snippet `getLocalizedCanonical`: canonical and hreflang.
 
 ---
 
-## [1.0.0-beta]
+## [1.0.0-beta] - 2026-06-17
 
 ### Added
-- Initial release for MODX 3 only
-- Fork of Localizator adapted exclusively for MODX Revolution 3
-- Отдельное имя пакета (localizator3) и таблицы (localizator3_*) — без конфликтов с Localizator
-- Использование MODX 3 namespaces (\MODX\Revolution\*, \xPDO\Transport\*)
-- Только нативная поддержка MODX 3 — без слоя совместимости
+- First release, MODX 3 only.
+- Fork of Localizator adapted for MODX Revolution 3.
+- Separate package name (`localizator3`) and tables (`localizator3_*`), so it does not clash with the original Localizator.
+- MODX 3 namespaces (`\MODX\Revolution\*`, `\xPDO\Transport\*`).
+- MODX 3 only, with no MODX 2 compatibility layer.

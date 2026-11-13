@@ -2,7 +2,7 @@
 
 Сниппеты, Fenom-модификаторы, события, процессоры и CLI.
 
-**Версия:** 1.0.8-beta · [Оглавление документации](./README.md)
+**Версия:** 1.1.0-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -205,6 +205,8 @@ Canonical и hreflang-ссылки для SEO. Выводит `<link rel="canoni
 | `OnToggleLocalizatorLanguage` | key, language | При установке текущего языка |
 | `OnBeforeSaveLocalization` | — | Перед сохранением локализации |
 | `OnSaveLocalization` | — | После сохранения локализации |
+| `OnBeforeRemoveLocalization` | — | Перед удалением локализации |
+| `OnRemoveLocalization` | — | После удаления локализации |
 | `OnBeforeSaveLocalizatorLanguage` | — | Перед сохранением языка |
 | `OnSaveLocalizatorLanguage` | — | После сохранения языка |
 | `OnHasLocalizatorError404` | resource, language_key | Перед отдачей 404 при отсутствии локализации |
@@ -221,6 +223,7 @@ Canonical и hreflang-ссылки для SEO. Выводит `<link rel="canoni
 | `OnLoadWebDocument` | Подстановка переводов |
 | `OnEmptyTrash` | Очистка данных |
 | `OnTVFormPrerender` | Чекбокс доступности TV |
+| `OnTVFormSave` | Сохранение `localizator3_enabled` |
 | `pdoToolsOnFenomInit` | Fenom-модификаторы |
 | `mseOnBeforeIndex` | Индексация для mSearch |
 | `mseOnGetWorkFields` | Расширение полей mSearch |
@@ -247,6 +250,7 @@ Canonical и hreflang-ссылки для SEO. Выводит `<link rel="canoni
 |--------|------|----------|
 | `mgr/content/create` | POST | Создать локализацию (resource_id, key, поля) |
 | `mgr/content/update` | POST | Обновить локализацию |
+| `mgr/content/updatefromgrid` | POST | Обновить из DataTable (JSON в `data`) |
 | `mgr/content/get` | GET | Получить запись по id |
 | `mgr/content/getlist` | GET | Список локализаций ресурса |
 | `mgr/content/remove` | POST | Удалить локализацию |

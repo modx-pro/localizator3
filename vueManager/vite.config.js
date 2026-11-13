@@ -39,6 +39,7 @@ const postcssPlugins = [
     ],
     transform: (prefix, selector) => {
       if (selector === ':root') return '.vueApp'
+      if (/^#modx-content/.test(selector)) return selector
       if (/^#localizator3-/.test(selector)) return selector
       if (/^\.localizator3-/.test(selector)) return selector
       if (selector.startsWith('.vueApp')) return selector

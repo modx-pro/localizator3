@@ -79,10 +79,9 @@ if ($transport->xpdo) {
                 }
             }
 
-            // Миграция только для старых установок localizator v1:
-            // прежняя настройка localizator_tv_fields задавала список TV.
-            // Если настройки нет — ничего не трогаем: новые TV по умолчанию
-            // выключены (localizator3_enabled=0), не включаем всё подряд.
+            // Если на сайте ещё есть системная настройка localizator_tv_fields
+            // со списком имён TV — включить им localizator3_enabled=1.
+            // Иначе ничего не трогаем: новые TV по умолчанию выключены.
             $fields_in = $fields_out = $criteria = array();
             if ($fields = $modx->getOption('localizator_tv_fields', null, false, true)) {
                 $fields = array_map('trim', explode(',', $fields));

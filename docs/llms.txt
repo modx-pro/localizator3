@@ -1,5 +1,5 @@
 # Localizator3
-> Мультиязычность для MODX Revolution 3. Локализация ресурсов, TV, товаров miniShop3 и опций. Версия: 1.0.8-beta.
+> Мультиязычность для MODX Revolution 3. Локализация ресурсов, TV, товаров miniShop3 и опций. Версия: 1.1.0-beta.
 
 ## Documentation Index
 - [docs/README.md]: Оглавление документации
@@ -10,21 +10,22 @@
 - [docs/customization.md]: OnBuildLocalizationTabs, getformconfig
 - [docs/integration-minishop3.md]: miniShop3
 - [docs/integration-msearch.md]: mSearch
-- [docs/roadmap.md]: План F1–F10, сравнение с Babel/WPML/Drupal
+- [docs/roadmap.md]: План F1–F10 (+ F9-08 theme, F2-12/13 TV), сравнение с Babel/WPML/Drupal
 
 ## Requirements
-- MODX 3.0+, PHP 8.2+ (component: 8.1+), pdoTools, VueTools ≥1.1.2-pl, Node.js 18+ (build only)
+- MODX 3.0+, PHP 8.2+, pdoTools, VueTools ≥1.1.2-pl, Node.js 18+ (build only)
 
 ## Core Files
-- [core/components/localizator3/localizator.class.php]: Сервис (findLocalization, translate, versionedAsset, getLocalizedOption*)
+- [core/components/localizator3/model/localizator3/localizator.class.php]: Сервис (findLocalization, translate, versionedAsset, getLocalizedOption*)
 - [core/components/localizator3/model/localizator3/]: xPDO-модели (localizatorLanguage, localizatorContent, locTemplateVarResource, locOption, locProductOption)
 - [core/components/localizator3/processors/mgr/]: Процессоры (language/*, content/*, fields, lexicon/*)
 - [core/components/localizator3/elements/snippets/]: Сниппеты (getLocalizedResources, getLanguageList, getLocalizedField, makeLocalizedUrl, getLocalizedCanonical, getLocalizedSitemap)
-- [core/components/localizator3/elements/plugins/handlers/]: OnMODXInit, OnHandleRequest, OnDocFormPrerender, OnDocFormSave, OnLoadWebDocument, mseOnBeforeIndex, mseOnGetWorkFields, pdoToolsOnFenomInit
+- [core/components/localizator3/elements/plugins/handlers/]: OnMODXInit, OnHandleRequest, OnPageNotFound, OnDocFormPrerender, OnDocFormSave, OnLoadWebDocument, OnEmptyTrash, OnTVFormPrerender, OnTVFormSave, mseOnBeforeIndex, mseOnGetWorkFields, pdoToolsOnFenomInit
 - [vueManager/src/components/ContentGrid.vue]: Inline-форма локализации на ресурсе
 - [vueManager/src/components/LanguagesGrid.vue]: CRUD языков
-- [vueManager/src/composables/]: useConnector, useLexicon, useDataTable, useGridCrud, useConfirmAction (созданы, интеграция — roadmap)
+- [vueManager/src/composables/]: useConnector, useLexicon, useDataTable, useGridCrud, useConfirmAction, useContentForm (в ContentGrid / LanguagesGrid)
 - [vueManager/src/app/createLocalizatorApp.js]: Bootstrap Vue UI
+- [vueManager/src/app/primevueTheme.js]: Always ModxManagerTheme (getActiveTheme('modx'); ignores vuetools.theme)
 - [vueManager/src/entries/content.js]: Entry вкладки ресурса
 - [vueManager/src/entries/languages.js]: Entry страницы «Языки»
 - [assets/components/localizator3/js/mgr/vue-dist/]: Lean bundles (~14KB)
@@ -39,7 +40,7 @@
 - **Fenom**: locfield, locoptioncaption, locproductoptionvalue
 
 ## Events (custom)
-OnBuildLocalizationTabs, OnBeforeFindLocalization, OnFindLocalization, OnFindLocalizatorResource, OnToggleLocalizatorLanguage, OnBeforeSaveLocalization, OnSaveLocalization, OnBeforeSaveLocalizatorLanguage, OnSaveLocalizatorLanguage, OnHasLocalizatorError404
+OnBuildLocalizationTabs, OnBeforeFindLocalization, OnFindLocalization, OnFindLocalizatorResource, OnToggleLocalizatorLanguage, OnBeforeSaveLocalization, OnSaveLocalization, OnBeforeRemoveLocalization, OnRemoveLocalization, OnBeforeSaveLocalizatorLanguage, OnSaveLocalizatorLanguage, OnHasLocalizatorError404
 
 ## Dependencies
 - VueTools ≥1.1.2-pl (обязательно): Import Map vue, pinia, primevue
@@ -50,8 +51,9 @@ OnBuildLocalizationTabs, OnBeforeFindLocalization, OnFindLocalization, OnFindLoc
 ## Vue UI
 - ContentGrid: dropdown activeLanguages, inline-форма Document/TV, Save/Translate
 - LanguagesGrid: DataTable, inline Dialog CRUD
+- Theme: ModxManagerTheme only (primevueTheme.js); Save/Add severity success
 - VueTools Import Map, lean entries, BEM + .vueApp isolation
-- Richtext: Textarea (MODX RTE — roadmap)
+- Richtext: MODX editor via MODx.loadRTE / Ace (TvRenderedInput)
 
 ## Build
 ```bash

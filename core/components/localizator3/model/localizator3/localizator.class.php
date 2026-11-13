@@ -541,7 +541,7 @@ class localizator
     }
 
     /**
-     * Resolve language for connector / AJAX: `language` param → Referer path → cookie → HTTP host.
+     * Resolve language for connector / AJAX: request param → Referer path → HTTP host → cookie.
      *
      * Full page requests still use OnHandleRequest → findLocalization(URL).
      * Package connectors often never send X-Requested-With and have empty `q`,

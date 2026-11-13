@@ -3,13 +3,20 @@
  *
  * Wraps PrimeVue useConfirm and useToast for consistent UX.
  */
+import { unref } from 'vue'
 import { useConfirm, useToast } from 'primevue'
 
 export function useConfirmAction(lexicon = {}) {
   const confirm = useConfirm()
   const toast = useToast()
 
-  const t = (key, fallback = '') => lexicon[key] || fallback
+  const t = (key, fallback = '') => {
+    const lx = unref(lexicon) || {}
+    if (typeof lx.t === 'function') {
+      return lx.t(key, fallback)
+    }
+    return lx[key] || fallback
+  }
 
   /**
    * Show confirmation dialog

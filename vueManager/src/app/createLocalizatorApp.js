@@ -2,8 +2,7 @@
  * createLocalizatorApp — единый bootstrap для Vue-UI Localizator3.
  *
  * Vue-стек (vue, primevue) резолвится через Import Map пакета VueTools ≥1.1.2-pl.
- * Тема PrimeVue (Aura) и локаль берутся из composables VueTools, поэтому сам
- * бандл не тащит @primevue/themes, primeicons и createPinia (stores пока нет).
+ * Тема PrimeVue — всегда ModxManagerTheme (@vuetools/useTheme, getActiveTheme('modx')).
  *
  * @param {import('vue').Component} RootComponent — корневой компонент (ContentGrid, LanguagesGrid, …)
  * @param {Record<string, any>} [rootProps] — props корневого компонента
@@ -12,25 +11,13 @@
  * @returns {import('vue').App}
  */
 import { createApp } from 'vue'
-// PrimeVue и тема Aura резолвятся через Import Map VueTools: ключ «primevue»
-// указывает на сборку, реэкспортирующую и config, и темы (Aura).
-import { PrimeVue, Aura } from 'primevue'
-import { getPrimeVueLocale } from '@vuetools/usePrimeVueLocale'
+import { PrimeVue } from 'primevue'
+import { getManagerPrimeVueConfig } from './primevueTheme.js'
 
 export function createLocalizatorApp(RootComponent, rootProps = {}, options = {}) {
   const app = createApp(RootComponent, rootProps)
 
-  app.use(PrimeVue, {
-    theme: {
-      preset: Aura,
-      options: {
-        darkModeSelector: false,
-        cssLayer: false,
-      },
-    },
-    locale: getPrimeVueLocale(),
-    ripple: false,
-  })
+  app.use(PrimeVue, getManagerPrimeVueConfig())
 
   if (options.components) {
     for (const [name, component] of Object.entries(options.components)) {

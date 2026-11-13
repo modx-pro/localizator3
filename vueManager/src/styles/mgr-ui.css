@@ -1,22 +1,45 @@
 /**
- * Shared manager UI patterns (mSearch-inspired).
- * All selectors scoped under .vueApp — safe inside MODX ExtJS manager.
+ * MODX 3 manager chrome — tokens aligned with VueTools / ms3YandexMarket.
+ * All selectors under .vueApp (or #modx-content:has(#localizator3-…)) —
+ * safe inside ExtJS manager.
  */
 .vueApp {
+  --loc-radius: var(--modx-mgr-global-radius, 0.25rem);
+  --loc-primary: #6cb24a;
+  --loc-text: #53595f;
+  --loc-text-muted: #5c656b;
+  --loc-border: #e4e4e4;
+  --loc-border-soft: #f0f0f0;
+  --loc-bg-strip: #f1f1f1;
+  --loc-bg-surface: #fff;
+  --loc-surface: #f8f8f8;
+  --loc-surface-muted: #f1f1f1;
+  --loc-stat-value: #6cb24a;
+  --loc-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+    "Helvetica Neue", sans-serif;
+  --loc-pad-x: 15px;
+  --loc-control-h: 32px;
+  --loc-page-padding-x: 16px;
+  --loc-page-padding-y: 16px;
+  --p-primary-color: #6cb24a;
+  --p-primary-contrast-color: #fff;
+  --p-primary-hover-color: #528738;
+  --p-primary-active-color: #385c26;
+  --p-toggleswitch-checked-background: #6cb24a;
+  --p-datatable-body-cell-padding: 4px 10px;
+  --p-datatable-header-cell-padding: 10px;
+  box-sizing: border-box;
+  color: var(--loc-text);
+  font-family: var(--loc-font);
+  font-size: 13px;
+  line-height: 1.45;
   color-scheme: light;
-  --loc-accent: #0d9488;
-  --loc-accent-soft: #ecfdf5;
-  --loc-stat-value: #059669;
-  --loc-surface: #f8fafc;
-  --loc-surface-muted: #f1f5f9;
-  --loc-border: #e2e8f0;
-  --loc-border-strong: #cbd5e1;
-  --loc-text-muted: #64748b;
-  --loc-radius: 0.5rem;
-  --loc-radius-lg: 0.75rem;
-  --loc-shadow: 0 1px 2px rgb(15 23 42 / 6%);
-  --loc-page-padding-x: 1.25rem;
-  --loc-page-padding-y: 1rem;
+}
+
+.vueApp *,
+.vueApp *::before,
+.vueApp *::after {
+  box-sizing: border-box;
 }
 
 .vueApp.languages-grid,
@@ -24,91 +47,150 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  box-sizing: border-box;
 }
 
 /* Страница «Языки» — MODX не даёт inner padding панели */
 .vueApp.languages-grid {
-  padding: 1rem 1.25rem 1.5rem;
+  padding: 0 16px 16px;
 }
 
-/* Вкладка ресурса — padding уже у .main-wrapper MODX, не дублируем по горизонтали */
+.vueApp .languages-grid__intro {
+  margin: 16px 0 16px;
+}
+
+.vueApp .languages-grid__title {
+  margin: 0 0 4px;
+  color: var(--loc-text);
+  font: normal 20px/1.25 var(--loc-font);
+}
+
+.vueApp.languages-grid .loc-section-bar {
+  margin: 0 0 12px;
+}
+
+.vueApp .languages-grid__toolbar {
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.vueApp .languages-grid__search {
+  flex: 0 0 16rem;
+  width: 16rem;
+}
+
+.vueApp .languages-grid__search .p-inputtext {
+  width: 100%;
+}
+
+.vueApp .loc-toolbar__spacer {
+  flex: 1 1 auto;
+  min-width: 8px;
+}
+
+/* Вкладка ресурса — padding уже у .main-wrapper MODX */
 .vueApp.content-grid {
   padding: 0.5rem 0 1rem;
 }
 
-/* Section subtitle bar */
-.vueApp .loc-section-bar {
-  margin: 0 0 1rem;
-  padding: 0.625rem 1rem;
-  background: var(--loc-surface-muted);
-  border: 1px solid var(--loc-border);
-  border-radius: var(--loc-radius);
-  font-size: 0.875rem;
-  color: var(--loc-text-muted);
-  line-height: 1.5;
+/* Languages page only: paint #modx-content around mount; do not hide host panel on resource tab */
+#modx-content:has(#localizator3-languages-app) {
+  background: #f1f1f1;
+  bottom: 0 !important;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
 }
 
-/* Stats cards row */
+#modx-content:has(#localizator3-languages-app) > .x-panel-bwrap {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+}
+
+/* Section subtitle — secondary, de-emphasized vs controls */
+.vueApp .loc-section-bar {
+  margin: 0 0 12px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  font-size: 12px;
+  color: var(--loc-text-muted);
+  line-height: 1.45;
+  max-width: 72ch;
+}
+
+.vueApp.content-grid .loc-section-bar {
+  margin: 4px 0 12px;
+}
+
+/* Stats — compact strip, not tall competing cards */
 .vueApp .loc-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--loc-bg-surface);
+  border: 1px solid var(--loc-border);
+  border-radius: 3px;
 }
 
 .vueApp .loc-stat-card {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 5.5rem;
-  padding: 1rem 0.75rem;
-  background: #fff;
-  border: 1px solid var(--loc-border);
-  border-radius: var(--loc-radius-lg);
-  box-shadow: var(--loc-shadow);
-  text-align: center;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: left;
 }
 
 .vueApp .loc-stat-card__value {
-  font-size: 1.75rem;
+  margin: 0;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.2;
   color: var(--loc-stat-value);
 }
 
 .vueApp .loc-stat-card__label {
-  margin-top: 0.375rem;
-  font-size: 0.8125rem;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 400;
   line-height: 1.35;
   color: var(--loc-text-muted);
 }
 
-/* Toolbar panel */
+/* Toolbar panel — flat, no Aura double shadow */
 .vueApp .loc-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 0.75rem 1rem;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: #fff;
-  border: 1px solid var(--loc-border);
-  border-radius: var(--loc-radius-lg);
-  box-shadow: var(--loc-shadow);
+  gap: 8px 12px;
+  margin-bottom: 12px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .vueApp .loc-toolbar__field {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: 4px;
   min-width: 12rem;
   flex: 1 1 12rem;
 }
 
 .vueApp .loc-toolbar__label {
-  font-size: 0.8125rem;
+  font-size: 12px;
   font-weight: 500;
   color: var(--loc-text-muted);
 }
@@ -121,94 +203,103 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
   margin-left: auto;
 }
 
-/* Content panel (table wrapper) */
+/* Content panel (table / form wrapper) */
 .vueApp .loc-panel {
-  background: #fff;
+  background: var(--loc-bg-surface);
   border: 1px solid var(--loc-border);
-  border-radius: var(--loc-radius-lg);
-  box-shadow: var(--loc-shadow);
+  border-radius: 3px;
+  box-shadow: none;
   overflow: hidden;
   max-width: 100%;
   min-width: 0;
 }
 
-.vueApp .loc-panel :deep(.p-datatable) {
+.vueApp .loc-panel :deep(.p-datatable),
+.vueApp .loc-panel .p-datatable {
   border: 0;
 }
 
-.vueApp .loc-panel :deep(.p-datatable-header) {
-  background: var(--loc-surface);
+.vueApp .loc-panel :deep(.p-datatable-header),
+.vueApp .loc-panel .p-datatable-header {
+  background: var(--loc-bg-strip);
   border-bottom: 1px solid var(--loc-border);
 }
 
-.vueApp .loc-panel :deep(.p-datatable-thead > tr > th) {
-  background: var(--loc-surface);
+.vueApp .loc-panel :deep(.p-datatable-thead > tr > th),
+.vueApp .loc-panel .p-datatable-thead > tr > th {
+  background: var(--loc-bg-strip);
   color: var(--loc-text-muted);
-  font-size: 0.8125rem;
+  font-size: 12px;
   font-weight: 600;
   border-color: var(--loc-border);
-  padding: 0.75rem 1rem;
+  padding: 10px;
 }
 
-.vueApp .loc-panel :deep(.p-datatable-tbody > tr > td) {
-  padding: 0.625rem 1rem;
+.vueApp .loc-panel :deep(.p-datatable-tbody > tr > td),
+.vueApp .loc-panel .p-datatable-tbody > tr > td {
+  padding: 4px 10px;
   border-color: var(--loc-border);
-  font-size: 0.875rem;
+  font-size: 13px;
 }
 
-.vueApp .loc-panel :deep(.p-datatable-tbody > tr:nth-child(even)) {
+.vueApp .loc-panel :deep(.p-datatable-tbody > tr:nth-child(even)),
+.vueApp .loc-panel .p-datatable-tbody > tr:nth-child(even) {
   background: var(--loc-surface);
 }
 
-.vueApp .loc-panel :deep(.p-paginator) {
+.vueApp .loc-panel :deep(.p-paginator),
+.vueApp .loc-panel .p-paginator {
   border-top: 1px solid var(--loc-border);
-  background: var(--loc-surface);
-  padding: 0.5rem 1rem;
+  background: var(--loc-bg-strip);
+  padding: 8px 10px;
 }
 
 /* Row actions */
 .vueApp .loc-row-actions {
   display: flex;
   align-items: center;
-  gap: 0.125rem;
+  gap: 2px;
 }
 
 /* Dialog polish */
-.vueApp :deep(.p-dialog-header) {
-  padding: 1rem 1.25rem;
+.vueApp :deep(.p-dialog-header),
+.vueApp .p-dialog-header {
+  padding: 12px 16px;
   border-bottom: 1px solid var(--loc-border);
 }
 
-.vueApp :deep(.p-dialog-content) {
-  padding: 1.25rem;
+.vueApp :deep(.p-dialog-content),
+.vueApp .p-dialog-content {
+  padding: 16px;
 }
 
-.vueApp :deep(.p-dialog-footer) {
-  padding: 0.75rem 1.25rem 1rem;
+.vueApp :deep(.p-dialog-footer),
+.vueApp .p-dialog-footer {
+  padding: 12px 16px 16px;
   border-top: 1px solid var(--loc-border);
 }
 
-/* Form blocks inside dialogs */
+/* Form blocks */
 .vueApp .loc-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 16px;
 }
 
 .vueApp .loc-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.25rem 1.5rem;
+  gap: 16px 20px;
 }
 
 .vueApp .loc-form-field {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 4px;
 }
 
 .vueApp .loc-form-field--full {
@@ -216,19 +307,27 @@
 }
 
 .vueApp .loc-form-label {
-  font-size: 0.875rem;
+  font-size: 12px;
   font-weight: 500;
-  color: var(--p-text-color, #334155);
+  color: var(--loc-text-muted);
 }
 
 .vueApp .loc-form-label__required {
-  color: #ef4444;
-  margin-left: 0.125rem;
+  color: #b3261e;
+  margin-left: 2px;
+}
+
+.vueApp .loc-form-label__desc {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--loc-text-muted);
 }
 
 .vueApp .loc-form-hint {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 12px;
   line-height: 1.45;
   color: var(--loc-text-muted);
 }
@@ -236,25 +335,162 @@
 .vueApp .loc-form-checkbox {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: var(--loc-surface);
+  gap: 8px;
+  padding: 12px;
+  background: var(--loc-bg-strip);
   border: 1px solid var(--loc-border);
-  border-radius: var(--loc-radius);
+  border-radius: 3px;
 }
 
 .vueApp .loc-form-checkbox__label {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 13px;
   cursor: pointer;
 }
 
 .vueApp .loc-form-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 0.5rem;
-  padding-top: 1rem;
+  gap: 8px;
+  padding-top: 12px;
   border-top: 1px solid var(--loc-border);
+}
+
+/* Content form tabs — flush to panel top, no grey strip above active tab */
+.vueApp .content-form-tabs .p-tablist {
+  padding: 0 !important;
+}
+
+.vueApp .content-form-tabs .p-tablist-tab-list {
+  background: var(--loc-bg-strip);
+  border: 0;
+  border-bottom: 1px solid var(--loc-border);
+  border-radius: 0;
+  gap: 0;
+  padding: 0 !important;
+}
+
+.vueApp .content-form-tabs .p-tab {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+  color: var(--loc-text) !important;
+  font-family: var(--loc-font) !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  height: 39px !important;
+  line-height: 39px !important;
+  min-height: 39px !important;
+  padding: 0 12px !important;
+}
+
+.vueApp .content-form-tabs .p-tab:hover {
+  background: #e4e4e4 !important;
+  color: #000 !important;
+}
+
+.vueApp .content-form-tabs .p-tab[data-p-active="true"],
+.vueApp .content-form-tabs .p-tab.p-tab-active,
+.vueApp .content-form-tabs .p-tab[aria-selected="true"] {
+  background: #fff !important;
+  color: #09121c !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  margin-bottom: -1px;
+  position: relative;
+  z-index: 1;
+}
+
+.vueApp .content-form-tabs .p-tablist-active-bar {
+  display: none !important;
+}
+
+.vueApp .content-form-tabs .p-tabpanels {
+  background: var(--loc-bg-surface);
+  padding: 16px var(--loc-pad-x) 24px;
+}
+
+.vueApp .content-form-tabs {
+  margin-bottom: 0;
+}
+
+/* Controls: height / font aligned with manager */
+.vueApp .p-button,
+.vueApp .p-inputtext,
+.vueApp .p-select,
+.vueApp .p-multiselect,
+.vueApp .p-inputnumber,
+.vueApp .p-textarea {
+  box-sizing: border-box !important;
+}
+
+.vueApp :is(
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  .p-button,
+  .p-inputtext,
+  .p-select,
+  .p-tab,
+  .p-checkbox,
+  .p-toggleswitch
+):focus-visible {
+  outline: 2px solid var(--loc-primary, #6cb24a) !important;
+  outline-offset: 2px;
+}
+
+.vueApp .p-button {
+  height: var(--loc-control-h) !important;
+  min-height: var(--loc-control-h) !important;
+  max-height: var(--loc-control-h) !important;
+  padding: 0 12px !important;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.vueApp .p-button.p-button-icon-only {
+  width: var(--loc-control-h) !important;
+  padding: 0 !important;
+}
+
+.vueApp .p-inputtext,
+.vueApp .p-select,
+.vueApp .p-multiselect,
+.vueApp .p-inputnumber {
+  height: var(--loc-control-h) !important;
+  min-height: var(--loc-control-h) !important;
+  max-height: var(--loc-control-h) !important;
+  font-size: 13px;
+}
+
+.vueApp .p-inputtext {
+  padding-block: 0 !important;
+}
+
+.vueApp .p-select,
+.vueApp .p-multiselect,
+.vueApp .p-inputnumber {
+  align-items: center;
+}
+
+.vueApp .p-select-label,
+.vueApp .p-multiselect-label {
+  display: flex;
+  align-items: center;
+  min-height: 0;
+  padding-block: 0;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.vueApp .p-textarea {
+  min-height: calc(var(--loc-control-h) * 2);
+  font-size: 13px;
+  line-height: 1.45;
+  padding: 6px 10px;
 }
 
 @media (max-width: 640px) {
@@ -270,6 +506,15 @@
 
   .vueApp .loc-toolbar__actions .p-button {
     flex: 1 1 auto;
+  }
+
+  .vueApp .languages-grid__search {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .vueApp .languages-grid__toolbar .p-button {
+    width: 100%;
   }
 
   .vueApp .loc-form-grid {

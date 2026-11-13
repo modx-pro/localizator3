@@ -4,19 +4,43 @@
  * Encapsulates create, read, update, delete, enable/disable actions
  * with consistent error handling and feedback.
  */
-import { ref } from 'vue'
+import { ref, unref } from 'vue'
 
 export function useGridCrud(options = {}) {
-  const { connector, lexicon, onSuccess, onError } = options
+  const {
+    connector,
+    lexicon,
+    onSuccess,
+    onError,
+    actionPrefix = 'mgr/content',
+    idsFormat = actionPrefix.includes('language') ? 'json' : 'csv',
+  } = options
 
   const dialogVisible = ref(false)
   const editingItem = ref(null)
   const isEdit = ref(false)
   const formData = ref({})
 
-  /**
-   * Open create dialog
-   */
+  function t(key, fallback = '') {
+    const lx = unref(lexicon)
+    if (lx && typeof lx.t === 'function') {
+      return lx.t(key, fallback)
+    }
+    if (lx && typeof lx === 'object') {
+      return lx[key] || fallback
+    }
+    return fallback
+  }
+
+  function actionPath(name) {
+    return `${actionPrefix.replace(/\/$/, '')}/${name}`
+  }
+
+  function formatIds(ids) {
+    const arr = Array.isArray(ids) ? ids : [ids]
+    return idsFormat === 'json' ? JSON.stringify(arr) : arr.join(',')
+  }
+
   function openCreate(initialData = {}) {
     isEdit.value = false
     editingItem.value = null
@@ -24,9 +48,6 @@ export function useGridCrud(options = {}) {
     dialogVisible.value = true
   }
 
-  /**
-   * Open edit dialog
-   */
   function openEdit(item) {
     isEdit.value = true
     editingItem.value = item
@@ -34,9 +55,6 @@ export function useGridCrud(options = {}) {
     dialogVisible.value = true
   }
 
-  /**
-   * Close dialog and reset form
-   */
   function closeDialog() {
     dialogVisible.value = false
     editingItem.value = null
@@ -44,11 +62,8 @@ export function useGridCrud(options = {}) {
     isEdit.value = false
   }
 
-  /**
-   * Execute action with error handling
-   */
-  async function executeAction(action, params, options = {}) {
-    const { successMessage, errorMessage, suppressToast = false } = options
+  async function executeAction(action, params, actionOptions = {}) {
+    const { successMessage, errorMessage, suppressToast = false } = actionOptions
 
     try {
       const result = await connector.post(action, params)
@@ -69,53 +84,41 @@ export function useGridCrud(options = {}) {
     }
   }
 
-  /**
-   * Enable items by IDs
-   */
   async function enable(ids) {
     return executeAction(
-      'mgr/content/enable',
-      { ids: Array.isArray(ids) ? ids.join(',') : ids },
-      { successMessage: lexicon?.t?.('localizator_enabled') || 'Enabled' }
+      actionPath('enable'),
+      { ids: formatIds(ids) },
+      { successMessage: t('localizator_enabled', 'Enabled') }
     )
   }
 
-  /**
-   * Disable items by IDs
-   */
   async function disable(ids) {
     return executeAction(
-      'mgr/content/disable',
-      { ids: Array.isArray(ids) ? ids.join(',') : ids },
-      { successMessage: lexicon?.t?.('localizator_disabled') || 'Disabled' }
+      actionPath('disable'),
+      { ids: formatIds(ids) },
+      { successMessage: t('localizator_disabled', 'Disabled') }
     )
   }
 
-  /**
-   * Remove items by IDs (with confirmation handled separately)
-   */
   async function remove(ids) {
     return executeAction(
-      'mgr/content/remove',
-      { ids: Array.isArray(ids) ? ids.join(',') : ids },
-      { successMessage: lexicon?.t?.('localizator_deleted') || 'Deleted' }
+      actionPath('remove'),
+      { ids: formatIds(ids) },
+      { successMessage: t('localizator_deleted', 'Deleted') }
     )
   }
 
-  /**
-   * Save form (create or update)
-   */
   async function save(data, action = null) {
-    const isUpdate = isEdit.value || data.id
-    const saveAction = action || (isUpdate ? 'mgr/content/update' : 'mgr/content/create')
+    const isUpdate = isEdit.value || !!data.id
+    const saveAction = action || (isUpdate ? actionPath('update') : actionPath('create'))
 
     const result = await executeAction(
       saveAction,
       data,
       {
         successMessage: isUpdate
-          ? (lexicon?.t?.('localizator_content_updated') || 'Updated')
-          : (lexicon?.t?.('localizator_content_created') || 'Created'),
+          ? (t('localizator_language_updated', '') || t('localizator_content_updated', 'Updated'))
+          : (t('localizator_language_created', '') || t('localizator_content_created', 'Created')),
       }
     )
 
@@ -123,38 +126,31 @@ export function useGridCrud(options = {}) {
     return result
   }
 
-  /**
-   * Translate selected items
-   */
   async function translate(ids) {
     return executeAction(
-      'mgr/content/translate',
-      { ids: Array.isArray(ids) ? ids.join(',') : ids },
+      actionPath('translate'),
+      { ids: formatIds(ids) },
       {
-        successMessage: lexicon?.t?.('localizator_translate_processed') || 'Translation completed',
-        errorMessage: lexicon?.t?.('localizator_item_err_save') || 'Translation failed',
+        successMessage: t('localizator_translate_processed', 'Translation completed'),
+        errorMessage: t('localizator_item_err_save', 'Translation failed'),
       }
     )
   }
 
   return {
-    // Dialog state
     dialogVisible,
     editingItem,
     isEdit,
     formData,
-
-    // Dialog actions
     openCreate,
     openEdit,
     closeDialog,
-
-    // CRUD actions
     save,
     enable,
     disable,
     remove,
     translate,
     executeAction,
+    actionPath,
   }
 }

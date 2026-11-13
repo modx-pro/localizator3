@@ -57,9 +57,6 @@ $_lang['setting_localizator_translate_fields_desc'] = 'Указанные пол
 $_lang['setting_localizator3_translate_fields'] = 'Список полей для перевода';
 $_lang['setting_localizator3_translate_fields_desc'] = 'Указанные поля будут переведены при использовании автоматического перевода';
 
-$_lang['setting_localizator_tv_fields'] = 'Список дополнительных полей (TV)';
-$_lang['setting_localizator_tv_fields_desc'] = 'Указанные дополнительные поля будут доступны для редактирования в локализации. Оставьте настройку пустой, если нужны все доп. поля';
-
 $_lang['setting_localizator_check_permissions'] = 'Проверять права доступа';
 $_lang['setting_localizator_check_permissions_desc'] = 'Проверять права на редактирование локализаций';
 $_lang['setting_localizator3_check_permissions'] = 'Проверять права доступа';

@@ -62,6 +62,7 @@ $lexiconKeys = array(
     'localizator_stats_translations', 'localizator_stats_active', 'localizator_stats_available',
     'localizator_add', 'localizator_translate', 'localizator_grid_search',
     'localizator__key', 'localizator_pagetitle', 'localizator_seotitle', 'localizator_active',
+    'localizator_content_active', 'localizator_content_active_desc',
     'localizator_grid_actions', 'localizator_item_update', 'localizator_item_enable',
     'localizator_item_disable', 'localizator_item_remove', 'localizator_items_remove_confirm',
     'localizator_translate_confirm', 'localizator_language', 'localizator_loading',
