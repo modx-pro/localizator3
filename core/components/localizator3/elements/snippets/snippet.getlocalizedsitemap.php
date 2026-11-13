@@ -16,7 +16,7 @@ $excludeIds = $modx->getOption('excludeIds', $scriptProperties, '');
 $scheme = (int) $modx->getOption('scheme', $scriptProperties, 0);
 $onlyWithLocalization = filter_var($modx->getOption('onlyWithLocalization', $scriptProperties, false), FILTER_VALIDATE_BOOLEAN);
 
-$parentIds = array_map('intval', array_filter(array_map('trim', explode(',', $parents))));
+$parentIds = array_map('intval', array_filter(array_map('trim', explode(',', $parents)), 'strlen'));
 if (empty($parentIds)) {
     return '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml"></urlset>';
 }
@@ -31,7 +31,11 @@ $q->where([
 if (!empty($excludeIds)) {
     $q->where(['id:NOT IN' => $excludeIds]);
 }
-$childIds = $modx->getChildIds($parentIds, $depth, ['context' => $modx->context->key]);
+$childIds = [];
+foreach ($parentIds as $parentId) {
+    $childIds = array_merge($childIds, $modx->getChildIds($parentId, $depth, ['context' => $modx->context->key]));
+}
+$childIds = array_unique($childIds);
 $allIds = array_unique(array_merge($parentIds, $childIds));
 $q->where(['id:IN' => $allIds]);
 $q->sortby('id', 'ASC');

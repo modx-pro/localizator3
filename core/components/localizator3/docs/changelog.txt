@@ -6,9 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [1.1.1-beta] - 2026-11-13
+## [1.1.2-beta] - 2026-11-13
 
 ### Fixed
+- **Issue #37**: `getLocalizedSitemap`: `array_filter` без callback отбрасывал строку `'0'`, поэтому `parents=0` давал пустую карту. Добавлен фильтр `'strlen'` для сохранения `0`. `getChildIds` вызывается для каждого родителя отдельно (MODX 3 не принимает массив), глубина обхода работает корректно (#37).
+- **Issue #35**: `getLanguageList` (`snippet.getlocales.php`): значение `outerClass` (запасное `languages`) теперь передаётся в чанк через `$data['outerClass']`. Шаблон `chunk.languages.tpl` корректно получает `{$outerClass}` без явной передачи параметра (#35).
+- **Issue #34**: Сборка transport: `snippets.php` и `chunks.php` теперь используют префиксы `snippet.` и `chunk.` в поле `file`, что совпадает с реальными именами файлов (`snippet.getlocales.php`, `chunk.languages.tpl`). Сниппеты `getLanguageList`/`makeLocalizedUrl` и чанки `languages.tpl`/`languages.dropdown.tpl` теперь собираются с правильным содержимым и попадают в transport-пакет (#34).
 - **Issue #30**: `localizator3_default_language`: пустое значение настройки теперь берёт первый активный язык по `rank`/`id` (метод `localizator::getDefaultLanguageKey()`). Автоперевод в менеджере и CLI-скрипт `translate_resources.php` работают без явного указания настройки (#30).
 - **Issue #29**: `getLocalizedCanonical` / `getLocalizedField`: вызов без `&id` теперь корректно использует текущий ресурс. В properties сниппетов `value` изменён с `''` на `null`, обработка `$scriptProperties` проверяет пустоту до приведения к `(int)` (#29).
 - **Issue #28**: pdoTools 3: резолвер обновляет настройку `pdotools_fetch_class` (вместо устаревшей `pdoFetch.class`). Класс `pdoFetchLocalizator` расширяет `pdoFetch` из pdoTools 3 (без namespace, autoload через composer). Резолвер обновляет значение при `ACTION_UPGRADE`, если оно отличается (#28).

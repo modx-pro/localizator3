@@ -55,6 +55,7 @@ if ($locales) {
     }
 
     $data['languages'] = $languages;
+    $data['outerClass'] = $outerClass;
     $output = $pdoFetch->getChunk($tpl, $data);
 }
 
