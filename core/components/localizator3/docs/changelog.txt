@@ -12,11 +12,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Issue #30**: `localizator3_default_language`: пустое значение настройки теперь берёт первый активный язык по `rank`/`id` (метод `localizator::getDefaultLanguageKey()`). Автоперевод в менеджере и CLI-скрипт `translate_resources.php` работают без явного указания настройки (#30).
 - **Issue #29**: `getLocalizedCanonical` / `getLocalizedField`: вызов без `&id` теперь корректно использует текущий ресурс. В properties сниппетов `value` изменён с `''` на `null`, обработка `$scriptProperties` проверяет пустоту до приведения к `(int)` (#29).
 - **Issue #28**: pdoTools 3: резолвер обновляет настройку `pdotools_fetch_class` (вместо устаревшей `pdoFetch.class`). Класс `pdoFetchLocalizator` расширяет `pdoFetch` из pdoTools 3 (без namespace, autoload через composer). Резолвер обновляет значение при `ACTION_UPGRADE`, если оно отличается (#28).
+- **Issue #32**: Процессоры `mgr/content/translate` и `mgr/lexicon/translate`, а также CLI-скрипт `translate_resources.php` используют `localizator::getDefaultLanguageKey()` вместо прямого чтения настройки. Это позволяет работать без явного указания `localizator3_default_language`, используя fallback на первый активный язык (#32).
+- **Issue #31**: pdoTools 3: класс `FetchLocalizator` перемещён в `src/FetchLocalizator.php` с namespace `ModxPro\PdoTools` и autoload через PSR-4. Резолвер устанавливает `pdotools_fetch_class = ModxPro\PdoTools\FetchLocalizator`. Старый файл `pdofetchlocalizator3.class.php` удалён (#31).
 
 ### Changed
 - `localizator::getDefaultLanguageKey()`: добавлено кэширование результата в свойстве `$defaultLanguageKeyCache` для избежания повторных SQL-запросов.
 - `snippet.getLocalizedCanonical`: упрощена проверка `$currentKey` (убрана избыточная проверка `!== 0`).
 - `pdofetchlocalizator3.class.php`: убран conditional `require_once pdofetch.class.php` (pdoFetch autoload'ится в pdoTools 3). Добавлена переменная `$prepareTypes` в `prepareRows()` для кэширования источников TV.
+- **composer.json**: добавлен PSR-4 autoload `ModxPro\PdoTools\` → `core/components/localizator3/src/` для автозагрузки `FetchLocalizator` (#31).
+
+### Added
+- `core/components/localizator3/src/FetchLocalizator.php`: новый класс-наследник `ModxPro\PdoTools\Fetch` с полной поддержкой локализованных TV для pdoTools 3 (#31).
 
 ---
 

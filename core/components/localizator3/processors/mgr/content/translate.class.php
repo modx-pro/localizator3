@@ -14,7 +14,13 @@ class localizatorContentTranslateProcessor extends modProcessor
             return $this->failure('Не указан id ресурса');
         }
 
-        if (!$default_language = $this->modx->getOption('localizator3_default_language')) {
+        // Получаем язык по умолчанию с fallback
+        $localizatorService = $this->modx->getService('localizator3', 'localizator', $this->modx->getOption('localizator3_core_path', null, $this->modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/');
+        if (!$localizatorService) {
+            return $this->failure('Не удалось загрузить сервис localizator3');
+        }
+        $default_language = $localizatorService->getDefaultLanguageKey();
+        if (empty($default_language)) {
             return $this->failure($this->modx->lexicon('localizator_item_err_default_language'));
         }
 

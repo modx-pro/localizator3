@@ -71,9 +71,10 @@ if (!$localizator || !($localizator instanceof localizator)) {
     exit(1);
 }
 
-$defaultLang = $modx->getOption('localizator3_default_language', null, '');
+// Получаем язык по умолчанию с fallback (Issue #32)
+$defaultLang = $localizator->getDefaultLanguageKey();
 if (empty($defaultLang)) {
-    fwrite(STDERR, "Setting localizator3_default_language is required.\n");
+    fwrite(STDERR, "Error: default language not found. Set 'localizator3_default_language' or ensure at least one active language exists.\n");
     exit(1);
 }
 
