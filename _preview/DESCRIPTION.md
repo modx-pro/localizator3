@@ -4,7 +4,7 @@ Localizator3 локализует поля ресурсов, TV, товары mi
 
 MODX 2.x: [Localizator](https://github.com/modx-pro/localizator).
 
-Версия: **1.1.0-beta**.
+Версия: **1.1.1-beta**.
 
 ---
 
@@ -151,7 +151,7 @@ Yandex, Google, DeepL, LibreTranslate, MyMemory, SimpleCopy. Перевод из
 - Overlay: одно дерево ресурсов, переводы полей. Разная структура по языкам: **Babel**.
 - Локализованный alias на язык (F4-04) в roadmap; в 1.0.8 URL = общий alias + http_host.
 - Vue UI требует VueTools ≥1.1.2; ExtJS fallback убран в 1.0.8.
-- Compact overview переводов (F2-04), duplicate localization (F2-06) и batch translate (F3-04) — в [roadmap](../docs/roadmap.md), ещё не в 1.1.0-beta.
+- Compact overview переводов (F2-04), duplicate localization (F2-06) и batch translate (F3-04) — в [roadmap](../docs/roadmap.md), ещё не в 1.1.1-beta.
 
 ---
 

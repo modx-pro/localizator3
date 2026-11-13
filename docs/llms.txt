@@ -1,5 +1,5 @@
 # Localizator3
-> Мультиязычность для MODX Revolution 3. Локализация ресурсов, TV, товаров miniShop3 и опций. Версия: 1.1.0-beta.
+> Мультиязычность для MODX Revolution 3. Локализация ресурсов, TV, товаров miniShop3 и опций. Версия: 1.1.1-beta.
 
 ## Documentation Index
 - [docs/README.md]: Оглавление документации

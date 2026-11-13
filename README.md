@@ -4,7 +4,7 @@
 
 Работает только с MODX 3. Для MODX 2.x используйте [Localizator](https://github.com/modx-pro/localizator).
 
-**Версия:** 1.1.0-beta
+**Версия:** 1.1.1-beta
 
 ---
 
@@ -109,7 +109,7 @@ cd vueManager && npm install && npm run build
 cd .. && php _build/build.php
 ```
 
-Transport-пакет: `core/packages/localizator3-1.1.0-beta.transport.zip`
+Transport-пакет: `core/packages/localizator3-1.1.1-beta.transport.zip`
 
 Подробнее: [docs/installation.md](docs/installation.md)
 

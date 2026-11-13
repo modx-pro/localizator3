@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.1.1-beta] - 2026-11-13
+
+### Added
+- `ModxPro\PdoTools\FetchLocalizator` in `src/FetchLocalizator.php` (PSR-4) for pdoTools 3 localized TVs (#31).
+
+### Changed
+- `localizator::getDefaultLanguageKey()` caches the resolved key.
+- `getLocalizedCanonical`: simplified `$currentKey` check.
+- Composer PSR-4 autoload for `ModxPro\PdoTools\` → `core/components/localizator3/src/` (#31).
+- Resolver sets `pdotools_fetch_class = ModxPro\PdoTools\FetchLocalizator` for pdoTools 3 (#28, #31).
+
+### Fixed
+- `#37` `getLocalizedSitemap`: `array_filter` without callback dropped `'0'`; use `strlen` filter. Call `getChildIds` per parent (MODX 3).
+- `#35` `getLanguageList`: pass `outerClass` into the languages chunk.
+- `#34` Transport build: `snippet.` / `chunk.` file prefixes so snippets and chunks ship with real content.
+- `#32` Translate processors and CLI use `getDefaultLanguageKey()` (fallback when setting empty).
+- `#30` Empty `localizator3_default_language` falls back to first active language by rank/id.
+- `#29` `getLocalizedCanonical` / `getLocalizedField` without `&id` use the current resource (`null` property default).
+- `#28` pdoTools 3: resolver updates `pdotools_fetch_class` (not legacy `pdoFetch.class`) on upgrade.
+
+---
+
 ## [1.1.0-beta] - 2026-11-13
 
 ### Added
