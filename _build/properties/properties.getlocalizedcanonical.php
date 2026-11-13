@@ -5,7 +5,7 @@ $properties = array();
 $tmp = array(
     'id' => array(
         'type' => 'numberfield',
-        'value' => '',
+        'value' => null,
     ),
     'tpl' => array(
         'type' => 'textfield',

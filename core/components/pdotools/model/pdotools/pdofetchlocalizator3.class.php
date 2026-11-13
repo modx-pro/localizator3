@@ -1,8 +1,9 @@
 <?php
 
-if (!class_exists('pdoFetch')) {
-    require_once dirname(__FILE__) . '/pdofetch.class.php';
-}
+/**
+ * pdoFetchLocalizator — подкласс pdoFetch (pdoTools для MODX 3) с поддержкой локализованных TV.
+ * Класс pdoFetch autoload'ится через composer (pdoTools 3.x для MODX 3).
+ */
 
 class pdoFetchLocalizator extends pdoFetch
 {
@@ -10,38 +11,41 @@ class pdoFetchLocalizator extends pdoFetch
     {
         parent::addTVs();
 
-        if ($this->config['tvsJoin']) {
-            $localizator = $this->modx->getService(
-                'localizator3',
-                'localizator',
-                $this->modx->getOption('localizator3_core_path', null, $this->modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/'
-            );
-            if ($localizator instanceof localizator && $localizator->shouldUseResourceFields()) {
-                return;
-            }
+        if (empty($this->config['tvsJoin'])) {
+            return;
+        }
 
-            $this->config['localizator3_key'] = $this->modx->getOption('localizator3_key', $this->config, $this->modx->getOption('localizator3_key', null), true);
-            $this->config['localizatorTVs'] = array();
-            $where = array('name:IN' => array_keys($this->config['tvsJoin']));
-            if (\localizator3\localizatorContent::hasLocalizator3EnabledField($this->modx)) {
-                $where['localizator3_enabled'] = 1;
-            }
-            $q = $this->modx->newQuery(\MODX\Revolution\modTemplateVar::class)
-                ->where($where)
-                ->select('name');
-            if ($q->prepare() && $q->stmt->execute()) {
-                $this->config['localizatorTVs'] = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
-            }
-            foreach ($this->config['localizatorTVs'] as $name) {
-                $name = strtolower($name);
-                $alias = 'TV' . $name;
-                if (isset($this->config['tvsJoin'][$name])) {
-                    $this->config['tvsJoin'][$name]['class'] = 'locTemplateVarResource';
-                    $this->config['tvsJoin'][$name]['on'] .= " AND `{$alias}`.`key` = " . $this->modx->quote($this->config['localizator3_key']);
-                }
+        $localizator = $this->modx->getService(
+            'localizator3',
+            'localizator',
+            $this->modx->getOption('localizator3_core_path', null, $this->modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/'
+        );
+        if ($localizator instanceof localizator && $localizator->shouldUseResourceFields()) {
+            return;
+        }
+
+        $this->config['localizator3_key'] = $this->modx->getOption('localizator3_key', $this->config, $this->modx->getOption('localizator3_key', null), true);
+        $this->config['localizatorTVs'] = array();
+        $where = array('name:IN' => array_keys($this->config['tvsJoin']));
+        if (\localizator3\localizatorContent::hasLocalizator3EnabledField($this->modx)) {
+            $where['localizator3_enabled'] = 1;
+        }
+        $q = $this->modx->newQuery(\MODX\Revolution\modTemplateVar::class)
+            ->where($where)
+            ->select('name');
+        if ($q->prepare() && $q->stmt->execute()) {
+            $this->config['localizatorTVs'] = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
+        }
+        foreach ($this->config['localizatorTVs'] as $name) {
+            $name = strtolower($name);
+            $alias = 'TV' . $name;
+            if (isset($this->config['tvsJoin'][$name])) {
+                $this->config['tvsJoin'][$name]['class'] = 'locTemplateVarResource';
+                $this->config['tvsJoin'][$name]['on'] .= " AND `{$alias}`.`key` = " . $this->modx->quote($this->config['localizator3_key']);
             }
         }
     }
+
     /**
      * Prepares fetched rows and process template variables
      *
@@ -70,6 +74,9 @@ class pdoFetchLocalizator extends pdoFetch
             $this->config['prepareTVs'] = implode(',', array_diff($prepare, $processloctvs));
 
             if (!empty($processloctvs)) {
+                // Получаем типы TV для кэширования источников
+                $prepareTypes = $this->config['prepareTypes'] ?? array();
+
                 foreach ($rows as &$row) {
                     // Extract JSON fields
                     if ($this->config['decodeJSON']) {
@@ -84,7 +91,6 @@ class pdoFetchLocalizator extends pdoFetch
                     }
 
                     foreach ($processloctvs as $tv) {
-
                         /** @var \MODX\Revolution\modTemplateVar $templateVar */
                         if (!$templateVar = $this->getStore($tv, 'tv')) {
                             if ($templateVar = $this->modx->getObject(\MODX\Revolution\modTemplateVar::class, array('name' => $tv))) {

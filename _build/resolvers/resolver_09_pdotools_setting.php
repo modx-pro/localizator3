@@ -14,7 +14,7 @@ if (!$transport->xpdo) {
 }
 
 $modx = $transport->xpdo;
-$settingKey = 'pdoFetch.class';
+$settingKey = 'pdotools_fetch_class';
 $settingNamespace = 'pdotools';
 $settingValue = 'pdotools.pdofetchlocalizator3';
 
@@ -25,7 +25,7 @@ if (!$isInstallOrUpgrade) {
     return true;
 }
 
-$exists = $modx->getObject(\MODX\Revolution\modSystemSetting::class, [
+$setting = $modx->getObject(\MODX\Revolution\modSystemSetting::class, [
     'key' => $settingKey,
     'namespace' => $settingNamespace,
 ]);
@@ -33,7 +33,7 @@ $exists = $modx->getObject(\MODX\Revolution\modSystemSetting::class, [
 $tStart = microtime(true);
 $modx->log(\MODX\Revolution\modX::LOG_LEVEL_INFO, '== SetupPdoTools: migrating');
 
-if (!$exists) {
+if (!$setting) {
     $setting = $modx->newObject(\MODX\Revolution\modSystemSetting::class);
     $setting->set('key', $settingKey);
     $setting->set('namespace', $settingNamespace);
@@ -41,12 +41,22 @@ if (!$exists) {
     $setting->set('xtype', 'textfield');
     $setting->set('area', 'pdotools_main');
     if ($setting->save()) {
-        $modx->log(\MODX\Revolution\modX::LOG_LEVEL_INFO, '✓ Created pdoFetch.class in namespace pdotools = ' . $settingValue);
+        $modx->log(\MODX\Revolution\modX::LOG_LEVEL_INFO, '✓ Created ' . $settingKey . ' in namespace pdotools = ' . $settingValue);
     } else {
-        $modx->log(\MODX\Revolution\modX::LOG_LEVEL_WARN, '✗ Failed to create pdoFetch.class. Set manually to "' . $settingValue . '"');
+        $modx->log(\MODX\Revolution\modX::LOG_LEVEL_WARN, '✗ Failed to create ' . $settingKey . '. Set manually to "' . $settingValue . '"');
     }
 } else {
-    $modx->log(\MODX\Revolution\modX::LOG_LEVEL_INFO, '✓ pdoFetch.class already exists in pdotools namespace');
+    $oldValue = $setting->get('value');
+    if ($oldValue !== $settingValue) {
+        $setting->set('value', $settingValue);
+        if ($setting->save()) {
+            $modx->log(\MODX\Revolution\modX::LOG_LEVEL_INFO, '✓ Updated ' . $settingKey . ' from "' . $oldValue . '" to "' . $settingValue . '"');
+        } else {
+            $modx->log(\MODX\Revolution\modX::LOG_LEVEL_WARN, '✗ Failed to update ' . $settingKey);
+        }
+    } else {
+        $modx->log(\MODX\Revolution\modX::LOG_LEVEL_INFO, '✓ ' . $settingKey . ' already set to "' . $settingValue . '"');
+    }
 }
 
 $modx->log(\MODX\Revolution\modX::LOG_LEVEL_INFO, '== SetupPdoTools: migrated ' . number_format(microtime(true) - $tStart, 4) . 's');

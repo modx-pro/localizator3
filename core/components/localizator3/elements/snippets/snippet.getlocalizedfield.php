@@ -9,7 +9,8 @@
  * @param string $default Значение по умолчанию, если локализация отсутствует
  */
 
-$id = (int) $modx->getOption('id', $scriptProperties, $modx->resource ? $modx->resource->get('id') : 0);
+$idProp = $modx->getOption('id', $scriptProperties, null);
+$id = ($idProp !== null && $idProp !== '') ? (int)$idProp : ($modx->resource ? (int)$modx->resource->get('id') : 0);
 $field = $modx->getOption('field', $scriptProperties, '');
 $language = $modx->getOption('language', $scriptProperties, $modx->getOption('localizator3_key', null, ''));
 $default = $modx->getOption('default', $scriptProperties, '');

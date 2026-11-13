@@ -7,7 +7,8 @@
  * @param string $tpl Чанк для вывода (опционально)
  */
 
-$id = (int) $modx->getOption('id', $scriptProperties, $modx->resource ? $modx->resource->get('id') : 0);
+$idProp = $modx->getOption('id', $scriptProperties, null);
+$id = ($idProp !== null && $idProp !== '') ? (int)$idProp : ($modx->resource ? (int)$modx->resource->get('id') : 0);
 $tpl = $modx->getOption('tpl', $scriptProperties, '');
 
 if (!$id) {
@@ -15,7 +16,7 @@ if (!$id) {
 }
 
 $currentKey = $modx->getOption('localizator3_key', null, '');
-if ($currentKey === '' && $currentKey !== 0) {
+if ($currentKey === '') {
     return '';
 }
 

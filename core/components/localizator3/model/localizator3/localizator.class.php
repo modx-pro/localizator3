@@ -604,9 +604,41 @@ class localizator
     /**
      * @return string
      */
+    /**
+     * Cached value for default language key fallback.
+     * @var string|null
+     */
+    protected $defaultLanguageKeyCache = null;
+
     public function getDefaultLanguageKey()
     {
-        return (string)$this->modx->getOption('localizator3_default_language', null, '', true);
+        // Return cached value if we already computed it.
+        if ($this->defaultLanguageKeyCache !== null) {
+            return $this->defaultLanguageKeyCache;
+        }
+
+        $defaultKey = (string)$this->modx->getOption('localizator3_default_language', null, '', true);
+        if ($defaultKey !== '') {
+            $this->defaultLanguageKeyCache = $defaultKey;
+            return $defaultKey;
+        }
+
+        // Fallback: первый активный язык по rank/id
+        $q = $this->modx->newQuery(\localizator3\localizatorLanguage::class);
+        $q->where(['active' => 1]);
+        $q->sortby('rank', 'ASC');
+        $q->sortby('id', 'ASC');
+        $q->select('key');
+        if ($q->prepare() && $q->stmt->execute()) {
+            $key = $q->stmt->fetchColumn();
+            if ($key !== false && $key !== '') {
+                $this->defaultLanguageKeyCache = (string)$key;
+                return $this->defaultLanguageKeyCache;
+            }
+        }
+
+        $this->defaultLanguageKeyCache = '';
+        return '';
     }
 
     /**
