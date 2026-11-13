@@ -68,10 +68,10 @@
         <Column field="active" :header="lexicon.localizator_active || 'Active'" sortable style="width: 7rem">
           <template #body="{ data }">
             <Tag
-              :value="data.active
+              :value="isActive(data)
                 ? (lexicon.localizator_item_enable || 'Active')
                 : (lexicon.localizator_item_disable || 'Inactive')"
-              :severity="data.active ? 'success' : 'secondary'"
+              :severity="isActive(data) ? 'success' : 'secondary'"
               rounded
             />
           </template>
@@ -90,12 +90,12 @@
               />
               <Button
                 icon="pi pi-power-off"
-                :severity="data.active ? 'secondary' : 'success'"
+                :severity="isActive(data) ? 'secondary' : 'success'"
                 text
                 rounded
                 size="small"
-                :title="data.active ? lexicon.localizator_item_disable : lexicon.localizator_item_enable"
-                @click="data.active ? disableItems([data.id]) : enableItems([data.id])"
+                :title="isActive(data) ? lexicon.localizator_item_disable : lexicon.localizator_item_enable"
+                @click="isActive(data) ? disableItems([data.id]) : enableItems([data.id])"
               />
               <Button
                 icon="pi pi-trash"
@@ -220,6 +220,13 @@ function normalizeHttpHost(value) {
   return String(value).trim().replace(/^https?:\/\//i, '')
 }
 
+// Бэкенд отдаёт tinyint(1) (0/1), Vue — bool. Приводим оба вида + строки к строго bool,
+// чтобы статус, кнопка, статистика и форма всегда совпадали с реальностью.
+function isActive(value) {
+  const v = typeof value === 'object' && value !== null ? value.active : value
+  return v === true || v === 1 || v === '1'
+}
+
 async function api(action, params = {}) {
   const bodyParams = { action, ...params }
   if (modAuth) bodyParams.HTTP_MODAUTH = modAuth
@@ -267,15 +274,15 @@ function loadLexicon() {
 function updateStatsFromList(list, total) {
   stats.value = {
     total: total ?? list.length,
-    active: list.filter((item) => item.active).length,
-    inactive: list.filter((item) => !item.active).length,
+    active: list.filter((item) => isActive(item)).length,
+    inactive: list.filter((item) => !isActive(item)).length,
   }
 }
 
 async function loadStats() {
   try {
+    // Статистика — по всем языкам, без фильтра поиска.
     const params = { start: 0, limit: 9999, sort: 'rank', dir: 'ASC' }
-    if (searchQuery.value) params.query = searchQuery.value
     const data = await api('mgr/language/getlist', params)
     updateStatsFromList(data.results || [], data.total || 0)
   } catch {
@@ -339,7 +346,7 @@ function openEditDialog(row) {
   form.http_host = normalizeHttpHost(row.http_host)
   form.cultureKey = row.cultureKey || ''
   form.description = row.description || ''
-  form.active = !!row.active
+  form.active = isActive(row)
   dialogVisible.value = true
 }
 

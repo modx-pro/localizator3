@@ -58,6 +58,9 @@ class localizatorLanguageGetListProcessor extends modObjectGetListProcessor
     public function prepareRow(xPDOObject $object)
     {
         $array = $object->toArray();
+        // MODX хранит tinyint(1) как 0/1 (или NULL); отдаём строго bool,
+        // чтобы грид всегда показывал реальный статус.
+        $array['active'] = (bool)$array['active'];
         $array['actions'] = array();
 
         // Edit
