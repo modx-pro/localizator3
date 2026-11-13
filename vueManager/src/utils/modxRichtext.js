@@ -12,10 +12,15 @@ export function initManagerRichtext(containerOrAreas) {
   const which = window.MODx?.config?.which_editor || ''
   if (/tinymce/i.test(which) && typeof window.MODx?.loadRTE === 'function') {
     for (const area of areas) {
-      if (!area.id || window.tinymce?.get?.(area.id)) {
+      if (!area.id) {
         continue
       }
-      window.MODx.loadRTE(area.id)
+      // After Save/re-render the textarea is new DOM; a stale TinyMCE instance
+      // with the same id blocks loadRTE and leaves a plain textarea.
+      if (!editorBoundToArea(area)) {
+        destroyManagerRichtext(area.id)
+        window.MODx.loadRTE(area.id)
+      }
     }
     return
   }
@@ -31,6 +36,9 @@ export function initManagerRichtext(containerOrAreas) {
   if (typeof window.MODx?.loadRTE === 'function') {
     for (const area of areas) {
       if (area.id) {
+        if (!editorBoundToArea(area)) {
+          destroyManagerRichtext(area.id)
+        }
         window.MODx.loadRTE(area.id)
       }
     }
@@ -51,6 +59,40 @@ export function destroyManagerRichtext(id) {
   if (editor) {
     editor.remove()
   }
+}
+
+/**
+ * Remove TinyMCE instances whose targets live under container (or match listed areas).
+ * Call before replacing TV HTML after Save — otherwise ids collide with stale editors.
+ */
+export function destroyManagerRichtextIn(containerOrAreas) {
+  const areas = normalizeAreas(containerOrAreas)
+  for (const area of areas) {
+    if (area?.id) {
+      destroyManagerRichtext(area.id)
+    }
+  }
+  if (containerOrAreas && typeof containerOrAreas.querySelectorAll === 'function') {
+    const hosts = containerOrAreas.querySelectorAll('.tox-tinymce')
+    for (const tox of hosts) {
+      const id = tox.getAttribute('id')?.replace(/^tox-/, '') || tox.previousElementSibling?.id
+      if (id) {
+        destroyManagerRichtext(id)
+      }
+    }
+  }
+}
+
+function editorBoundToArea(area) {
+  if (!area?.id || !window.tinymce?.get) {
+    return false
+  }
+  const editor = window.tinymce.get(area.id)
+  if (!editor) {
+    return false
+  }
+  const target = editor.getElement?.() || editor.targetElm
+  return target === area
 }
 
 export function setManagerRichtextContent(id, value) {

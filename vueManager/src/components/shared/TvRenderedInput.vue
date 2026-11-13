@@ -4,7 +4,7 @@
 
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { initManagerRichtext } from '../../utils/modxRichtext.js'
+import { destroyManagerRichtextIn, initManagerRichtext } from '../../utils/modxRichtext.js'
 
 const props = defineProps({
   html: {
@@ -60,6 +60,11 @@ function collectNewComponents(knownIds) {
 
 function cleanup() {
   stopNameObserver()
+  if (host.value) {
+    // TinyMCE keeps instances by textarea id; clear them before wiping DOM
+    // or Save → re-render leaves plain textareas with orphaned editors.
+    destroyManagerRichtextIn(host.value)
+  }
   const Ext = ext()
   const merged = [...createdComponents]
   if (snapshotBefore) {
