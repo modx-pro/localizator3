@@ -509,6 +509,7 @@ if (!file_exists(dirname(__FILE__) . '/config.inc.php')) {
 }
 $config = require dirname(__FILE__) . '/config.inc.php';
 require_once MODX_CORE_PATH . 'model/modx/modx.class.php';
+require_once dirname(__FILE__) . '/preload_localizator_autoload.php';
 $modx = new modX();
 $install = new Localizator3Package($modx, $config);
 $builder = $install->process();

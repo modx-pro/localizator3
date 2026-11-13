@@ -15,10 +15,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `localizator::getDefaultLanguageKey()` caches the resolved key in `$defaultLanguageKeyCache`.
 - `getLocalizedCanonical`: simplified `$currentKey` check.
 - `pdofetchlocalizator3.class.php`: dropped conditional `require_once pdofetch.class.php` (pdoFetch autoloads in pdoTools 3); `$prepareTypes` caches TV sources in `prepareRows()`.
-- Composer PSR-4 autoload for `ModxPro\PdoTools\` → `core/components/localizator3/src/` (#31).
+- Composer PSR-4 autoload for `ModxPro\PdoTools\` → `src/` in the component `composer.json` (#31).
 - Resolver sets `pdotools_fetch_class = ModxPro\PdoTools\FetchLocalizator` for pdoTools 3 (#28, #31).
 
 ### Fixed
+- Localization tab document `content` (and richtext without custom TV HTML): mount MODX RTE / Ace via `RichtextField` + `MODx.loadRTE`, sync on save (`tinymce.triggerSave`). Init waits until the ExtJS Localization tab (and the textarea) is visible — TinyMCE fails when the field mounts while the tab is still hidden.
+- `#38` `FetchLocalizator` autoload: PSR-4 in component `composer.json`; namespace `bootstrap.php` requires `vendor/autoload.php` before OnMODXInit so pdoTools can `new` the class. Plugin also loads autoload on `OnMODXInit` (priority `-1000`) as a fallback.
 - `#37` `getLocalizedSitemap`: `array_filter` without callback dropped `'0'`; use `strlen` filter. Call `getChildIds` per parent (MODX 3).
 - `#35` `getLanguageList`: pass `outerClass` into the languages chunk.
 - `#34` Transport build: `snippet.` / `chunk.` file prefixes so snippets and chunks ship with real content.

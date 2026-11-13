@@ -56,8 +56,17 @@
     :target-name="'tvlocalizator_' + field.inputTV"
   />
 
+  <RichtextField
+    v-else-if="field.tvType === 'richtext'"
+    :id="'field-tv-' + (field.inputTV || field.field)"
+    :name="'tvlocalizator_' + field.inputTV"
+    :model-value="stringValue"
+    :rows="6"
+    @update:model-value="updateValue"
+  />
+
   <Textarea
-    v-else-if="isTextarea"
+    v-else-if="field.tvType === 'textarea'"
     :model-value="stringValue"
     :rows="textareaRows"
     fluid
@@ -76,6 +85,7 @@
 import { computed } from 'vue'
 import { Checkbox, InputNumber, InputText, MultiSelect, Select, Textarea } from 'primevue'
 import TvRenderedInput from './TvRenderedInput.vue'
+import RichtextField from './RichtextField.vue'
 
 const props = defineProps({
   field: {
@@ -92,13 +102,7 @@ const emit = defineEmits(['update:modelValue'])
 
 const options = computed(() => props.field.options || [])
 
-const isTextarea = computed(() => {
-  return ['textarea', 'richtext'].includes(props.field.tvType)
-})
-
-const textareaRows = computed(() => {
-  return ['textarea', 'richtext'].includes(props.field.tvType) ? 6 : 4
-})
+const textareaRows = computed(() => 4)
 
 const stringValue = computed(() => {
   if (props.modelValue === null || props.modelValue === undefined) {

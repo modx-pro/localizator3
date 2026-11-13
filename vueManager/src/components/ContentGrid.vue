@@ -137,8 +137,16 @@
                   v-model="form[field.field]"
                   :required="field.required"
                 />
+                <RichtextField
+                  v-else-if="field.type === 'richtext'"
+                  :id="'field-' + field.field"
+                  :name="field.field"
+                  v-model="form[field.field]"
+                  :required="field.required"
+                  :rows="field.field === 'content' ? 12 : 6"
+                />
                 <Textarea
-                  v-else-if="field.type === 'textarea' || field.type === 'richtext'"
+                  v-else-if="field.type === 'textarea'"
                   :id="'field-' + field.field"
                   v-model="form[field.field]"
                   :required="field.required"
@@ -164,6 +172,7 @@ import { toRef, onMounted, watch } from 'vue'
 import { getPrimarySaveSeverity } from '../app/primevueTheme.js'
 import { useContentForm } from '../composables/useContentForm.js'
 import TvFieldControl from './shared/TvFieldControl.vue'
+import RichtextField from './shared/RichtextField.vue'
 
 const props = defineProps({
   resourceId: { type: Number, required: true },

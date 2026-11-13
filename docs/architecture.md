@@ -234,7 +234,7 @@ vueManager/src/
 | Пакет | Обязательность | Назначение |
 |-------|----------------|------------|
 | **VueTools** ≥1.1.2-pl | Да | Vue 3, Pinia, PrimeVue через Import Map |
-| **pdoTools** | Да | `getLocalizedResources`, `getLanguageList` |
+| **pdoTools** | Да | `getLocalizedResources`, `getLanguageList`; `pdotools_fetch_class` → `ModxPro\PdoTools\FetchLocalizator` (autoload через `bootstrap.php` + `composer.json` PSR-4, [#38](https://github.com/modx-pro/localizator3/issues/38)) |
 | **miniShop3** | Нет | Локализация товаров и опций → [integration-minishop3.md](./integration-minishop3.md) |
 | **mSearch** | Нет | Индексация локализованных полей → [integration-msearch.md](./integration-msearch.md) |
 

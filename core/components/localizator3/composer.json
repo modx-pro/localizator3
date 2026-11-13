@@ -9,6 +9,11 @@
         "symfony/filesystem": "^7.1",
         "symfony/string": "^7.2"
     },
+    "autoload": {
+        "psr-4": {
+            "ModxPro\\PdoTools\\": "src/"
+        }
+    },
     "config": {
         "platform": {
             "php": "8.2.0"

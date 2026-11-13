@@ -19,6 +19,7 @@ if (!defined('MODX_CORE_PATH')) {
 }
 
 require_once MODX_CORE_PATH . 'model/modx/modx.class.php';
+require_once dirname(__FILE__) . '/preload_localizator_autoload.php';
 
 $modx = new modX();
 $modx->initialize('mgr');

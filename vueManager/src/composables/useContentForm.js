@@ -6,6 +6,7 @@ import { useConnector } from './useConnector.js'
 import { useLexicon } from './useLexicon.js'
 import { useConfirmAction } from './useConfirmAction.js'
 import { useGridCrud } from './useGridCrud.js'
+import { syncManagerRichtext } from '../utils/modxRichtext.js'
 
 export function useContentForm(options = {}) {
   const resourceId = computed(() => toValue(options.resourceId))
@@ -395,7 +396,17 @@ export function useContentForm(options = {}) {
     saving.value = true
     const action = isEdit.value ? actionPath('update') : actionPath('create')
     try {
+      syncManagerRichtext()
       const payload = collectRenderedTvValues({ ...form.value })
+      // Document richtext (e.g. content): read textarea after tinymce.triggerSave
+      const richAreas = formEl.value?.querySelectorAll?.('textarea.modx-richtext[name]') || []
+      for (const area of richAreas) {
+        const key = area.getAttribute('name')
+        if (key && !key.startsWith('tvlocalizator_')) {
+          payload[key] = area.value
+          form.value[key] = area.value
+        }
+      }
       await connector.post(action, payload)
       showSuccess(
         isEdit.value
