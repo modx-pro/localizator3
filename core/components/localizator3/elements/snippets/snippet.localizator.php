@@ -55,7 +55,15 @@ if (!$useResourceFields) {
 
     $columns = array('`' . $alias . '`.*');
     foreach ($overlay as $field) {
-        // CASE без вложенных скобок: pdoTools режет select по запятым и по первой паре скобок.
+        // CASE без скобок: pdoTools режет select по запятым и по первой паре скобок.
+        if ($field === 'menutitle') {
+            $columns[] = 'CASE WHEN `localizator`.`menutitle` IS NULL OR `localizator`.`menutitle` = \'\''
+                . ' THEN CASE WHEN `localizator`.`pagetitle` IS NULL OR `localizator`.`pagetitle` = \'\''
+                . ' THEN `' . $alias . '`.`menutitle`'
+                . ' ELSE `localizator`.`pagetitle` END'
+                . ' ELSE `localizator`.`menutitle` END AS `menutitle`';
+            continue;
+        }
         $columns[] = 'CASE WHEN `localizator`.`' . $field . '` IS NULL OR `localizator`.`' . $field . "` = ''"
             . ' THEN `' . $alias . '`.`' . $field . '`'
             . ' ELSE `localizator`.`' . $field . '` END AS `' . $field . '`';

@@ -344,6 +344,25 @@ class localizator
                 }
             }
 
+            if ($request !== '' && strpos($request, '/') === false) {
+                $segmentHost = $host . '/' . $request;
+                $bareQuery = $this->modx->newQuery(\localizator3\localizatorLanguage::class);
+                $bareQuery->where(array(
+                    'active' => 1,
+                    'http_host:IN' => array($segmentHost, $segmentHost . '/'),
+                ));
+                if ($this->modx->getCount(\localizator3\localizatorLanguage::class, $bareQuery)) {
+                    $target = $this->resolveUrlScheme() . $http_host . '/' . $request . '/';
+                    $params = $_GET;
+                    unset($params[$this->modx->getOption('request_param_alias', null, 'q')]);
+                    if ($params) {
+                        $target .= '?' . http_build_query($params);
+                    }
+                    $this->modx->sendRedirect($target, array('responseCode' => 'HTTP/1.1 301 Moved Permanently'));
+                    return false;
+                }
+            }
+
             if ($this->modx->getOption('localizator3_auto_detect_language', null, false, true)) {
                 $langKeys = [];
                 $langQ = $this->modx->newQuery(\localizator3\localizatorLanguage::class);
@@ -378,14 +397,29 @@ class localizator
                 }
             }
 
+            $specific = rtrim($find, '/');
+            $root = rtrim($host, '/');
+            $rankedHosts = array_values(array_unique(array(
+                $find,
+                $specific,
+                $specific . '/',
+                $root . '/',
+                $root,
+            )));
             $q = $this->modx->newQuery(\localizator3\localizatorLanguage::class);
             $q->where(array(
-                array('http_host' => $find),
-                array('OR:http_host:=' => $host . '/'),
-                array('OR:http_host:=' => $host),
+                'http_host:IN' => $rankedHosts,
             ));
-            $q->sortby("FIELD(http_host, '{$find}', '{$host}/', '{$host}')");
-            $language = $this->modx->getObject(\localizator3\localizatorLanguage::class, $q);
+            $byHost = array();
+            foreach ($this->modx->getCollection(\localizator3\localizatorLanguage::class, $q) as $candidate) {
+                $byHost[(string)$candidate->get('http_host')] = $candidate;
+            }
+            foreach ($rankedHosts as $candidateHost) {
+                if (isset($byHost[$candidateHost])) {
+                    $language = $byHost[$candidateHost];
+                    break;
+                }
+            }
         }
 
         if ($language) {

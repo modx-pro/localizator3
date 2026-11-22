@@ -13,6 +13,7 @@ if ($localizatorKey === '') {
     return;
 }
 if ($localizator->shouldUseResourceFields($localizatorKey)) {
+    $modx->resource->set('localizator3_content', $modx->resource->getContent());
     return;
 }
 $q = $modx->newQuery(\localizator3\localizatorContent::class);
@@ -34,6 +35,9 @@ if (!$content && $localizatorKey !== '' && $modx->getOption('localizator3_404_if
         $modx->sendErrorPage(404);
     }
 }
+if (!$content) {
+    $modx->resource->set('localizator3_content', $modx->resource->getContent());
+}
 if ($content) {
     $placeholders = array();
     $fields = explode(',', $modx->getOption('localizator3_translate_fields', null, 'pagetitle,longtitle,menutitle,seotitle,keywords,introtext,description,content'));
@@ -44,8 +48,19 @@ if ($content) {
         }
         $value = $content->get($field);
         if ($field == 'content') {
+            if ($value === null || $value === '') {
+                $value = $modx->resource->getContent();
+            }
             $placeholders['localizator3_content'] = $value;
             $modx->resource->set('localizator3_content', $value);
+            continue;
+        }
+        if ($field === 'menutitle' && ($value === null || $value === '')) {
+            $localizedTitle = $content->get('pagetitle');
+            if ($localizedTitle !== null && $localizedTitle !== '') {
+                $placeholders['menutitle'] = $localizedTitle;
+                $modx->resource->set('menutitle', $localizedTitle);
+            }
             continue;
         }
         if ($value === null || $value === '') {
@@ -53,6 +68,10 @@ if ($content) {
         }
         $placeholders[$field] = $value;
         $modx->resource->set($field, $value);
+    }
+    if (!array_key_exists('localizator3_content', $placeholders)) {
+        $placeholders['localizator3_content'] = $modx->resource->getContent();
+        $modx->resource->set('localizator3_content', $placeholders['localizator3_content']);
     }
     $localizatorTVOutput = array();
     foreach ($content->getTVKeys() as $field) {

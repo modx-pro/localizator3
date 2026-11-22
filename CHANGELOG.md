@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.3-beta] - 2026-11-22
+
+### Fixed
+- A language root without a trailing slash (`/en`) redirects with 301 to `/en/` before the root language is chosen. `/en/` still matches a language host stored with or without that slash. Deeper paths such as `/en/page` are not redirected.
+- An empty localized menu title no longer leaves the document menu title in the menu. The localized pagetitle is used instead, both on the page and in `getLocalizedResources`.
+- `{$_modx->resource.localizator3_content}` is set for every language. The default language and an empty content translation use the document content.
+
 ## [1.1.2-beta] - 2026-11-22
 
 ### Fixed
