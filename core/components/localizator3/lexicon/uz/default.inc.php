@@ -94,3 +94,13 @@ $_lang['tv_localizator_enabled_msg'] = 'Qo\'shimcha maydon lokalizatsiyalarda ta
 $_lang['tv_localizator3_enabled'] = 'TV lokalizatsiyalarda mavjud';
 $_lang['tv_localizator3_enabled_msg'] = 'Qo\'shimcha maydon lokalizatsiyalarda tahrirlash uchun mavjud';
 $_lang['localizator3_tab'] = 'Lokalizatsiya';
+
+$_lang['localizator_chunk_languages_desc'] = 'Tillar roʻyxati: havolalar.';
+$_lang['localizator_chunk_languages_dropdown_desc'] = 'Tillar roʻyxati: ochiladigan roʻyxat.';
+$_lang['localizator_snippet_getlocalizedresources_desc'] = 'Lokalizatsiyani hisobga olgan holda resurslar tanlovi.';
+$_lang['localizator_snippet_getlanguagelist_desc'] = 'Til almashtirgich uchun roʻyxat.';
+$_lang['localizator_snippet_makelocalizedurl_desc'] = 'Tilni hisobga olgan holda resurs URL manzili.';
+$_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'Joriy lokalizatsiyaning kanonik URL manzili.';
+$_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Lokalizatsiyalarni hisobga olgan sayt xaritasi.';
+$_lang['localizator_snippet_getlocalizedfield_desc'] = 'Resursning lokalizatsiyalangan maydoni.';
+$_lang['localizator3_plugin_desc'] = 'Resurslar, TV va MiniShop3 parametrlarini lokalizatsiya qilish.';

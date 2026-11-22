@@ -122,3 +122,13 @@ $_lang['uncategorized'] = 'Uncategorized';
 
 // VueTools dependency
 $_lang['localizator3_vuetools_required'] = 'The <strong>VueTools ≥ 1.1.2-pl</strong> package is required for the Vue interface. Install it from <a href="https://modstore.pro/packages/utilities/vuetools" target="_blank">modstore.pro</a>.';
+
+$_lang['localizator_chunk_languages_desc'] = 'Language list as links.';
+$_lang['localizator_chunk_languages_dropdown_desc'] = 'Language list as a dropdown.';
+$_lang['localizator_snippet_getlocalizedresources_desc'] = 'Resource list with localization.';
+$_lang['localizator_snippet_getlanguagelist_desc'] = 'Language switcher list.';
+$_lang['localizator_snippet_makelocalizedurl_desc'] = 'Resource URL for a language.';
+$_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'Canonical URL of the current localization.';
+$_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Sitemap including localizations.';
+$_lang['localizator_snippet_getlocalizedfield_desc'] = 'Localized resource field.';
+$_lang['localizator3_plugin_desc'] = 'Localizes resources, TVs and MiniShop3 options.';

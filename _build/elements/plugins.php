@@ -8,6 +8,7 @@ return [
             'OnTVFormPrerender' => [],
             'OnTVFormSave' => [],
             'OnDocFormPrerender' => [],
+            'OnManagerPageBeforeRender' => [],
             // Load FetchLocalizator autoload before pdoTools/MS3 factories resolve pdotools_fetch_class
             'OnMODXInit' => ['priority' => -1000],
             'OnHandleRequest' => [],

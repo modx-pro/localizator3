@@ -367,7 +367,7 @@ class localizator
                         if ($targetLang) {
                             $siteUrl = preg_match('#^https?://#i', $targetLang->http_host)
                                 ? $targetLang->http_host
-                                : MODX_URL_SCHEME . $targetLang->http_host;
+                                : $this->resolveUrlScheme() . $targetLang->http_host;
                             $siteUrl = rtrim($siteUrl, '/') . '/';
                             $path = $request ? ltrim($request, '/') : '';
                             $redirectUrl = $siteUrl . $path;
@@ -419,7 +419,7 @@ class localizator
         if (preg_match("/^(http(s):\/\/)/i", $language->http_host)) {
             $site_url = $language->http_host;
         } else {
-            $site_url = MODX_URL_SCHEME . $language->http_host;
+            $site_url = $this->resolveUrlScheme() . $language->http_host;
         }
 
         if (substr($site_url, -1) != '/') {
@@ -454,7 +454,7 @@ class localizator
         $this->modx->lexicon->load($cultureKey . ':localizator3:site');
 
         if ($setCookie) {
-            setcookie('localizator3_key', $language->key, time() + 31536000, '/', '', !empty($_SERVER['HTTPS']), true);
+            setcookie('localizator3_key', $language->key, time() + 31536000, '/', '', $this->isSecureRequest(), true);
         }
 
         $this->modx->invokeEvent('OnToggleLocalizatorLanguage', array(
@@ -465,6 +465,51 @@ class localizator
         ));
 
         return true;
+    }
+
+    /**
+     * Scheme for a language HTTP HOST that has no protocol.
+     * MODX_URL_SCHEME ignores X-Forwarded-Proto, so TLS terminated at a proxy stays http.
+     *
+     * @return string
+     */
+    public function resolveUrlScheme()
+    {
+        if ($this->isSecureRequest()) {
+            return 'https://';
+        }
+
+        if (defined('MODX_URL_SCHEME') && MODX_URL_SCHEME !== '') {
+            return MODX_URL_SCHEME;
+        }
+
+        return 'http://';
+    }
+
+    /**
+     * Request reached PHP over HTTPS, including a proxy that sets X-Forwarded-Proto or X-Forwarded-Ssl.
+     *
+     * @return bool
+     */
+    public function isSecureRequest()
+    {
+        $https = strtolower((string) ($_SERVER['HTTPS'] ?? ''));
+        if ($https !== '' && $https !== 'off') {
+            return true;
+        }
+
+        if ((int) ($_SERVER['SERVER_PORT'] ?? 0) === 443) {
+            return true;
+        }
+
+        $forwarded = strtolower(trim(explode(',', (string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''))[0]));
+        if ($forwarded === 'https') {
+            return true;
+        }
+
+        $ssl = strtolower(trim((string) ($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '')));
+
+        return $ssl === 'on';
     }
 
     /**
@@ -626,7 +671,7 @@ class localizator
         // Fallback: первый активный язык по rank/id
         $q = $this->modx->newQuery(\localizator3\localizatorLanguage::class);
         $q->where(['active' => 1]);
-        $q->sortby('rank', 'ASC');
+        $q->sortby($this->modx->escape('rank'), 'ASC');
         $q->sortby('id', 'ASC');
         $q->select('key');
         if ($q->prepare() && $q->stmt->execute()) {
@@ -747,7 +792,7 @@ class localizator
                     return (string)$value;
                 }
             }
-            return $this->getResourceFieldValue($resource, $field);
+            return $this->getStoredResourceFieldValue($resource, $field);
         }
 
         if (in_array($field, $resourceFields, true)) {
@@ -764,7 +809,7 @@ class localizator
                     return (string)$value;
                 }
             }
-            return $this->getResourceFieldValue($resource, $field);
+            return $this->getStoredResourceFieldValue($resource, $field);
         }
 
         $tv = $this->modx->getObject(\MODX\Revolution\modTemplateVar::class, array('name' => $field));
@@ -789,10 +834,38 @@ class localizator
                     }
                 }
             }
-            return $this->getResourceFieldValue($resource, $field);
+            return $this->getStoredResourceFieldValue($resource, $field);
         }
 
         return '';
+    }
+
+    /**
+     * Поле документа из базы, минуя объект ресурса в памяти.
+     * OnLoadWebDocument может уже подменить поля текущего ресурса.
+     *
+     * @param \MODX\Revolution\modResource $resource
+     * @param string $field
+     * @return string
+     */
+    protected function getStoredResourceFieldValue($resource, $field)
+    {
+        $resourceFields = array_keys($this->modx->getFields(\MODX\Revolution\modResource::class));
+        $id = (int)$resource->get('id');
+        if ($id > 0 && in_array($field, $resourceFields, true)) {
+            $q = $this->modx->newQuery(\MODX\Revolution\modResource::class);
+            $q->where(array('id' => $id));
+            $q->select($this->modx->escape($field));
+            if ($q->prepare() && $q->stmt->execute()) {
+                $value = $q->stmt->fetchColumn();
+                if ($value !== false && $value !== null && $value !== '') {
+                    return (string)$value;
+                }
+            }
+            return '';
+        }
+
+        return $this->getResourceFieldValue($resource, $field);
     }
 
     /**

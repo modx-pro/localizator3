@@ -111,7 +111,7 @@ class localizatorFormProcessor extends modProcessor
         if ($templateId) {
             /* get categories */
             $cc = $this->modx->newQuery(\MODX\Revolution\modCategory::class);
-            $cc->sortby('rank', 'ASC');
+            $cc->sortby($this->modx->escape('rank'), 'ASC');
             $cc->sortby('category', 'ASC');
             $cats = $this->modx->getCollection(\MODX\Revolution\modCategory::class, $cc);
             foreach ($cats as $cat) {

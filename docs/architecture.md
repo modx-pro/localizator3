@@ -2,7 +2,7 @@
 
 Архитектура компонента мультиязычности для MODX 3.
 
-**Версия:** 1.1.1-beta · [Оглавление документации](./README.md)
+**Версия:** 1.1.2-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -76,6 +76,8 @@
 3. При `auto_detect_language` — cookie `localizator3_key`, Accept-Language (редирект на URL языка)
 4. Установка `localizator3_key`, **cultureKey**, site_url, base_url
 5. **OnToggleLocalizatorLanguage** — интеграции, кэш
+
+`site_url` — схема плюс HTTP HOST языка (`https://dev.example.ru/en/`). `base_url` — только путь этого адреса (`/` или `/en/`). Если в HTTP HOST нет `http://` или `https://`, схема берётся из запроса: `HTTPS`, порт 443, `X-Forwarded-Proto: https`, `X-Forwarded-Ssl: on`. Иначе остаётся `MODX_URL_SCHEME`. Тот же признак ставит cookie `localizator3_key` с флагом `Secure`. Редирект автоопределения языка использует ту же схему.
 
 ### Connector / AJAX
 

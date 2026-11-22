@@ -94,3 +94,13 @@ $_lang['tv_localizator_enabled_msg'] = 'Додаткове поле доступ
 $_lang['tv_localizator3_enabled'] = 'TV доступно в локалізаціях';
 $_lang['tv_localizator3_enabled_msg'] = 'Додаткове поле доступне для редагування в локалізаціях';
 $_lang['localizator3_tab'] = 'Локалізація';
+
+$_lang['localizator_chunk_languages_desc'] = 'Список мов: посилання у списку.';
+$_lang['localizator_chunk_languages_dropdown_desc'] = 'Список мов: випадаючий список.';
+$_lang['localizator_snippet_getlocalizedresources_desc'] = 'Вибірка ресурсів з урахуванням локалізації.';
+$_lang['localizator_snippet_getlanguagelist_desc'] = 'Список мов для перемикача.';
+$_lang['localizator_snippet_makelocalizedurl_desc'] = 'URL ресурсу з урахуванням мови.';
+$_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'Канонічний URL поточної локалізації.';
+$_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Карта сайту з урахуванням локалізацій.';
+$_lang['localizator_snippet_getlocalizedfield_desc'] = 'Локалізоване поле ресурсу.';
+$_lang['localizator3_plugin_desc'] = 'Локалізація ресурсів, TV і опцій MiniShop3.';

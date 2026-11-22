@@ -83,3 +83,13 @@ $_lang['localizator_content_updated'] = 'Пераклад абноўлены';
 $_lang['localizator_no_available_languages'] = 'Няма даступных моў. Усе лакалізацыі для гэтага рэсурсу ўжо створаны.';
 $_lang['localizator_no_languages_configured'] = 'Мовы не наладжаны. Дадайце мовы ў раздзеле Localizator3 → Мовы.';
 $_lang['localizator_add_languages_hint'] = 'Дадайце мовы ў раздзеле Localizator3 → Мовы';
+
+$_lang['localizator_chunk_languages_desc'] = 'Спіс моў: спасылкі ў спісе.';
+$_lang['localizator_chunk_languages_dropdown_desc'] = 'Спіс моў: выпадальны спіс.';
+$_lang['localizator_snippet_getlocalizedresources_desc'] = 'Выбарка рэсурсаў з улікам лакалізацыі.';
+$_lang['localizator_snippet_getlanguagelist_desc'] = 'Спіс моў для пераключальніка.';
+$_lang['localizator_snippet_makelocalizedurl_desc'] = 'URL рэсурсу з улікам мовы.';
+$_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'Кананічны URL бягучай лакалізацыі.';
+$_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Карта сайта з улікам лакалізацый.';
+$_lang['localizator_snippet_getlocalizedfield_desc'] = 'Лакалізаванае поле рэсурсу.';
+$_lang['localizator3_plugin_desc'] = 'Лакалізацыя рэсурсаў, TV і опцый MiniShop3.';

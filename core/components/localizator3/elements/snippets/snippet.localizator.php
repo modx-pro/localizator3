@@ -18,25 +18,52 @@ if ($elementName == 'msProducts' || $elementName == 'ms3Products') {
     $scriptProperties['class'] = $class;
 }
 
-$where = array(
-    'localizator.key' => $localizator_key,
-);
+$alias = $modx->getAlias($class);
+$useResourceFields = $localizator instanceof localizator
+    && $localizator->shouldUseResourceFields($localizator_key !== '' ? $localizator_key : null);
 
-$localizatorJoin = array(
-    'class' => \localizator3\localizatorContent::class,
-    'on' => "`localizator`.`resource_id` = `{$class}`.`id`",
-);
+$where = array();
+$leftJoin = array();
+$innerJoin = array();
+$select = array();
 
-$select = array(
-    'localizator' => "`{$class}`.*, `localizator`.*, `{$class}`.`id`",
-);
+if (!$useResourceFields) {
+    // Ключ языка в ON, не в WHERE: иначе LEFT JOIN отбрасывает ресурсы без перевода.
+    $on = '`localizator`.`resource_id` = `' . $alias . '`.`id`'
+        . ' AND `localizator`.`key` = ' . $modx->quote((string)$localizator_key)
+        . ' AND `localizator`.`active` = 1';
 
-if ($onlyWithLocalization) {
-    $innerJoin = array('localizator' => $localizatorJoin);
-    $leftJoin = array();
-} else {
-    $leftJoin = array('localizator' => $localizatorJoin);
-    $innerJoin = array();
+    $localizatorJoin = array(
+        'class' => \localizator3\localizatorContent::class,
+        'alias' => 'localizator',
+        'on' => $on,
+    );
+
+    if ($onlyWithLocalization) {
+        $innerJoin = array('localizator' => $localizatorJoin);
+    } else {
+        $leftJoin = array('localizator' => $localizatorJoin);
+    }
+
+    $resourceFields = array_keys($modx->getFields($class));
+    $contentFields = array_keys($modx->getFields(\localizator3\localizatorContent::class));
+    $overlay = array_values(array_intersect(
+        array('pagetitle', 'longtitle', 'menutitle', 'description', 'introtext', 'content'),
+        $resourceFields,
+        $contentFields
+    ));
+
+    $columns = array('`' . $alias . '`.*');
+    foreach ($overlay as $field) {
+        // CASE без вложенных скобок: pdoTools режет select по запятым и по первой паре скобок.
+        $columns[] = 'CASE WHEN `localizator`.`' . $field . '` IS NULL OR `localizator`.`' . $field . "` = ''"
+            . ' THEN `' . $alias . '`.`' . $field . '`'
+            . ' ELSE `localizator`.`' . $field . '` END AS `' . $field . '`';
+    }
+    $columns[] = '`' . $alias . '`.`id`';
+    $select = array(
+        'localizator' => implode(', ', $columns),
+    );
 }
 
 foreach (array('where', 'leftJoin', 'innerJoin', 'select') as $v) {

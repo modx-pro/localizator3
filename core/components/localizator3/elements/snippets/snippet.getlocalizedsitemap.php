@@ -4,7 +4,7 @@
  * Генерирует sitemap.xml с hreflang для мультиязычных страниц (SEO).
  *
  * @param string $parents ID родителей через запятую (по умолчанию — site_start)
- * @param int $depth Глубина выборки (0 = без ограничения)
+ * @param int $depth Глубина обхода потомков. 0 оставляет только указанные parents: MODX getChildIds не спускается при depth < 1
  * @param string $excludeIds ID ресурсов для исключения
  * @param int $scheme 0: auto, 1: http, 2: https
  * @param bool $onlyWithLocalization Включать только ресурсы с локализацией
@@ -44,7 +44,7 @@ $resources = $modx->getCollection(\MODX\Revolution\modResource::class, $q);
 $languages = [];
 $langQ = $modx->newQuery(\localizator3\localizatorLanguage::class);
 $langQ->where(['active' => 1]);
-$langQ->sortby('rank', 'ASC');
+$langQ->sortby($modx->escape('rank'), 'ASC');
 $langQ->sortby('id', 'ASC');
 foreach ($modx->getCollection(\localizator3\localizatorLanguage::class, $langQ) as $lang) {
     $languages[$lang->get('key')] = $lang;
@@ -59,12 +59,18 @@ foreach ($resources as $resource) {
 
     if ($onlyWithLocalization) {
         $contentQ = $modx->newQuery(\localizator3\localizatorContent::class);
-        $contentQ->where(['resource_id' => $resourceId]);
-        $contentQ->select('key');
-        $contentQ->groupby('key');
-        $contentObjs = $modx->getCollection(\localizator3\localizatorContent::class, $contentQ);
-        foreach ($contentObjs as $c) {
-            $locales[] = $c->get('key');
+        $contentQ->where([
+            'resource_id' => $resourceId,
+            'active' => 1,
+        ]);
+        $contentQ->select($modx->escape('key'));
+        if ($contentQ->prepare() && $contentQ->stmt->execute()) {
+            while (($key = $contentQ->stmt->fetchColumn()) !== false) {
+                if ($key !== null && $key !== '') {
+                    $locales[(string) $key] = (string) $key;
+                }
+            }
+            $locales = array_values($locales);
         }
         if (empty($locales)) {
             continue;

@@ -46,10 +46,13 @@ if ($content) {
         if ($field == 'content') {
             $placeholders['localizator3_content'] = $value;
             $modx->resource->set('localizator3_content', $value);
-        } else {
-            $placeholders[$field] = $value;
-            $modx->resource->set($field, $value);
+            continue;
         }
+        if ($value === null || $value === '') {
+            continue;
+        }
+        $placeholders[$field] = $value;
+        $modx->resource->set($field, $value);
     }
     $localizatorTVOutput = array();
     foreach ($content->getTVKeys() as $field) {

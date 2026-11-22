@@ -94,3 +94,13 @@ $_lang['tv_localizator_enabled_msg'] = 'Қосымша өріс локализа
 $_lang['tv_localizator3_enabled'] = 'TV локализацияларда қолжетімді';
 $_lang['tv_localizator3_enabled_msg'] = 'Қосымша өріс локализацияларда өңдеуге қолжетімді';
 $_lang['localizator3_tab'] = 'Локализация';
+
+$_lang['localizator_chunk_languages_desc'] = 'Тілдер тізімі: сілтемелер.';
+$_lang['localizator_chunk_languages_dropdown_desc'] = 'Тілдер тізімі: ашылмалы тізім.';
+$_lang['localizator_snippet_getlocalizedresources_desc'] = 'Локализацияны ескеріп ресурстарды таңдау.';
+$_lang['localizator_snippet_getlanguagelist_desc'] = 'Тіл ауыстырғышының тізімі.';
+$_lang['localizator_snippet_makelocalizedurl_desc'] = 'Тілді ескерген ресурс URL мекенжайы.';
+$_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'Ағымдағы локализацияның канондық URL мекенжайы.';
+$_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Локализацияларды ескерген сайт картасы.';
+$_lang['localizator_snippet_getlocalizedfield_desc'] = 'Ресурстың локализацияланған өрісі.';
+$_lang['localizator3_plugin_desc'] = 'Ресурстарды, TV және MiniShop3 опцияларын локализациялау.';

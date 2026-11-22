@@ -122,3 +122,13 @@ $_lang['uncategorized'] = 'Без категории';
 
 // VueTools dependency
 $_lang['localizator3_vuetools_required'] = 'Для работы Vue-интерфейса требуется пакет <strong>VueTools ≥ 1.1.2-pl</strong>. Установите его через <a href="https://modstore.pro/packages/utilities/vuetools" target="_blank">modstore.pro</a>.';
+
+$_lang['localizator_chunk_languages_desc'] = 'Список языков: ссылки в списке.';
+$_lang['localizator_chunk_languages_dropdown_desc'] = 'Список языков: выпадающий список.';
+$_lang['localizator_snippet_getlocalizedresources_desc'] = 'Выборка ресурсов с учётом локализации.';
+$_lang['localizator_snippet_getlanguagelist_desc'] = 'Список языков для переключателя.';
+$_lang['localizator_snippet_makelocalizedurl_desc'] = 'URL ресурса с учётом языка.';
+$_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'Канонический URL текущей локализации.';
+$_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Карта сайта с учётом локализаций.';
+$_lang['localizator_snippet_getlocalizedfield_desc'] = 'Локализованное поле ресурса.';
+$_lang['localizator3_plugin_desc'] = 'Локализация ресурсов, TV и опций MiniShop3.';

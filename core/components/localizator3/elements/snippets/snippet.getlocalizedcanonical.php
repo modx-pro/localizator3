@@ -22,12 +22,11 @@ if ($currentKey === '') {
 
 $q = $modx->newQuery(\localizator3\localizatorLanguage::class);
 $q->where(['active' => 1]);
-$q->sortby('rank', 'ASC');
+$q->sortby($modx->escape('rank'), 'ASC');
 $q->sortby('id', 'ASC');
 $languages = $modx->getCollection(\localizator3\localizatorLanguage::class, $q);
 
 $links = [];
-$protocol = $modx->getOption('server_protocol', null, 'http') . '://';
 
 foreach ($languages as $language) {
     $url = $modx->runSnippet('makeLocalizedUrl', [
@@ -67,8 +66,25 @@ if ($defaultUrl) {
     $output .= '<link rel="alternate" hreflang="x-default" href="' . htmlspecialchars($defaultUrl) . '">' . "\n";
 }
 
-if ($tpl) {
-    $output = $modx->getChunk($tpl, ['links' => $links, 'output' => $output]);
+if ($tpl !== '') {
+    $rendered = '';
+    if (isset($tpl[0]) && $tpl[0] === '@') {
+        $pdoFetch = $modx->getService('pdoFetch');
+        if ($pdoFetch) {
+            $rendered = $pdoFetch->getChunk($tpl, [
+                'links' => $links,
+                'output' => $output,
+            ]);
+        }
+    } elseif ($modx->getCount(\MODX\Revolution\modChunk::class, ['name' => $tpl])) {
+        $rendered = $modx->getChunk($tpl, [
+            'links' => $links,
+            'output' => $output,
+        ]);
+    }
+    if (is_string($rendered) && $rendered !== '') {
+        $output = $rendered;
+    }
 }
 
 return $output;

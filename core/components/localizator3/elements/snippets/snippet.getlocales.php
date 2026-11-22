@@ -13,7 +13,16 @@ $currentLocale = $modx->config['cultureKey'];
 $where = $modx->getOption('where', $scriptProperties, ['active' => 1]);
 $sortby = $modx->getOption('sortby', $scriptProperties, 'rank');
 $sortdir = $modx->getOption('sortdir', $scriptProperties, 'ASC');
-$protocol = $modx->getOption('server_protocol', null, 'http') . '://';
+$localizator = $modx->getService(
+    'localizator3',
+    'localizator',
+    $modx->getOption('localizator3_core_path', null, $modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/'
+);
+if ($localizator instanceof localizator) {
+    $protocol = $localizator->resolveUrlScheme();
+} else {
+    $protocol = rtrim((string) $modx->getOption('server_protocol', null, 'http'), ':/') . '://';
+}
 
 $scriptProperties['sortby'] = $sortby;
 $scriptProperties['sortdir'] = $sortdir;

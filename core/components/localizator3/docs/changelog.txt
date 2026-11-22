@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased]
+
+## [1.1.2-beta] - 2026-11-22
+
+### Fixed
+- `getLocalizedSitemap` with `onlyWithLocalization` no longer fails on `GROUP BY key` (`key` is reserved in MySQL 8) and counts only active translations.
+- `getLocalizedCanonical` `tpl` accepts `@INLINE` and keeps the default `<link>` markup when the chunk name does not exist.
+- `getLocalizedCanonical` and `getLocalizedSitemap` sort languages by `` `rank` ``. MySQL 8 treats `rank` as a reserved word, so the unquoted ORDER BY aborted both snippets.
+- `makeLocalizedUrl` no longer appends the current `base_url` to the site start, so the homepage is `/` or `/en/` instead of `/en/en/`. `makeLocalizedUrl` and `getLanguageList` take the scheme from the secure request (`HTTPS`, `X-Forwarded-Proto`), not from an empty `server_protocol`.
+- `site_url` uses `https` when the request is secure via `HTTPS`, port 443, `X-Forwarded-Proto` or `X-Forwarded-Ssl`, even if `MODX_URL_SCHEME` is still `http`. `base_url` stays the language path (`/` or `/en/`). The language cookie gets the `Secure` flag on the same check.
+- `getLocalizedResources`: join uses the xPDO alias (`modResource`), not the fully-qualified class name. The language key is in the JOIN `ON` clause, so `pdoMenu` / `pdoResources` still list resources that have no translation. Empty localized fields fall back to the resource document.
+- Empty localized fields no longer overwrite the resource on `OnLoadWebDocument`. `getLocalizedField` reads the document column from the database when the translation is empty.
+- Upgrade fills empty `languages.tpl` and `languages.dropdown.tpl` from the package templates and leaves a non-empty chunk body unchanged.
+- Element descriptions (`localizator_chunk_*`, `localizator_snippet_*`, `localizator3_plugin_desc`) resolve from the lexicon in the manager. Saving an untouched description keeps the lexicon key.
+
+---
+
 ## [1.1.1-beta] - 2026-11-13
 
 ### Added

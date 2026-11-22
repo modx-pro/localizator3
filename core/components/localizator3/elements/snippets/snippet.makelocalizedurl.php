@@ -27,7 +27,16 @@ if (!$language) {
 }
 
 $httpHost = $language->get('http_host');
-$protocol = $modx->getOption('server_protocol', null, 'http') . '://';
+$localizator = $modx->getService(
+    'localizator3',
+    'localizator',
+    $modx->getOption('localizator3_core_path', null, $modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/'
+);
+if ($localizator instanceof localizator) {
+    $protocol = $localizator->resolveUrlScheme();
+} else {
+    $protocol = rtrim((string) $modx->getOption('server_protocol', null, 'http'), ':/') . '://';
+}
 
 if (strpos($httpHost, '://') === false && strpos($httpHost, '[[') === false) {
     $baseUrl = $protocol . $httpHost;
@@ -36,12 +45,16 @@ if (strpos($httpHost, '://') === false && strpos($httpHost, '[[') === false) {
 }
 $baseUrl = rtrim($baseUrl, '/') . '/';
 
-$resourcePath = $modx->makeUrl($id, '', '', -1);
-if (strpos($resourcePath, '://') !== false) {
-    $parsed = parse_url($resourcePath);
-    $resourcePath = isset($parsed['path']) ? ltrim($parsed['path'], '/') : (string) $id;
-} else {
-    $resourcePath = ltrim($resourcePath, '/');
+// site_start with scheme -1 is the current base_url (/ or /en/), not the document path.
+$resourcePath = '';
+if ((int) $id !== (int) $modx->getOption('site_start')) {
+    $resourcePath = $modx->makeUrl($id, '', '', -1);
+    if (strpos($resourcePath, '://') !== false) {
+        $parsed = parse_url($resourcePath);
+        $resourcePath = isset($parsed['path']) ? ltrim((string) ($parsed['path'] ?? ''), '/') : '';
+    } else {
+        $resourcePath = ltrim($resourcePath, '/');
+    }
 }
 
 $url = $baseUrl . $resourcePath;

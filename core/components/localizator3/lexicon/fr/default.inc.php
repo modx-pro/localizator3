@@ -89,3 +89,13 @@ $_lang['tv_localizator_enabled_msg'] = 'TV est disponible pour modification dans
 $_lang['tv_localizator3_enabled'] = 'TV est disponible dans les localisations';
 $_lang['tv_localizator3_enabled_msg'] = 'TV est disponible pour modification dans les localisations.';
 $_lang['localizator3_tab'] = 'Localisation';
+
+$_lang['localizator_chunk_languages_desc'] = 'Liste des langues : liens.';
+$_lang['localizator_chunk_languages_dropdown_desc'] = 'Liste des langues : liste déroulante.';
+$_lang['localizator_snippet_getlocalizedresources_desc'] = 'Sélection de ressources avec localisation.';
+$_lang['localizator_snippet_getlanguagelist_desc'] = 'Liste des langues pour le sélecteur.';
+$_lang['localizator_snippet_makelocalizedurl_desc'] = 'URL de la ressource selon la langue.';
+$_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'URL canonique de la localisation courante.';
+$_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Plan du site avec les localisations.';
+$_lang['localizator_snippet_getlocalizedfield_desc'] = 'Champ localisé de la ressource.';
+$_lang['localizator3_plugin_desc'] = 'Localisation des ressources, TV et options MiniShop3.';
