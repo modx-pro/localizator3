@@ -38,7 +38,22 @@ if (!$content && $localizatorKey !== '' && $modx->getOption('localizator3_404_if
 }
 $defaultFromResource = $localizator->isDefaultFromResource();
 if (!$content) {
-    $modx->resource->set('localizator3_content', $defaultFromResource ? '' : $modx->resource->getContent());
+    $placeholders = array(
+        'localizator3_content' => $defaultFromResource ? '' : $modx->resource->getContent(),
+    );
+    $modx->resource->set('localizator3_content', $placeholders['localizator3_content']);
+    if ($defaultFromResource) {
+        $fields = explode(',', $modx->getOption('localizator3_translate_fields', null, 'pagetitle,longtitle,menutitle,seotitle,keywords,introtext,description,content'));
+        foreach ($fields as $field) {
+            $field = trim($field);
+            if ($field === '' || $field === 'content' || $field === 'menutitle') {
+                continue;
+            }
+            $placeholders[$field] = '';
+            $modx->resource->set($field, '');
+        }
+    }
+    $modx->setPlaceholders($placeholders, '*');
 }
 if ($content) {
     $placeholders = array();
