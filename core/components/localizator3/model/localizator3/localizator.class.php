@@ -689,6 +689,12 @@ class localizator
      */
     protected $defaultLanguageKeyCache = null;
 
+    /**
+     * Нижний регистр ключа или cultureKey => сохранённый key.
+     * @var array<string, string>|null
+     */
+    protected $languageKeyMap = null;
+
     public function getDefaultLanguageKey()
     {
         // Return cached value if we already computed it.
@@ -744,7 +750,7 @@ class localizator
         if ($key === null || $key === '') {
             $key = (string)$this->modx->getOption('localizator3_key', null, '', true);
         }
-        return $key === $defaultKey;
+        return $this->resolveLanguageKey($key) === $this->resolveLanguageKey($defaultKey);
     }
 
     /**
@@ -801,9 +807,16 @@ class localizator
         if ($key === null || $key === '') {
             $key = (string)$this->modx->getOption('localizator3_key', null, '', true);
         }
+        $key = $this->resolveLanguageKey($key);
 
         if ($this->shouldUseResourceFields($key)) {
-            return $this->getResourceFieldValue($resource, $field);
+            return $this->getStoredResourceFieldValue($resource, $field);
+        }
+
+        $current = $this->modx->resource;
+        $currentKey = $this->resolveLanguageKey((string)$this->modx->getOption('localizator3_key', null, '', true));
+        if ($current && $id > 0 && (int)$current->get('id') === $id && $key !== '' && $key === $currentKey) {
+            return $this->getCurrentResourceFieldValue($current, $field);
         }
 
         $contentFields = array_diff(
@@ -812,43 +825,20 @@ class localizator
         );
         $resourceFields = array_keys($this->modx->getFields(\MODX\Revolution\modResource::class));
 
-        if (in_array($field, $contentFields, true)) {
-            $q = $this->modx->newQuery(\localizator3\localizatorContent::class);
-            $q->where(array(
-                'resource_id' => $id,
-                'key' => $key,
-                'active' => 1,
-            ));
-            $q->select($field);
-            if ($q->prepare() && $q->stmt->execute()) {
-                $value = $q->stmt->fetchColumn();
-                if ($value !== false && $value !== null && $value !== '') {
-                    return (string)$value;
-                }
-            }
-            return $this->getStoredResourceFieldValue($resource, $field);
-        }
-
-        if (in_array($field, $resourceFields, true)) {
-            $q = $this->modx->newQuery(\localizator3\localizatorContent::class);
-            $q->where(array(
-                'resource_id' => $id,
-                'key' => $key,
-                'active' => 1,
-            ));
-            $content = $this->modx->getObject(\localizator3\localizatorContent::class, $q);
+        if (in_array($field, $contentFields, true) || in_array($field, $resourceFields, true)) {
+            $content = $this->findLocalizedContent($id, $key);
             if ($content) {
                 $value = $content->get($field);
                 if ($value !== null && $value !== '') {
                     return (string)$value;
                 }
             }
-            return $this->getStoredResourceFieldValue($resource, $field);
+            return $this->fallbackLocalizedFieldValue($resource, $field, $key);
         }
 
         $tv = $this->modx->getObject(\MODX\Revolution\modTemplateVar::class, array('name' => $field));
         if ($tv) {
-            if ($tv->get('localizator3_enabled')) {
+            if ($tv->get('localizator3_enabled') && $this->findLocalizedContent($id, $key)) {
                 $q = $this->modx->newQuery(\localizator3\locTemplateVarResource::class);
                 $q->where(array(
                     'contentid' => $id,
@@ -868,10 +858,125 @@ class localizator
                     }
                 }
             }
-            return $this->getStoredResourceFieldValue($resource, $field);
+            return $this->fallbackLocalizedFieldValue($resource, $field, $key);
         }
 
         return '';
+    }
+
+    /**
+     * EN и en, а также cultureKey, приводятся к сохранённому ключу языка.
+     * Неизвестный ключ остаётся как есть.
+     *
+     * @param string $key
+     * @return string
+     */
+    protected function resolveLanguageKey($key)
+    {
+        $key = trim((string)$key);
+        if ($key === '') {
+            return '';
+        }
+        $map = $this->getLanguageKeyMap();
+        $lookup = strtolower($key);
+        if (isset($map[$lookup])) {
+            return $map[$lookup];
+        }
+        return $key;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function getLanguageKeyMap()
+    {
+        if ($this->languageKeyMap !== null) {
+            return $this->languageKeyMap;
+        }
+        $this->languageKeyMap = array();
+        $q = $this->modx->newQuery(\localizator3\localizatorLanguage::class);
+        $q->select(array('key', 'cultureKey'));
+        if ($q->prepare() && $q->stmt->execute()) {
+            while ($row = $q->stmt->fetch(\PDO::FETCH_ASSOC)) {
+                $normalized = array();
+                foreach ($row as $column => $value) {
+                    $normalized[strtolower((string)$column)] = (string)$value;
+                }
+                $stored = isset($normalized['key']) ? $normalized['key'] : '';
+                if ($stored === '') {
+                    continue;
+                }
+                $this->languageKeyMap[strtolower($stored)] = $stored;
+                $culture = isset($normalized['culturekey']) ? $normalized['culturekey'] : '';
+                if ($culture !== '') {
+                    $this->languageKeyMap[strtolower($culture)] = $stored;
+                }
+            }
+        }
+        return $this->languageKeyMap;
+    }
+
+    /**
+     * Поле текущего ресурса после OnLoadWebDocument.
+     * Пустая строка — уже результат перевода, её нечем заменять.
+     *
+     * @param \MODX\Revolution\modResource $resource
+     * @param string $field
+     * @return string
+     */
+    protected function getCurrentResourceFieldValue($resource, $field)
+    {
+        if ($field === 'content') {
+            $value = $resource->get('localizator3_content');
+            return $value !== null ? (string)$value : '';
+        }
+        $value = $resource->get($field);
+        return $value !== null ? (string)$value : '';
+    }
+
+    /**
+     * Опубликованная строка перевода: key или cultureKey, active = 1.
+     *
+     * @param int $resourceId
+     * @param string $key
+     * @return \localizator3\localizatorContent|null
+     */
+    protected function findLocalizedContent($resourceId, $key)
+    {
+        $q = $this->modx->newQuery(\localizator3\localizatorContent::class);
+        $q->leftJoin(
+            \localizator3\localizatorLanguage::class,
+            'localizatorLanguage',
+            'localizatorLanguage.key = localizatorContent.key'
+        );
+        $q->where(array(
+            'localizatorContent.resource_id' => (int)$resourceId,
+            'localizatorContent.active' => 1,
+        ));
+        $q->where(array(
+            'localizatorLanguage.key' => $key,
+            'OR:localizatorLanguage.cultureKey:=' => $key,
+        ));
+        return $this->modx->getObject(\localizator3\localizatorContent::class, $q);
+    }
+
+    /**
+     * Запасное значение, если ячейка перевода пустая.
+     * При чтении базового языка из полей ресурса документ — это другой язык,
+     * поэтому для остальных ключей запасной путь не используется.
+     *
+     * @param \MODX\Revolution\modResource $resource
+     * @param string $field
+     * @param string $key
+     * @return string
+     */
+    protected function fallbackLocalizedFieldValue($resource, $field, $key)
+    {
+        if ($this->isDefaultFromResource() && !$this->shouldUseResourceFields($key)) {
+            return '';
+        }
+
+        return $this->getStoredResourceFieldValue($resource, $field);
     }
 
     /**

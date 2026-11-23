@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- An unpublished translation (`active = 0`) is no longer applied on the page or returned by `getLocalizedField` and `locfield`. The page, the field snippet and `getLocalizedResources` all require `active = 1`. A localized TV is read only when that published row exists.
+
+## [1.1.4-beta] - 2026-11-23
+
+### Fixed
+- `getLocalizedField` and `locfield` accept a language key in any case (`EN` and `en`). On the current language they return the same value as the resource field. A request for another language finds the translation by key or cultureKey, including a translation the page already shows.
+- With `localizator3_default_from_resource`, `getLocalizedField` and `locfield` no longer copy the document field into another language. An empty translation stays empty. On that language an empty overlay clears the resource field. The menu title still falls back to the localized pagetitle.
+
 ## [1.1.3-beta] - 2026-11-22
 
 ### Fixed

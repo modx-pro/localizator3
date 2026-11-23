@@ -2,7 +2,7 @@
 
 Архитектура компонента мультиязычности для MODX 3.
 
-**Версия:** 1.1.3-beta · [Оглавление документации](./README.md)
+**Версия:** 1.1.4-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -113,7 +113,7 @@
 | `OnPageNotFound` | OnPageNotFound.php | Роутинг URL локализации |
 | `OnDocFormPrerender` | OnDocFormPrerender.php | Вкладка Localizator в форме ресурса |
 | `OnDocFormSave` | OnDocFormSave.php | Синхронизация контента по умолчанию |
-| `OnLoadWebDocument` | OnLoadWebDocument.php | Подстановка локализованных полей |
+| `OnLoadWebDocument` | OnLoadWebDocument.php | Подстановка опубликованного перевода (`active = 1`) |
 | `OnEmptyTrash` | OnEmptyTrash.php | Удаление данных при очистке корзины |
 | `OnTVFormPrerender` | OnTVFormPrerender.php | Чекбокс доступности TV для локализации |
 | `OnTVFormSave` | OnTVFormSave.php | Сохранение `localizator3_enabled` (в т.ч. `0` при снятии галочки) |

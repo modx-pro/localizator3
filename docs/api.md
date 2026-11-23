@@ -2,7 +2,7 @@
 
 Сниппеты, Fenom-модификаторы, события, процессоры и CLI.
 
-**Версия:** 1.1.3-beta · [Оглавление документации](./README.md)
+**Версия:** 1.1.4-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -108,7 +108,7 @@
 {'!getLocalizedField' | snippet : ['field' => 'pagetitle', 'language' => 'en']}
 ```
 
-При `localizator3_default_from_resource = true` для ключа `localizator3_default_language` значение берётся из основных полей ресурса.
+При `localizator3_default_from_resource = true` для ключа `localizator3_default_language` значение берётся из основных полей ресурса. Остальные языки поля ресурса не наследуют: пустая ячейка перевода даёт пустую строку. Ключ языка ищется без учёта регистра (`EN` и `en`). Для текущего языка сниппет возвращает то же значение, что уже лежит в поле ресурса. Снятый с публикации перевод (`active = 0`) страница и сниппет не читают: остаётся поле документа, как в `getLocalizedResources`.
 
 ---
 
@@ -174,7 +174,7 @@ Canonical и hreflang-ссылки для SEO. Выводит `<link rel="canoni
 {$tv_name | locfield}
 ```
 
-Для базового языка при `localizator3_default_from_resource = true` возвращает значение из основных полей/TV ресурса.
+Для базового языка при `localizator3_default_from_resource = true` возвращает значение из основных полей/TV ресурса. Остальные языки поля ресурса не наследуют.
 
 ### locoptioncaption
 

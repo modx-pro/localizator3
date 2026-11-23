@@ -20,6 +20,7 @@ $q = $modx->newQuery(\localizator3\localizatorContent::class);
 $q->leftJoin(\localizator3\localizatorLanguage::class, 'localizatorLanguage', 'localizatorLanguage.key = localizatorContent.key');
 $q->where(array(
     'localizatorContent.resource_id' => $modx->resource->id,
+    'localizatorContent.active' => 1,
 ));
 $q->where(array(
     'localizatorLanguage.key' => $localizatorKey,
@@ -35,8 +36,9 @@ if (!$content && $localizatorKey !== '' && $modx->getOption('localizator3_404_if
         $modx->sendErrorPage(404);
     }
 }
+$defaultFromResource = $localizator->isDefaultFromResource();
 if (!$content) {
-    $modx->resource->set('localizator3_content', $modx->resource->getContent());
+    $modx->resource->set('localizator3_content', $defaultFromResource ? '' : $modx->resource->getContent());
 }
 if ($content) {
     $placeholders = array();
@@ -48,7 +50,7 @@ if ($content) {
         }
         $value = $content->get($field);
         if ($field == 'content') {
-            if ($value === null || $value === '') {
+            if (($value === null || $value === '') && !$defaultFromResource) {
                 $value = $modx->resource->getContent();
             }
             $placeholders['localizator3_content'] = $value;
@@ -64,13 +66,17 @@ if ($content) {
             continue;
         }
         if ($value === null || $value === '') {
+            if ($defaultFromResource) {
+                $placeholders[$field] = '';
+                $modx->resource->set($field, '');
+            }
             continue;
         }
         $placeholders[$field] = $value;
         $modx->resource->set($field, $value);
     }
     if (!array_key_exists('localizator3_content', $placeholders)) {
-        $placeholders['localizator3_content'] = $modx->resource->getContent();
+        $placeholders['localizator3_content'] = $defaultFromResource ? '' : $modx->resource->getContent();
         $modx->resource->set('localizator3_content', $placeholders['localizator3_content']);
     }
     $localizatorTVOutput = array();
