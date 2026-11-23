@@ -55,10 +55,29 @@ class localizatorContentUpdateProcessor extends modObjectUpdateProcessor
 
 
     /**
-     * @return bool
+     * Vue шлёт boolean как строку "true"/"false". intval("true") равен 0,
+     * поэтому сохранение формы выключало уже включённый перевод.
+     *
+     * @param mixed $value
+     * @return int
      */
+    public static function normalizeActive($value)
+    {
+        if (is_bool($value)) {
+            return $value ? 1 : 0;
+        }
+        if (is_int($value) || is_float($value)) {
+            return (int)$value === 1 ? 1 : 0;
+        }
+        $value = strtolower(trim((string)$value));
+        return in_array($value, array('1', 'true', 'on', 'yes'), true) ? 1 : 0;
+    }
+
     public function beforeSet()
     {
+        if (array_key_exists('active', $this->properties)) {
+            $this->setProperty('active', self::normalizeActive($this->properties['active']));
+        }
 
         $id = (int)$this->getProperty('id');
         if (empty($id)) {

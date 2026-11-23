@@ -38,6 +38,10 @@ export function useConnector(connectorUrl, modAuth) {
         data.append(key, '')
         continue
       }
+      if (typeof value === 'boolean') {
+        data.append(key, value ? '1' : '0')
+        continue
+      }
       if (Array.isArray(value)) {
         if (value.length === 0) {
           data.append(key, '')

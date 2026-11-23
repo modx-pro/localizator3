@@ -9,9 +9,7 @@ class localizatorContentDisableProcessor extends localizatorContentUpdateProcess
      */
     public function beforeSet()
     {
-        $this->properties = array(
-            'active' => false,
-        );
+        $this->setProperty('active', 0);
 
         return true;
     }

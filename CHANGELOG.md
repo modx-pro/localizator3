@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.6-beta] - 2026-11-23
+
+### Fixed
+- Listing `uri` stays the document path. A menu link `href="{$uri}"` on a base `/en/` no longer becomes `/en/en/`. `link` is still `/en/page.html`.
+- Saving a translation no longer turns it off. The form sent `active` as the string `true`, and that was stored as `0`, so the menu kept the document title.
+- Turning a translation on, or saving it, no longer returns HTTP 500 when a date TV has a value. `strftime()` is deprecated on PHP 8.1, and the connector reports that warning as an error. The date is stored with `date()`.
+
 ## [1.1.5-beta] - 2026-11-23
 
 ### Fixed

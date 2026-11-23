@@ -178,7 +178,7 @@ class FetchLocalizator extends Fetch
             }
         }
 
-        return $this->prefixListingUris(parent::prepareRows($rows));
+        return parent::prepareRows($rows);
     }
 
     /**
@@ -274,38 +274,6 @@ class FetchLocalizator extends Fetch
         }
 
         return [];
-    }
-
-    /**
-     * uri без начального слэша, но с префиксом языка: шаблон '/' ~ $uri даёт /en/page.
-     *
-     * @param array $rows
-     * @return array
-     */
-    protected function prefixListingUris(array $rows): array
-    {
-        $bare = $this->languageBase();
-        if ($bare === '') {
-            return $rows;
-        }
-
-        $siteStart = (int)$this->modx->getOption('site_start');
-        foreach ($rows as &$row) {
-            if (!is_array($row) || !array_key_exists('uri', $row)) {
-                continue;
-            }
-            $uri = ltrim((string)$row['uri'], '/');
-            if ($uri === $bare || strpos($uri, $bare . '/') === 0) {
-                continue;
-            }
-            $id = isset($row['id']) ? (int)$row['id'] : 0;
-            $row['uri'] = $id === $siteStart
-                ? $bare . '/'
-                : $bare . '/' . $uri;
-        }
-        unset($row);
-
-        return $rows;
     }
 
     protected function languageBase(): string

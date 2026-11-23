@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(__FILE__) . '/update.class.php';
+
 class localizatorContentCreateProcessor extends modObjectCreateProcessor
 {
     public $objectType = 'localizatorContent';
@@ -40,6 +42,10 @@ class localizatorContentCreateProcessor extends modObjectCreateProcessor
      */
     public function beforeSet()
     {
+        if (array_key_exists('active', $this->properties)) {
+            $this->setProperty('active', localizatorContentUpdateProcessor::normalizeActive($this->properties['active']));
+        }
+
         $key = trim($this->getProperty('key'));
         $resource_id = $this->getProperty('resource_id');
         if (empty($key)) {

@@ -287,14 +287,19 @@ class localizatorContent extends xPDOSimpleObject
 
             switch ($tv->get('type')) {
                 case 'url':
-                    $value = str_replace(array('ftp://', 'http://'), '', $value);
+                    $value = str_replace(array('ftp://', 'http://'), '', is_scalar($value) ? (string)$value : '');
                     break;
                 case 'date':
-                    $value = empty($value) ? '' : strftime('%Y-%m-%d %H:%M:%S', strtotime($value));
+                    if (empty($value) || is_array($value)) {
+                        $value = '';
+                        break;
+                    }
+                    $timestamp = is_numeric($value) ? (int)$value : strtotime((string)$value);
+                    $value = $timestamp ? date('Y-m-d H:i:s', $timestamp) : '';
                     break;
                 case 'tag':
                 case 'autotag':
-                    $tags = explode(',', $value);
+                    $tags = explode(',', is_scalar($value) ? (string)$value : '');
                     $newTags = array();
                     foreach ($tags as $tag) {
                         $newTags[] = trim($tag);
