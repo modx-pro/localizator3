@@ -43,12 +43,7 @@ if ($mode == 'new') {
             }
         }
     }
-} elseif ($resource->get('class_key') === \MODX\Revolution\modStaticResource::class) {
-    if (!$localizator->isDefaultFromResource()) {
-        $upd = $modx->prepare("UPDATE " . $modx->getTableName(\localizator3\localizatorContent::class) . " SET `content` = ? WHERE `resource_id` = ?");
-        $upd->execute(array($resource->get('content'), $resource->get('id')));
-    }
-} elseif (in_array($resource->get('class_key'), array(\MODX\Revolution\modSymLink::class, \MODX\Revolution\modWebLink::class))) {
+} elseif (in_array($resource->get('class_key'), array(\MODX\Revolution\modStaticResource::class, \MODX\Revolution\modSymLink::class, \MODX\Revolution\modWebLink::class), true)) {
     if (!$localizator->isDefaultFromResource()) {
         $defaultKey = $modx->getOption('localizator3_default_language', null, '', true);
         if ($defaultKey !== '') {
