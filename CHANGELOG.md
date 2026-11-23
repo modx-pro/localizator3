@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - With `localizator3_default_from_resource`, a missing translation row clears the same resource fields as an empty cell. The menu title stays on the document value because there is no localized pagetitle. The setting off still leaves those fields on the document.
 - `FetchLocalizator` joins localized TVs by name through `localizator3\locTemplateVarResource`. The previous select returned the TV id, so the join stayed on the document TV table.
 - Saving a static resource updates `content` only for the default language, the same as a symlink or weblink. Other translations keep their content.
+- With `localizator3_default_from_resource`, an empty localized TV is cleared on the page. The value `0` is still treated as filled.
 
 ## [1.1.4-beta] - 2026-11-23
 

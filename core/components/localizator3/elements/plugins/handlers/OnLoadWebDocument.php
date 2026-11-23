@@ -97,12 +97,18 @@ if ($content) {
     $localizatorTVOutput = array();
     foreach ($content->getTVKeys() as $field) {
         $value = $content->get($field);
-        if (!empty($value)) {
-            $value = \localizator3\localizatorContent::renderTVOutput($modx, $field, $value, $modx->resource->id);
-            $modx->resource->set($field, $value);
-            $localizatorTVOutput[$field] = $value;
-            $placeholders[$field] = $value;
+        if ($value === null || $value === '') {
+            if ($defaultFromResource) {
+                $modx->resource->set($field, '');
+                $localizatorTVOutput[$field] = '';
+                $placeholders[$field] = '';
+            }
+            continue;
         }
+        $value = \localizator3\localizatorContent::renderTVOutput($modx, $field, $value, $modx->resource->id);
+        $modx->resource->set($field, $value);
+        $localizatorTVOutput[$field] = $value;
+        $placeholders[$field] = $value;
     }
     if (!empty($localizatorTVOutput)) {
         $modx->resource = new LocalizatorResourceTVWrapper($modx->resource, $localizatorTVOutput);
