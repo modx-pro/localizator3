@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
+- Direct `pdoMenu` and `pdoResources` overlay the same resource fields as `getLocalizedResources`. A second `localizator` join is not added when the wrapper already supplied one.
+- Listing `uri` for a language base such as `/en/` is `en/page.html`, and `link` is `/en/page.html`. A template that prefixes `/` stays on that language. The default language base `/` is unchanged.
 - Translator HTTP calls stop after 5 seconds to connect and 15 seconds for the response.
 - `getLocalizedSitemap` skips resources with `searchable = 0`.
 - With `onlyWithLocalization`, a page that has a translation still lists the default language from the document. `x-default` stays on that language.

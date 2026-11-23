@@ -18,71 +18,17 @@ if ($elementName == 'msProducts' || $elementName == 'ms3Products') {
     $scriptProperties['class'] = $class;
 }
 
-$alias = $modx->getAlias($class);
-$useResourceFields = $localizator instanceof localizator
-    && $localizator->shouldUseResourceFields($localizator_key !== '' ? $localizator_key : null);
-$keepEmptyTranslation = $localizator instanceof localizator
-    && $localizator->isDefaultFromResource();
-
 $where = array();
-$leftJoin = array();
-$innerJoin = array();
-$select = array();
-
-if (!$useResourceFields) {
-    // Ключ языка в ON, не в WHERE: иначе LEFT JOIN отбрасывает ресурсы без перевода.
-    $on = '`localizator`.`resource_id` = `' . $alias . '`.`id`'
-        . ' AND `localizator`.`key` = ' . $modx->quote((string)$localizator_key)
-        . ' AND `localizator`.`active` = 1';
-
-    $localizatorJoin = array(
-        'class' => \localizator3\localizatorContent::class,
-        'alias' => 'localizator',
-        'on' => $on,
+$listing = ($localizator instanceof localizator)
+    ? $localizator->getListingQuery($class, (string)$localizator_key, $onlyWithLocalization)
+    : array(
+        'leftJoin' => array(),
+        'innerJoin' => array(),
+        'select' => array(),
     );
-
-    if ($onlyWithLocalization) {
-        $innerJoin = array('localizator' => $localizatorJoin);
-    } else {
-        $leftJoin = array('localizator' => $localizatorJoin);
-    }
-
-    $resourceFields = array_keys($modx->getFields($class));
-    $contentFields = array_keys($modx->getFields(\localizator3\localizatorContent::class));
-    $overlay = array_values(array_intersect(
-        array('pagetitle', 'longtitle', 'menutitle', 'description', 'introtext', 'content'),
-        $resourceFields,
-        $contentFields
-    ));
-
-    $columns = array('`' . $alias . '`.*');
-    foreach ($overlay as $field) {
-        // CASE без скобок: pdoTools режет select по запятым и по первой паре скобок.
-        if ($field === 'menutitle') {
-            $columns[] = 'CASE WHEN `localizator`.`menutitle` IS NULL OR `localizator`.`menutitle` = \'\''
-                . ' THEN CASE WHEN `localizator`.`pagetitle` IS NULL OR `localizator`.`pagetitle` = \'\''
-                . ' THEN `' . $alias . '`.`menutitle`'
-                . ' ELSE `localizator`.`pagetitle` END'
-                . ' ELSE `localizator`.`menutitle` END AS `menutitle`';
-            continue;
-        }
-        if ($keepEmptyTranslation) {
-            $columns[] = 'CASE WHEN `localizator`.`id` IS NULL'
-                . ' THEN `' . $alias . '`.`' . $field . '`'
-                . ' WHEN `localizator`.`' . $field . '` IS NULL OR `localizator`.`' . $field . "` = ''"
-                . ' THEN \'\''
-                . ' ELSE `localizator`.`' . $field . '` END AS `' . $field . '`';
-            continue;
-        }
-        $columns[] = 'CASE WHEN `localizator`.`' . $field . '` IS NULL OR `localizator`.`' . $field . "` = ''"
-            . ' THEN `' . $alias . '`.`' . $field . '`'
-            . ' ELSE `localizator`.`' . $field . '` END AS `' . $field . '`';
-    }
-    $columns[] = '`' . $alias . '`.`id`';
-    $select = array(
-        'localizator' => implode(', ', $columns),
-    );
-}
+$leftJoin = $listing['leftJoin'];
+$innerJoin = $listing['innerJoin'];
+$select = $listing['select'];
 
 foreach (array('where', 'leftJoin', 'innerJoin', 'select') as $v) {
     if (!empty($scriptProperties[$v])) {

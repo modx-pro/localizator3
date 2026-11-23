@@ -1164,4 +1164,89 @@ class localizator
             'data' => $params,
         );
     }
+
+    /**
+     * JOIN и SELECT для выборки pdoTools.
+     * Пустые массивы, если поля документа читаются как есть.
+     *
+     * @param string $class
+     * @param string $key
+     * @param bool $onlyWithLocalization
+     * @return array{leftJoin: array, innerJoin: array, select: array}
+     */
+    public function getListingQuery($class, $key, $onlyWithLocalization = false)
+    {
+        $empty = array(
+            'leftJoin' => array(),
+            'innerJoin' => array(),
+            'select' => array(),
+        );
+        $key = (string)$key;
+        $class = (string)$class;
+        if ($key === '' || $class === '' || $this->shouldUseResourceFields($key)) {
+            return $empty;
+        }
+
+        $resourceFields = $this->modx->getFields($class);
+        $contentFields = $this->modx->getFields(\localizator3\localizatorContent::class);
+        if (!is_array($resourceFields) || !is_array($contentFields)) {
+            return $empty;
+        }
+
+        $overlay = array_values(array_intersect(
+            array('pagetitle', 'longtitle', 'menutitle', 'description', 'introtext', 'content'),
+            array_keys($resourceFields),
+            array_keys($contentFields)
+        ));
+        if ($overlay === array()) {
+            return $empty;
+        }
+
+        $alias = $this->modx->getAlias($class);
+        $on = '`localizator`.`resource_id` = `' . $alias . '`.`id`'
+            . ' AND `localizator`.`key` = ' . $this->modx->quote($key)
+            . ' AND `localizator`.`active` = 1';
+        $join = array(
+            'class' => \localizator3\localizatorContent::class,
+            'alias' => 'localizator',
+            'on' => $on,
+        );
+        $query = $empty;
+        if ($onlyWithLocalization) {
+            $query['innerJoin'] = array('localizator' => $join);
+        } else {
+            $query['leftJoin'] = array('localizator' => $join);
+        }
+
+        $keepEmptyTranslation = $this->isDefaultFromResource();
+        $columns = array('`' . $alias . '`.*');
+        foreach ($overlay as $field) {
+            // CASE без скобок: pdoTools режет select по запятым и по первой паре скобок.
+            if ($field === 'menutitle') {
+                $columns[] = 'CASE WHEN `localizator`.`menutitle` IS NULL OR `localizator`.`menutitle` = \'\''
+                    . ' THEN CASE WHEN `localizator`.`pagetitle` IS NULL OR `localizator`.`pagetitle` = \'\''
+                    . ' THEN `' . $alias . '`.`menutitle`'
+                    . ' ELSE `localizator`.`pagetitle` END'
+                    . ' ELSE `localizator`.`menutitle` END AS `menutitle`';
+                continue;
+            }
+            if ($keepEmptyTranslation) {
+                $columns[] = 'CASE WHEN `localizator`.`id` IS NULL'
+                    . ' THEN `' . $alias . '`.`' . $field . '`'
+                    . ' WHEN `localizator`.`' . $field . '` IS NULL OR `localizator`.`' . $field . "` = ''"
+                    . ' THEN \'\''
+                    . ' ELSE `localizator`.`' . $field . '` END AS `' . $field . '`';
+                continue;
+            }
+            $columns[] = 'CASE WHEN `localizator`.`' . $field . '` IS NULL OR `localizator`.`' . $field . "` = ''"
+                . ' THEN `' . $alias . '`.`' . $field . '`'
+                . ' ELSE `localizator`.`' . $field . '` END AS `' . $field . '`';
+        }
+        $columns[] = '`' . $alias . '`.`id`';
+        $query['select'] = array(
+            'localizator' => implode(', ', $columns),
+        );
+
+        return $query;
+    }
 }

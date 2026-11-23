@@ -48,21 +48,12 @@ class FetchLocalizator extends Fetch
             return;
         }
 
-        $localizator = $this->modx->getService(
-            'localizator3',
-            'localizator',
-            $this->modx->getOption(
-                'localizator3_core_path',
-                null,
-                $this->modx->getOption('core_path', null, MODX_CORE_PATH) . 'components/localizator3/'
-            ) . 'model/localizator3/'
-        );
-
-        if (!$localizator) {
+        $localizator = $this->localizatorService();
+        if ($localizator === null) {
             return;
         }
 
-        if ($localizator instanceof \localizator && method_exists($localizator, 'shouldUseResourceFields') && $localizator->shouldUseResourceFields()) {
+        if (method_exists($localizator, 'shouldUseResourceFields') && $localizator->shouldUseResourceFields()) {
             return;
         }
 
@@ -187,6 +178,170 @@ class FetchLocalizator extends Fetch
             }
         }
 
-        return parent::prepareRows($rows);
+        return $this->prefixListingUris(parent::prepareRows($rows));
+    }
+
+    /**
+     * Подмешивает перевод полей ресурса в прямой pdoMenu и pdoResources.
+     * Обёртка getLocalizedResources уже кладёт join localizator, второй раз он не добавляется.
+     */
+    public function addJoins()
+    {
+        $this->applyListingLocalization();
+        parent::addJoins();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makeUrl($id, $options = [], $args = [])
+    {
+        $url = parent::makeUrl($id, $options, $args);
+        if (!is_string($url) || $url === '') {
+            return $url;
+        }
+
+        return $this->languageUrl($url);
+    }
+
+    /**
+     * @return \localizator|null
+     */
+    protected function localizatorService()
+    {
+        $service = $this->modx->getService(
+            'localizator3',
+            'localizator',
+            $this->modx->getOption(
+                'localizator3_core_path',
+                null,
+                $this->modx->getOption('core_path', null, MODX_CORE_PATH) . 'components/localizator3/'
+            ) . 'model/localizator3/'
+        );
+
+        return $service instanceof \localizator ? $service : null;
+    }
+
+    protected function applyListingLocalization(): void
+    {
+        foreach (['leftJoin', 'innerJoin', 'select'] as $part) {
+            if (isset($this->listingConfigArray($this->config[$part] ?? null)['localizator'])) {
+                return;
+            }
+        }
+
+        $localizator = $this->localizatorService();
+        if ($localizator === null || !method_exists($localizator, 'getListingQuery')) {
+            return;
+        }
+
+        $key = (string)$this->modx->getOption(
+            'localizator3_key',
+            $this->config,
+            $this->modx->getOption('localizator3_key', null, ''),
+            true
+        );
+        $class = (string)($this->config['class'] ?? \MODX\Revolution\modResource::class);
+        $onlyWithLocalization = filter_var($this->config['onlyWithLocalization'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $listing = $localizator->getListingQuery($class, $key, $onlyWithLocalization);
+
+        foreach (['leftJoin', 'innerJoin', 'select'] as $part) {
+            if (empty($listing[$part])) {
+                continue;
+            }
+            $existing = $this->config[$part] ?? null;
+            $existingArray = $this->listingConfigArray($existing);
+            if ($part === 'select' && is_string($existing) && $existing !== '' && $existingArray === []) {
+                $alias = $this->modx->getAlias((string)($this->config['class'] ?? \MODX\Revolution\modResource::class));
+                $existingArray = [$alias => $existing];
+            }
+            $this->config[$part] = array_merge($listing[$part], $existingArray);
+        }
+    }
+
+    /**
+     * @param mixed $value
+     * @return array
+     */
+    protected function listingConfigArray($value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (is_string($value) && $value !== '' && ($value[0] === '{' || $value[0] === '[')) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return [];
+    }
+
+    /**
+     * uri без начального слэша, но с префиксом языка: шаблон '/' ~ $uri даёт /en/page.
+     *
+     * @param array $rows
+     * @return array
+     */
+    protected function prefixListingUris(array $rows): array
+    {
+        $bare = $this->languageBase();
+        if ($bare === '') {
+            return $rows;
+        }
+
+        $siteStart = (int)$this->modx->getOption('site_start');
+        foreach ($rows as &$row) {
+            if (!is_array($row) || !array_key_exists('uri', $row)) {
+                continue;
+            }
+            $uri = ltrim((string)$row['uri'], '/');
+            if ($uri === $bare || strpos($uri, $bare . '/') === 0) {
+                continue;
+            }
+            $id = isset($row['id']) ? (int)$row['id'] : 0;
+            $row['uri'] = $id === $siteStart
+                ? $bare . '/'
+                : $bare . '/' . $uri;
+        }
+        unset($row);
+
+        return $rows;
+    }
+
+    protected function languageBase(): string
+    {
+        return trim((string)$this->modx->getOption('base_url', null, '/'), '/');
+    }
+
+    protected function languageUrl(string $url): string
+    {
+        $bare = $this->languageBase();
+        if ($bare === '' || strpos($url, '://') !== false) {
+            return $url;
+        }
+
+        $hash = '';
+        $query = '';
+        $path = $url;
+        $hashPos = strpos($path, '#');
+        if ($hashPos !== false) {
+            $hash = substr($path, $hashPos);
+            $path = substr($path, 0, $hashPos);
+        }
+        $queryPos = strpos($path, '?');
+        if ($queryPos !== false) {
+            $query = substr($path, $queryPos);
+            $path = substr($path, 0, $queryPos);
+        }
+
+        $trimmed = ltrim($path, '/');
+        if ($trimmed === '' || $trimmed === $bare) {
+            return '/' . $bare . '/' . $query . $hash;
+        }
+        if (strpos($trimmed, $bare . '/') === 0) {
+            return '/' . $trimmed . $query . $hash;
+        }
+
+        return '/' . $bare . '/' . $trimmed . $query . $hash;
     }
 }
