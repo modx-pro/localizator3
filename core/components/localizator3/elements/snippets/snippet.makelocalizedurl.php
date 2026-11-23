@@ -65,6 +65,16 @@ if ((int) $id !== (int) $modx->getOption('site_start')) {
 }
 
 $url = $baseUrl . $resourcePath;
+if ($localizator instanceof localizator) {
+    $publicUrl = $localizator->isPublicHttpUrl($url);
+} else {
+    $urlScheme = parse_url($url, PHP_URL_SCHEME);
+    $publicUrl = $urlScheme === null
+        || (is_string($urlScheme) && in_array(strtolower($urlScheme), array('http', 'https'), true));
+}
+if (!$publicUrl) {
+    return '';
+}
 
 if ($fullUrl || $scheme >= 0) {
     if (strpos($url, '://') === false) {

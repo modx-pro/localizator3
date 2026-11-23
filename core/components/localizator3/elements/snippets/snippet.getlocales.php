@@ -61,8 +61,14 @@ if ($locales) {
 
         $isCurrent = ($locale['key'] == $currentLocale || $locale['cultureKey'] == $currentLocale);
         $rowCssClass = ($showActive && $isCurrent) ? trim($rowClass . ' ' . $activeClass) : $rowClass;
-        $urlScheme = parse_url($url, PHP_URL_SCHEME);
-        if ($urlScheme !== null && !in_array(strtolower((string)$urlScheme), array('http', 'https'), true)) {
+        if ($localizator instanceof localizator) {
+            $publicUrl = $localizator->isPublicHttpUrl($url);
+        } else {
+            $urlScheme = parse_url($url, PHP_URL_SCHEME);
+            $publicUrl = $urlScheme === null
+                || (is_string($urlScheme) && in_array(strtolower($urlScheme), array('http', 'https'), true));
+        }
+        if (!$publicUrl) {
             $url = '';
         }
 

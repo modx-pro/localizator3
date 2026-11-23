@@ -529,6 +529,23 @@ class localizator
     }
 
     /**
+     * Публичная ссылка может быть только http или https.
+     * Адрес без схемы (относительный путь или тег MODX) остаётся.
+     *
+     * @param string $url
+     * @return bool
+     */
+    public function isPublicHttpUrl($url)
+    {
+        $scheme = parse_url((string)$url, PHP_URL_SCHEME);
+        if ($scheme === null) {
+            return true;
+        }
+
+        return is_string($scheme) && in_array(strtolower($scheme), array('http', 'https'), true);
+    }
+
+    /**
      * Request reached PHP over HTTPS, including a proxy that sets X-Forwarded-Proto or X-Forwarded-Ssl.
      *
      * @return bool
