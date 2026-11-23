@@ -13,7 +13,7 @@ $eventParams = $modx->event->params ?? [];
 $mode = $mode ?? ($eventParams['mode'] ?? '');
 $resource = $resource ?? ($eventParams['resource'] ?? null);
 
-if (!$resource instanceof \MODX\Revolution\modResource) {
+if (!is_a($resource, 'MODX\\Revolution\\modResource')) {
     return;
 }
 
@@ -43,7 +43,15 @@ if ($mode == 'new') {
             }
         }
     }
-} elseif (in_array($resource->get('class_key'), array(\MODX\Revolution\modStaticResource::class, \MODX\Revolution\modSymLink::class, \MODX\Revolution\modWebLink::class), true)) {
+// cspell:ignore MODX
+} elseif (in_array($resource->get('class_key'), array(
+    'MODX\\Revolution\\modStaticResource',
+    'MODX\\Revolution\\modSymLink',
+    'MODX\\Revolution\\modWebLink',
+    'modStaticResource',
+    'modSymLink',
+    'modWebLink',
+), true)) {
     if (!$localizator->isDefaultFromResource()) {
         $defaultKey = $modx->getOption('localizator3_default_language', null, '', true);
         if ($defaultKey !== '') {
