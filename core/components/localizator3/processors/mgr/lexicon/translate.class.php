@@ -18,15 +18,20 @@ class localizatorLexiconTranslateProcessor extends modProcessor
 
         $tranlate_all = $this->modx->getOption('localizator3_translate_translated_fields');
 
+        $checkPermissions = $this->modx->getOption('localizator3_check_permissions', null, false, true);
         $languages = [];
         $processed = 0;
 
         $_languages = $this->modx->getIterator(\localizator3\localizatorLanguage::class);
         foreach ($_languages as $language) {
             $key = $language->cultureKey ?: $language->key;
-            if ($key != $default_language) {
-                $languages[] = $key;
+            if ($key == $default_language) {
+                continue;
             }
+            if ($checkPermissions && !$this->modx->hasPermission('localizatorcontent_save_' . $language->key)) {
+                continue;
+            }
+            $languages[] = $key;
         }
 
         $c = $this->modx->newQuery(\MODX\Revolution\modLexiconEntry::class);

@@ -52,7 +52,9 @@
 |-----|-----|----------|---------|----------|
 | outputMode | string | No | list | `list` — список, `dropdown` — выпадающий |
 | showActive | bool | No | true | Подсветка текущего языка |
-| activeClass | string | No | active | CSS-класс для активного |
+| activeClass | string | No | active | CSS-класс активного языка. В списке и в пункте dropdown |
+| outerClass | string | No | languages | Класс внешнего `ul` или `select` |
+| rowClass | string | No | — | Класс пункта. В dropdown попадает на `option` |
 | tpl | string | No | languages.tpl | Чанк шаблона |
 | pageId | int | No | текущий | ID страницы для URL |
 | sortby | string | No | rank | Поле сортировки |

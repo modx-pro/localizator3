@@ -83,6 +83,7 @@ foreach ($resources as $resource) {
     }
 
     $alternates = [];
+    $urlsByLanguageKey = [];
     foreach ($locales as $key) {
         if (!isset($languages[$key])) {
             continue;
@@ -98,13 +99,14 @@ foreach ($resources as $resource) {
         }
         $hreflang = $languages[$key]->get('cultureKey') ?: $key;
         $alternates[$hreflang] = $url;
+        $urlsByLanguageKey[$key] = $url;
     }
 
     if (empty($alternates)) {
         continue;
     }
 
-    $defaultUrl = ($defaultKey && isset($alternates[$defaultKey])) ? $alternates[$defaultKey] : reset($alternates);
+    $defaultUrl = ($defaultKey !== '' && isset($urlsByLanguageKey[$defaultKey])) ? $urlsByLanguageKey[$defaultKey] : reset($alternates);
     $urls[] = [
         'loc' => $defaultUrl,
         'alternates' => $alternates,

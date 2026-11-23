@@ -1,5 +1,5 @@
-<ul class="{$outerClass}">
+<ul class="{$outerClass | escape}">
     {foreach $languages as $language}
-        <li class="{$language.rowClass}"><a href="{$language.url}">{$language.name}</a></li>
+        <li class="{$language.rowClass | escape}"><a href="{$language.url | escape}">{$language.name | escape}</a></li>
     {/foreach}
 </ul>

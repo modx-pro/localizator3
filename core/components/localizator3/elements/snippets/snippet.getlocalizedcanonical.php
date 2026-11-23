@@ -42,6 +42,7 @@ foreach ($languages as $language) {
     $links[] = [
         'url' => $url,
         'hreflang' => $hreflang,
+        'language_key' => $language->get('key'),
         'is_current' => ($language->get('key') == $currentKey),
     ];
 }
@@ -58,7 +59,7 @@ foreach ($links as $link) {
         $output .= '<link rel="canonical" href="' . htmlspecialchars($link['url']) . '">' . "\n";
     }
     $output .= '<link rel="alternate" hreflang="' . htmlspecialchars($link['hreflang']) . '" href="' . htmlspecialchars($link['url']) . '">' . "\n";
-    if (($defaultKey !== '' && $link['hreflang'] == $defaultKey) || ($defaultKey === '' && $link['is_current'])) {
+    if (($defaultKey !== '' && $link['language_key'] === $defaultKey) || ($defaultKey === '' && $link['is_current'])) {
         $defaultUrl = $link['url'];
     }
 }

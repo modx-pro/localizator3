@@ -14,12 +14,30 @@ $languageKey = $modx->getOption('language', $scriptProperties, $modx->getOption(
 $scheme = (int) $modx->getOption('scheme', $scriptProperties, -1);
 $fullUrl = filter_var($modx->getOption('fullUrl', $scriptProperties, false), FILTER_VALIDATE_BOOLEAN);
 
-if (!$id || !$modx->getObject(\MODX\Revolution\modResource::class, $id)) {
+$resource = $id ? $modx->getObject(\MODX\Revolution\modResource::class, $id) : null;
+if (!$resource) {
+    return '';
+}
+$contextKey = $modx->context ? (string)$modx->context->get('key') : '';
+if ($contextKey !== 'mgr' && (!(int)$resource->get('published') || (int)$resource->get('deleted'))) {
     return '';
 }
 
+$localizator = $modx->getService(
+    'localizator3',
+    'localizator',
+    $modx->getOption('localizator3_core_path', null, $modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/'
+);
+if ($localizator instanceof localizator) {
+    $languageKey = $localizator->resolveLanguageKey((string)($languageKey ?: $modx->getOption('localizator3_key', null, '')));
+    $protocol = $localizator->resolveUrlScheme();
+} else {
+    $languageKey = (string)($languageKey ?: $modx->getOption('localizator3_key', null, ''));
+    $protocol = rtrim((string) $modx->getOption('server_protocol', null, 'http'), ':/') . '://';
+}
+
 $language = $modx->getObject(\localizator3\localizatorLanguage::class, [
-    'key' => $languageKey ?: $modx->getOption('localizator3_key', null, ''),
+    'key' => $languageKey,
     'active' => 1,
 ]);
 if (!$language) {
@@ -27,17 +45,6 @@ if (!$language) {
 }
 
 $httpHost = $language->get('http_host');
-$localizator = $modx->getService(
-    'localizator3',
-    'localizator',
-    $modx->getOption('localizator3_core_path', null, $modx->getOption('core_path') . 'components/localizator3/') . 'model/localizator3/'
-);
-if ($localizator instanceof localizator) {
-    $protocol = $localizator->resolveUrlScheme();
-} else {
-    $protocol = rtrim((string) $modx->getOption('server_protocol', null, 'http'), ':/') . '://';
-}
-
 if (strpos($httpHost, '://') === false && strpos($httpHost, '[[') === false) {
     $baseUrl = $protocol . $httpHost;
 } else {

@@ -23,6 +23,10 @@ $resource = $modx->getObject(\MODX\Revolution\modResource::class, $id);
 if (!$resource) {
     return $default;
 }
+$contextKey = $modx->context ? (string)$modx->context->get('key') : '';
+if ($contextKey !== 'mgr' && (!(int)$resource->get('published') || (int)$resource->get('deleted'))) {
+    return $default;
+}
 
 $localizator = $modx->getService(
     'localizator3',

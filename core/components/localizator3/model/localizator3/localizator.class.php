@@ -46,9 +46,17 @@ class localizator
             'translator' => $this->modx->getOption('localizator3_default_translator', null, 'SimpleCopy', true),
         ), $config);
 
-        require_once dirname(__FILE__, 3) . '/translators/' . strtolower($this->config['translator']) . '.class.php';
+        $allowedTranslators = array('SimpleCopy', 'Yandex', 'Google', 'DeepL', 'LibreTranslate', 'MyMemory');
+        $translator = (string)$this->config['translator'];
+        if (!in_array($translator, $allowedTranslators, true)) {
+            $this->modx->log(\modX::LOG_LEVEL_ERROR, '[localizator3] Unknown translator "' . $translator . '", using SimpleCopy');
+            $translator = 'SimpleCopy';
+            $this->config['translator'] = $translator;
+        }
 
-        $this->translator = new $this->config['translator']($this->modx, $this->config);
+        require_once dirname(__FILE__, 3) . '/translators/' . strtolower($translator) . '.class.php';
+
+        $this->translator = new $translator($this->modx, $this->config);
 
         $this->modx->addPackage('localizator3', $this->config['modelPath'], null, 'localizator3\\');
         $this->modx->lexicon->load('localizator3:default');
@@ -871,7 +879,7 @@ class localizator
      * @param string $key
      * @return string
      */
-    protected function resolveLanguageKey($key)
+    public function resolveLanguageKey($key)
     {
         $key = trim((string)$key);
         if ($key === '') {
@@ -896,6 +904,7 @@ class localizator
         $this->languageKeyMap = array();
         $q = $this->modx->newQuery(\localizator3\localizatorLanguage::class);
         $q->select(array('key', 'cultureKey'));
+        $rows = array();
         if ($q->prepare() && $q->stmt->execute()) {
             while ($row = $q->stmt->fetch(\PDO::FETCH_ASSOC)) {
                 $normalized = array();
@@ -906,12 +915,25 @@ class localizator
                 if ($stored === '') {
                     continue;
                 }
+                $rows[] = array(
+                    'key' => $stored,
+                    'culture' => isset($normalized['culturekey']) ? $normalized['culturekey'] : '',
+                );
                 $this->languageKeyMap[strtolower($stored)] = $stored;
-                $culture = isset($normalized['culturekey']) ? $normalized['culturekey'] : '';
-                if ($culture !== '') {
-                    $this->languageKeyMap[strtolower($culture)] = $stored;
-                }
             }
+        }
+        foreach ($rows as $row) {
+            if ($row['culture'] === '') {
+                continue;
+            }
+            $lookup = strtolower($row['culture']);
+            if (isset($this->languageKeyMap[$lookup]) && $this->languageKeyMap[$lookup] !== $row['key']) {
+                if ($this->modx->getOption('localizator3_debug_log', null, false, true)) {
+                    $this->modx->log(\modX::LOG_LEVEL_WARN, '[localizator3] cultureKey "' . $row['culture'] . '" уже указывает на "' . $this->languageKeyMap[$lookup] . '", язык "' . $row['key'] . '" не записан');
+                }
+                continue;
+            }
+            $this->languageKeyMap[$lookup] = $row['key'];
         }
         return $this->languageKeyMap;
     }

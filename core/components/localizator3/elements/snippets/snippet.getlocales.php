@@ -6,11 +6,20 @@ $showActive = filter_var($modx->getOption('showActive', $scriptProperties, true)
 $activeClass = $modx->getOption('activeClass', $scriptProperties, 'active');
 $outerClass = $modx->getOption('outerClass', $scriptProperties, 'languages');
 $rowClass = $modx->getOption('rowClass', $scriptProperties, '');
-$tpl = $modx->getOption('tpl', $scriptProperties, $outputMode === 'dropdown' ? 'languages.dropdown.tpl' : 'languages.tpl');
+$tpl = $modx->getOption('tpl', $scriptProperties, '', true);
+if ($tpl === '' || $tpl === null) {
+    $tpl = $outputMode === 'dropdown' ? 'languages.dropdown.tpl' : 'languages.tpl';
+}
 $start = $modx->getOption('site_start');
-$pageId = $modx->getOption('pageId', $scriptProperties, $modx->resource ? $modx->resource->get('id') : $start);
+$pageId = $modx->getOption('pageId', $scriptProperties, '', true);
+if ($pageId === '' || $pageId === null) {
+    $pageId = $modx->resource ? $modx->resource->get('id') : $start;
+}
 $currentLocale = $modx->config['cultureKey'];
-$where = $modx->getOption('where', $scriptProperties, ['active' => 1]);
+$where = $modx->getOption('where', $scriptProperties, '', true);
+if ($where === '' || $where === null) {
+    $where = ['active' => 1];
+}
 $sortby = $modx->getOption('sortby', $scriptProperties, 'rank');
 $sortdir = $modx->getOption('sortdir', $scriptProperties, 'ASC');
 $localizator = $modx->getService(
@@ -52,6 +61,10 @@ if ($locales) {
 
         $isCurrent = ($locale['key'] == $currentLocale || $locale['cultureKey'] == $currentLocale);
         $rowCssClass = ($showActive && $isCurrent) ? trim($rowClass . ' ' . $activeClass) : $rowClass;
+        $urlScheme = parse_url($url, PHP_URL_SCHEME);
+        if ($urlScheme !== null && !in_array(strtolower((string)$urlScheme), array('http', 'https'), true)) {
+            $url = '';
+        }
 
         $languages[] = array_merge(
             $locale,

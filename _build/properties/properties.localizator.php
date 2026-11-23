@@ -15,6 +15,10 @@ $tmp = array(
         'type' => 'textfield',
         'value' => '',
     ),
+    'onlyWithLocalization' => array(
+        'type' => 'combo-boolean',
+        'value' => false,
+    ),
 );
 
 foreach ($tmp as $k => $v) {

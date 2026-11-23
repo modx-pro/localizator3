@@ -16,6 +16,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Saving a static resource updates `content` only for the default language, the same as a symlink or weblink. Other translations keep their content.
 - With `localizator3_default_from_resource`, an empty localized TV is cleared on the page. The value `0` is still treated as filled.
 - `getLocalizedSitemap` without parameters lists the site from parent `0`. An empty `parents` property no longer produces an empty urlset. The documented scheme default is `0`.
+- `makeLocalizedUrl` resolves a language key in any case before loading the active language.
+- `x-default` uses the default language key. The hreflang value stays the cultureKey.
+- Language names, CSS classes and URLs in the language chunks are escaped. A URL scheme other than http or https is dropped. The dropdown option receives `rowClass`.
+- `getLanguageList` registers its parameters. `getLocalizedResources` registers `onlyWithLocalization`. Empty `tpl`, `pageId` and `where` still use the snippet defaults.
+- A cultureKey is added to the language map only when that lookup is free, so it does not replace another language key.
+- `localizator3_default_translator` must be one of SimpleCopy, Yandex, Google, DeepL, LibreTranslate or MyMemory. Any other value loads SimpleCopy.
+- Lexicon translation skips a language when `localizator3_check_permissions` is on and `localizatorcontent_save_{key}` is missing.
+- In a web context, `getLocalizedField` and `makeLocalizedUrl` ignore unpublished and deleted resources.
 
 ## [1.1.4-beta] - 2026-11-23
 
