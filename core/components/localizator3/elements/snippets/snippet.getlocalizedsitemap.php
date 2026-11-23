@@ -3,14 +3,17 @@
 /**
  * Генерирует sitemap.xml с hreflang для мультиязычных страниц (SEO).
  *
- * @param string $parents ID родителей через запятую (по умолчанию — site_start)
+ * @param string $parents ID родителей через запятую (по умолчанию 0)
  * @param int $depth Глубина обхода потомков. 0 оставляет только указанные parents: MODX getChildIds не спускается при depth < 1
  * @param string $excludeIds ID ресурсов для исключения
  * @param int $scheme 0: auto, 1: http, 2: https
  * @param bool $onlyWithLocalization Включать только ресурсы с локализацией
  */
 
-$parents = $modx->getOption('parents', $scriptProperties, $modx->getOption('site_start', null, 1));
+$parents = $modx->getOption('parents', $scriptProperties, '0', true);
+if ($parents === '' || $parents === null) {
+    $parents = '0';
+}
 $depth = (int) $modx->getOption('depth', $scriptProperties, 10);
 $excludeIds = $modx->getOption('excludeIds', $scriptProperties, '');
 $scheme = (int) $modx->getOption('scheme', $scriptProperties, 0);

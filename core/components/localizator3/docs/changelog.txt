@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `FetchLocalizator` joins localized TVs by name through `localizator3\locTemplateVarResource`. The previous select returned the TV id, so the join stayed on the document TV table.
 - Saving a static resource updates `content` only for the default language, the same as a symlink or weblink. Other translations keep their content.
 - With `localizator3_default_from_resource`, an empty localized TV is cleared on the page. The value `0` is still treated as filled.
+- `getLocalizedSitemap` without parameters lists the site from parent `0`. An empty `parents` property no longer produces an empty urlset. The documented scheme default is `0`.
 
 ## [1.1.4-beta] - 2026-11-23
 

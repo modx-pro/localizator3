@@ -152,7 +152,7 @@ Canonical и hreflang-ссылки для SEO. Выводит `<link rel="canoni
 | parents | string | No | 0 | Родительские ID через запятую |
 | depth | int | No | 10 | Глубина обхода |
 | excludeIds | string | No | — | ID для исключения |
-| scheme | int | No | -1 | Схема URL |
+| scheme | int | No | 0 | Схема URL. Sitemap всегда запрашивает полный адрес, поэтому 0 и -1 дают абсолютный URL |
 | onlyWithLocalization | bool | No | false | Только страницы с активной локализацией |
 
 **Пример:**

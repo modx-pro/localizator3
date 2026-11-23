@@ -5,7 +5,7 @@ $properties = array();
 $tmp = array(
     'parents' => array(
         'type' => 'textfield',
-        'value' => '',
+        'value' => '0',
     ),
     'depth' => array(
         'type' => 'numberfield',
