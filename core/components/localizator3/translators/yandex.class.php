@@ -54,6 +54,8 @@ class Yandex
                 CURLOPT_POST => true,
                 CURLOPT_POSTFIELDS => http_build_query($data, '', '&'),
                 CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_CONNECTTIMEOUT => 5,
+                CURLOPT_TIMEOUT => 15,
                 CURLOPT_SSL_VERIFYPEER => true,
             ]);
             $rawResponse = curl_exec($ch);

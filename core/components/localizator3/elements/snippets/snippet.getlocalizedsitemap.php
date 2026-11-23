@@ -30,6 +30,7 @@ $q = $modx->newQuery(\MODX\Revolution\modResource::class);
 $q->where([
     'published' => 1,
     'deleted' => 0,
+    'searchable' => 1,
 ]);
 if (!empty($excludeIds)) {
     $q->where(['id:NOT IN' => $excludeIds]);
@@ -77,6 +78,9 @@ foreach ($resources as $resource) {
         }
         if (empty($locales)) {
             continue;
+        }
+        if ($defaultKey !== '' && isset($languages[$defaultKey]) && !in_array($defaultKey, $locales, true)) {
+            array_unshift($locales, $defaultKey);
         }
     } else {
         $locales = array_keys($languages);

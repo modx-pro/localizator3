@@ -155,7 +155,9 @@ Canonical и hreflang-ссылки для SEO. Выводит `<link rel="canoni
 | depth | int | No | 10 | Глубина обхода |
 | excludeIds | string | No | — | ID для исключения |
 | scheme | int | No | 0 | Схема URL. Sitemap всегда запрашивает полный адрес, поэтому 0 и -1 дают абсолютный URL |
-| onlyWithLocalization | bool | No | false | Только страницы с активной локализацией |
+| onlyWithLocalization | bool | No | false | Только страницы, у которых есть активный перевод. URL языка по умолчанию всё равно строится из документа |
+
+Ресурсы с `searchable = 0` в карту не попадают.
 
 **Пример:**
 
