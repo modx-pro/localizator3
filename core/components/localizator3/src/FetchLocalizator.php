@@ -84,7 +84,7 @@ class FetchLocalizator extends Fetch
         /** @var \xPDOQuery $q */
         $q = $this->modx->newQuery(modTemplateVar::class)
             ->where($where)
-            ->select($this->modx->getSelectColumns(modTemplateVar::class, modTemplateVar::class));
+            ->select('name');
 
         if ($q->prepare() && $q->stmt->execute()) {
             $this->config['localizatorTVs'] = $q->stmt->fetchAll(\PDO::FETCH_COLUMN);
@@ -94,7 +94,7 @@ class FetchLocalizator extends Fetch
             $tvName = strtolower($tvName);
             $alias  = 'TV' . $tvName;
             if (isset($this->config['tvsJoin'][$tvName])) {
-                $this->config['tvsJoin'][$tvName]['class'] = 'locTemplateVarResource';
+                $this->config['tvsJoin'][$tvName]['class'] = \localizator3\locTemplateVarResource::class;
                 $this->config['tvsJoin'][$tvName]['on']   .= ' AND `' . $alias . '`.`key` = ' . $this->modx->quote($this->config['localizator3_key']);
             }
         }

@@ -36,7 +36,7 @@ class pdoFetchLocalizator extends pdoFetch
             $name = strtolower($name);
             $alias = 'TV' . $name;
             if (isset($this->config['tvsJoin'][$name])) {
-                $this->config['tvsJoin'][$name]['class'] = 'locTemplateVarResource';
+                $this->config['tvsJoin'][$name]['class'] = \localizator3\locTemplateVarResource::class;
                 $this->config['tvsJoin'][$name]['on'] .= " AND `{$alias}`.`key` = " . $this->modx->quote($this->config['localizator3_key']);
             }
         }
