@@ -21,6 +21,8 @@ if ($elementName == 'msProducts' || $elementName == 'ms3Products') {
 $alias = $modx->getAlias($class);
 $useResourceFields = $localizator instanceof localizator
     && $localizator->shouldUseResourceFields($localizator_key !== '' ? $localizator_key : null);
+$keepEmptyTranslation = $localizator instanceof localizator
+    && $localizator->isDefaultFromResource();
 
 $where = array();
 $leftJoin = array();
@@ -62,6 +64,14 @@ if (!$useResourceFields) {
                 . ' THEN `' . $alias . '`.`menutitle`'
                 . ' ELSE `localizator`.`pagetitle` END'
                 . ' ELSE `localizator`.`menutitle` END AS `menutitle`';
+            continue;
+        }
+        if ($keepEmptyTranslation) {
+            $columns[] = 'CASE WHEN `localizator`.`id` IS NULL'
+                . ' THEN `' . $alias . '`.`' . $field . '`'
+                . ' WHEN `localizator`.`' . $field . '` IS NULL OR `localizator`.`' . $field . "` = ''"
+                . ' THEN \'\''
+                . ' ELSE `localizator`.`' . $field . '` END AS `' . $field . '`';
             continue;
         }
         $columns[] = 'CASE WHEN `localizator`.`' . $field . '` IS NULL OR `localizator`.`' . $field . "` = ''"

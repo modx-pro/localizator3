@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 - An unpublished translation (`active = 0`) is no longer applied on the page or returned by `getLocalizedField` and `locfield`. The page, the field snippet and `getLocalizedResources` all require `active = 1`. A localized TV is read only when that published row exists.
+- With `localizator3_default_from_resource`, `getLocalizedResources` no longer copies a document field into an empty translation cell. A resource with no translation row still uses the document field. An empty menu title still uses the localized pagetitle. The previous fallback stays when the setting is off.
 
 ## [1.1.4-beta] - 2026-11-23
 
