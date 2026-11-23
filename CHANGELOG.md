@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.5-beta] - 2026-11-23
+
 ### Fixed
 - `makeLocalizedUrl` and `getLocalizedCanonical` drop a language host whose scheme is not `http` or `https`. The language switcher already did this.
 - Direct `pdoMenu` and `pdoResources` overlay the same resource fields as `getLocalizedResources`. A second `localizator` join is not added when the wrapper already supplied one.

@@ -2,7 +2,7 @@
 
 Мультиязычность для **MODX Revolution 3**: локализация ресурсов, TV, товаров miniShop3 и опций.
 
-**Версия:** 1.1.4-beta · **Репозиторий:** [github.com/modx-pro/localizator3](https://github.com/modx-pro/localizator3)
+**Версия:** 1.1.5-beta · **Репозиторий:** [github.com/modx-pro/localizator3](https://github.com/modx-pro/localizator3)
 
 ---
 
