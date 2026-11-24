@@ -2,7 +2,7 @@
 
 Мультиязычность для **MODX Revolution 3**: локализация ресурсов, TV, товаров miniShop3 и опций.
 
-**Версия:** 1.1.7-beta · **Репозиторий:** [github.com/modx-pro/localizator3](https://github.com/modx-pro/localizator3)
+**Репозиторий:** [github.com/modx-pro/localizator3](https://github.com/modx-pro/localizator3). Номер версии записан в [changelog](../core/components/localizator3/docs/changelog.txt) и в `_build/config.inc.php`. В остальные документы его не копируют.
 
 ---
 
@@ -60,9 +60,11 @@
 
 1. Заголовок `# Тема — Localizator3`
 2. Краткое описание (1–2 предложения)
-3. Строка **Версия:** при необходимости
+3. Ссылка на [оглавление](./README.md)
 4. Основные разделы (`##`)
-5. Блок **См. также** со ссылками на связанные документы и [оглавление](./README.md)
+5. Блок **См. также** со ссылками на связанные документы
+
+Номер релиза в шапку не ставят. Его меняют в `_build/config.inc.php` и в секции релиза обоих changelog.
 
 ### Язык
 

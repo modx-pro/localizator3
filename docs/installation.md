@@ -2,7 +2,7 @@
 
 Компонент мультиязычности для **MODX 3 only**. Для MODX 2.x используйте оригинальный [Localizator](https://github.com/modx-pro/localizator).
 
-**Версия:** 1.1.7-beta · [Оглавление документации](./README.md)
+[Оглавление документации](./README.md)
 
 ---
 
@@ -84,7 +84,7 @@ php _build/build.php
 
 Скрипт собирает transport, при необходимости запускает `composer install` в `core/components/localizator3/` и может установить пакет на локальный MODX (см. `install` в `_build/config.inc.php`).
 
-Пакет: `core/packages/localizator3-1.1.7-beta.transport.zip`
+Пакет: `core/packages/localizator3-{version}-{release}.transport.zip`. Имя собирается из `version` и `release` в `_build/config.inc.php`.
 
 > **Примечание:** `_build/build.transport.php` — устаревший скрипт сборки. Используйте `_build/build.php`.
 

@@ -2,7 +2,7 @@
 
 HTML и Markdown для карточки **Localizator3** на [modstore.pro](https://modstore.pro) и поста на [modx.pro](https://modx.pro).
 
-Версия пакета: **1.1.7-beta**.
+Номер пакета берут из [changelog](../CHANGELOG.md) и из `_build/config.inc.php`. В этот текст его не копируют.
 
 ## Файлы
 
