@@ -2,7 +2,7 @@
 
 Архитектура компонента мультиязычности для MODX 3.
 
-**Версия:** 1.1.6-beta · [Оглавление документации](./README.md)
+**Версия:** 1.1.7-beta · [Оглавление документации](./README.md)
 
 ---
 
@@ -89,6 +89,8 @@
 4. cookie `localizator3_key` → `applyLanguageFromCookie()`
 
 Так `cultureKey` совпадает с языком витрины даже без `X-Requested-With` и без параметра `q`.
+
+Повторный `OnHandleRequest` из `connector.php` язык не переопределяет. pdoPage шлёт «Показать ещё» на `/assets/components/pdotools/connector.php` и сам вызывает это событие. В запросе нет пути страницы, поэтому второй `findLocalization()` выбирал корневой язык и затирал `localizator3_key` вместе с `base_url`. Обработчик выходит сразу, если скрипт — `connector.php`. Язык остаётся тем, который `OnMODXInit` взял из Referer или cookie.
 
 ---
 

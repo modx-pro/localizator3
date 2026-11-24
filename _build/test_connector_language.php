@@ -1,7 +1,11 @@
 <?php
 
 /**
- * Smoke: connector language sync (cultureKey from cookie).
+ * Smoke: connector language survives the second OnHandleRequest.
+ *
+ * pdoPage ajax posts to /assets/components/pdotools/connector.php, which
+ * initializes the web context and then invokes OnHandleRequest again.
+ * That second call must not replace the language resolved from the Referer.
  *
  * Run from site root or: php Extras/localizator3/_build/test_connector_language.php
  */
@@ -10,10 +14,14 @@ define('MODX_API_MODE', true);
 define('MODX_REQP', false);
 
 $_REQUEST['ctx'] = 'web';
+$_REQUEST['q'] = 'assets/components/pdotools/connector.php';
 $_SERVER['HTTP_HOST'] = 'project.test';
-$_SERVER['SCRIPT_NAME'] = '/assets/components/msquote/connector.php';
+$_SERVER['HTTPS'] = 'on';
+$_SERVER['SERVER_PORT'] = '443';
+$_SERVER['SCRIPT_NAME'] = '/assets/components/pdotools/connector.php';
+$_SERVER['HTTP_REFERER'] = 'https://project.test/en/';
+$_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
 $_COOKIE['localizator3_key'] = 'en';
-unset($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_X_REQUESTED_WITH']);
 
 $candidates = [
     dirname(__DIR__, 3) . '/config.core.php', // Sites/project/config.core.php when Extra is in project/Extras/
@@ -39,7 +47,23 @@ $modx->initialize('web');
 
 $culture = (string) $modx->getOption('cultureKey');
 $loc = (string) $modx->getOption('localizator3_key');
-$ok = ($culture === 'en' && $loc === 'en');
+$base = (string) $modx->getOption('base_url');
+$ok = ($culture === 'en' && $loc === 'en' && $base === '/en/');
 
-echo $ok ? "OK cultureKey=en localizator3_key=en\n" : "FAIL cultureKey={$culture} localizator3_key={$loc}\n";
+echo $ok
+    ? "OK before OnHandleRequest cultureKey=en localizator3_key=en base_url=/en/\n"
+    : "FAIL before OnHandleRequest cultureKey={$culture} localizator3_key={$loc} base_url={$base}\n";
+
+$modx->invokeEvent('OnHandleRequest');
+
+$culture = (string) $modx->getOption('cultureKey');
+$loc = (string) $modx->getOption('localizator3_key');
+$base = (string) $modx->getOption('base_url');
+$kept = ($culture === 'en' && $loc === 'en' && $base === '/en/');
+$ok = $ok && $kept;
+
+echo $kept
+    ? "OK after OnHandleRequest cultureKey=en localizator3_key=en base_url=/en/\n"
+    : "FAIL after OnHandleRequest cultureKey={$culture} localizator3_key={$loc} base_url={$base}\n";
+
 exit($ok ? 0 : 1);

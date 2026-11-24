@@ -178,7 +178,124 @@ class FetchLocalizator extends Fetch
             }
         }
 
-        return parent::prepareRows($rows);
+        $rows = parent::prepareRows($rows);
+
+        return $this->rootSiteMediaUrls($rows);
+    }
+
+    /**
+     * Image and file TVs stay at the site root when the media source
+     * does not use a relative URL. pdoTools treats the string "false" as on
+     * and prefixes the language base (/en/), so the picture 404s under <base href>.
+     *
+     * @param array $rows
+     * @return array
+     */
+    protected function rootSiteMediaUrls(array $rows): array
+    {
+        if ($rows === [] || empty($this->config['includeTVs'])) {
+            return $rows;
+        }
+
+        $names = array_filter(array_map('trim', explode(',', (string)$this->config['includeTVs'])));
+        if ($names === []) {
+            return $rows;
+        }
+
+        $types = array_flip(array_map('trim', explode(',', (string)$this->modx->getOption(
+            'manipulatable_url_tv_output_types',
+            null,
+            'image,file'
+        ))));
+        $prefix = !empty($this->config['tvPrefix']) ? trim((string)$this->config['tvPrefix']) : '';
+        $base = trim((string)$this->modx->getOption('base_url', null, '/'), '/');
+        $contextKey = ($this->modx->context) ? (string)$this->modx->context->get('key') : 'web';
+
+        foreach ($names as $name) {
+            $tv = $this->getStore($name, 'tv');
+            if (!$tv instanceof modTemplateVar) {
+                $tv = $this->modx->getObject(modTemplateVar::class, ['name' => $name]);
+                if (!$tv instanceof modTemplateVar) {
+                    continue;
+                }
+                $this->setStore($name, $tv, 'tv');
+            }
+            if (!isset($types[$tv->get('type')])) {
+                continue;
+            }
+
+            $source = $tv->get('sourceCache');
+            if (!is_array($source) || $source === []) {
+                $source = $tv->getSourceCache($contextKey);
+                $tv->set('sourceCache', is_array($source) ? $source : []);
+            }
+            if ($this->mediaUrlFollowsLanguage($source['baseUrlRelative'] ?? null)) {
+                continue;
+            }
+
+            $key = $prefix . $tv->get('name');
+            foreach ($rows as &$row) {
+                if (!isset($row[$key]) || !is_string($row[$key]) || $row[$key] === '') {
+                    continue;
+                }
+                $row[$key] = $this->rootMediaUrl($row[$key], $base);
+            }
+            unset($row);
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Only a real yes keeps the language base in the file URL.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    protected function mediaUrlFollowsLanguage($value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value) || is_float($value)) {
+            return (int)$value === 1;
+        }
+
+        $value = strtolower(trim((string)$value));
+
+        return in_array($value, ['1', 'true', 'yes'], true);
+    }
+
+    /**
+     * @param string $value
+     * @param string $base Language path without slashes, for example "en"
+     * @return string
+     */
+    protected function rootMediaUrl(string $value, string $base): string
+    {
+        $value = trim($value);
+        if ($value === '' || preg_match('#^(https?:)?//#i', $value) === 1 || strpos($value, 'data:') === 0) {
+            return $value;
+        }
+
+        if ($base !== '') {
+            $prefixed = '/' . $base . '/';
+            if (strpos($value, $prefixed) === 0) {
+                $value = substr($value, strlen('/' . $base));
+            } elseif (strpos($value, $base . '/') === 0) {
+                $value = '/' . substr($value, strlen($base . '/'));
+            }
+        }
+
+        if (strpos($value, '//') === 0) {
+            $value = '/' . ltrim($value, '/');
+        }
+
+        if ($value === '' || $value[0] !== '/') {
+            $value = '/' . ltrim($value, '/');
+        }
+
+        return $value;
     }
 
     /**

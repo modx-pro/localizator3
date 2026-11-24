@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.7-beta] - 2026-11-24
+
+### Fixed
+- pdoPage ajax («Показать ещё») keeps the storefront language. The connector calls `OnHandleRequest` again with no page path, and that call no longer switches back to the root language or changes `base_url`.
+- Listing image and file TVs stay at the site root when the media source has `baseUrlRelative` off. The language base `/en/` is not left on the picture URL.
+
 ## [1.1.6-beta] - 2026-11-23
 
 ### Fixed
