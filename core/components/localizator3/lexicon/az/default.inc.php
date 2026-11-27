@@ -103,4 +103,5 @@ $_lang['localizator_snippet_makelocalizedurl_desc'] = 'Dil nəzərə alınmaqla 
 $_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'Cari lokalizasiyanın kanonik URL-i.';
 $_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Lokalizasiyalar nəzərə alınmaqla sayt xəritəsi.';
 $_lang['localizator_snippet_getlocalizedfield_desc'] = 'Resursun lokalizasiya olunmuş sahəsi.';
+$_lang['localizator_snippet_getcurrentlanguage_desc'] = 'Cari dil: key, cultureKey, name və ya http_host.';
 $_lang['localizator3_plugin_desc'] = 'Resursların, TV-lərin və MiniShop3 seçimlərinin lokalizasiyası.';

@@ -19,7 +19,7 @@
 - [core/components/localizator3/model/localizator3/localizator.class.php]: Сервис (findLocalization, translate, versionedAsset, getLocalizedOption*)
 - [core/components/localizator3/model/localizator3/]: xPDO-модели (localizatorLanguage, localizatorContent, locTemplateVarResource, locOption, locProductOption)
 - [core/components/localizator3/processors/mgr/]: Процессоры (language/*, content/*, fields, lexicon/*)
-- [core/components/localizator3/elements/snippets/]: Сниппеты (getLocalizedResources, getLanguageList, getLocalizedField, makeLocalizedUrl, getLocalizedCanonical, getLocalizedSitemap)
+- [core/components/localizator3/elements/snippets/]: Сниппеты (getCurrentLanguage, getLocalizedResources, getLanguageList, getLocalizedField, makeLocalizedUrl, getLocalizedCanonical, getLocalizedSitemap)
 - [core/components/localizator3/elements/plugins/handlers/]: OnMODXInit, OnHandleRequest, OnPageNotFound, OnDocFormPrerender, OnDocFormSave, OnLoadWebDocument, OnEmptyTrash, OnTVFormPrerender, OnTVFormSave, mseOnBeforeIndex, mseOnGetWorkFields, pdoToolsOnFenomInit
 - [vueManager/src/components/ContentGrid.vue]: Inline-форма локализации на ресурсе
 - [vueManager/src/components/LanguagesGrid.vue]: CRUD языков

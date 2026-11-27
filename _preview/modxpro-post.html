@@ -66,13 +66,9 @@
 
 <hr>
 
-<h3>Сниппеты в roadmap (ещё нет в 1.0.8)</h3>
+<h3>Сниппеты в roadmap (пока не реализованы)</h3>
 
 <p>Имена и параметры могут измениться до релиза. Целевые примеры из <a href="https://github.com/modx-pro/localizator3/blob/main/docs/roadmap.md" target="_blank" rel="noopener">roadmap F11</a>:</p>
-
-<p><strong>getCurrentLanguage</strong> <em>(1.1)</em> — key, cultureKey, name или http_host текущей локали.</p>
-<pre>{'!getCurrentLanguage' | snippet : ['field' => 'key']}
-{'!getCurrentLanguage' | snippet : ['field' => 'name', 'format' => 'json']}</pre>
 
 <p><strong>hasLocalization</strong> <em>(1.1)</em> — есть ли активный перевод ресурса на языке. Для условий в Fenom.</p>
 <pre>{if '!hasLocalization' | snippet : ['id' => $id, 'language' => 'en']}
@@ -126,6 +122,8 @@
 
 <p>Каталог: <a href="https://github.com/modx-pro/localizator3/blob/main/docs/roadmap.md" target="_blank" rel="noopener">docs/roadmap.md</a>.</p>
 
+<p><strong>1.1.8-beta</strong>: сниппет <strong>getCurrentLanguage</strong> — key, cultureKey, name или http_host текущей локали.</p>
+
 <p><strong>1.1.1-beta</strong> (выпущен): VueTools, lean bundles, inline-форма «Локализация», 6 сниппетов, MS3, mSearch, автоперевод.</p>
 
 <p><strong>1.0.9-beta</strong>: composables в grids, декомпозиция Vue-компонентов, hard check VueTools, fix URL в <strong>getLanguageList</strong>.</p>
@@ -136,7 +134,7 @@
 <li>Rich text (MODX RTE) в форме;</li>
 <li>копирование с другого языка, batch translate;</li>
 <li>локализованный alias на язык;</li>
-<li><strong>getCurrentLanguage</strong>, <strong>hasLocalization</strong>, <strong>getResourceLocalizations</strong>, fallback в <strong>getLocalizedField</strong> / <strong>locfield</strong> (см. блок «Сниппеты в roadmap» выше).</li>
+<li><strong>hasLocalization</strong>, <strong>getResourceLocalizations</strong>, fallback в <strong>getLocalizedField</strong> / <strong>locfield</strong> (см. блок «Сниппеты в roadmap» выше).</li>
 </ul>
 
 <p><strong>1.2.0</strong>:</p>

@@ -92,4 +92,5 @@ $_lang['localizator_snippet_makelocalizedurl_desc'] = 'URL рэсурсу з у�
 $_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'Кананічны URL бягучай лакалізацыі.';
 $_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Карта сайта з улікам лакалізацый.';
 $_lang['localizator_snippet_getlocalizedfield_desc'] = 'Лакалізаванае поле рэсурсу.';
+$_lang['localizator_snippet_getcurrentlanguage_desc'] = 'Бягучая мова: key, cultureKey, name або http_host.';
 $_lang['localizator3_plugin_desc'] = 'Лакалізацыя рэсурсаў, TV і опцый MiniShop3.';

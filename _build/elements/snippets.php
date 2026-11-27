@@ -31,4 +31,9 @@ return [
         'description' => 'localizator_snippet_getlocalizedfield_desc',
         'properties' => include __DIR__ . '/../properties/properties.getlocalizedfield.php',
     ],
+    'getCurrentLanguage' => [
+        'file' => 'snippet.getcurrentlanguage',
+        'description' => 'localizator_snippet_getcurrentlanguage_desc',
+        'properties' => include __DIR__ . '/../properties/properties.getcurrentlanguage.php',
+    ],
 ];

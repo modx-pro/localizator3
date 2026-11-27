@@ -98,4 +98,5 @@ $_lang['localizator_snippet_makelocalizedurl_desc'] = 'URL de la ressource selon
 $_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'URL canonique de la localisation courante.';
 $_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Plan du site avec les localisations.';
 $_lang['localizator_snippet_getlocalizedfield_desc'] = 'Champ localisé de la ressource.';
+$_lang['localizator_snippet_getcurrentlanguage_desc'] = 'Langue courante : key, cultureKey, name ou http_host.';
 $_lang['localizator3_plugin_desc'] = 'Localisation des ressources, TV et options MiniShop3.';

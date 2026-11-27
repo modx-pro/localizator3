@@ -34,6 +34,7 @@ $snippets = [
     'getLocalizedCanonical' => 'snippet.getlocalizedcanonical.php',
     'getLocalizedSitemap' => 'snippet.getlocalizedsitemap.php',
     'getLocalizedField' => 'snippet.getlocalizedfield.php',
+    'getCurrentLanguage' => 'snippet.getcurrentlanguage.php',
 ];
 
 foreach ($snippets as $name => $file) {

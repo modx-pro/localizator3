@@ -131,4 +131,5 @@ $_lang['localizator_snippet_makelocalizedurl_desc'] = 'URL ресурса с у�
 $_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'Канонический URL текущей локализации.';
 $_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Карта сайта с учётом локализаций.';
 $_lang['localizator_snippet_getlocalizedfield_desc'] = 'Локализованное поле ресурса.';
+$_lang['localizator_snippet_getcurrentlanguage_desc'] = 'Текущий язык: key, cultureKey, name или http_host.';
 $_lang['localizator3_plugin_desc'] = 'Локализация ресурсов, TV и опций MiniShop3.';

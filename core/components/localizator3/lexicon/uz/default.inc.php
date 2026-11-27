@@ -103,4 +103,5 @@ $_lang['localizator_snippet_makelocalizedurl_desc'] = 'Tilni hisobga olgan holda
 $_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'Joriy lokalizatsiyaning kanonik URL manzili.';
 $_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Lokalizatsiyalarni hisobga olgan sayt xaritasi.';
 $_lang['localizator_snippet_getlocalizedfield_desc'] = 'Resursning lokalizatsiyalangan maydoni.';
+$_lang['localizator_snippet_getcurrentlanguage_desc'] = 'Joriy til: key, cultureKey, name yoki http_host.';
 $_lang['localizator3_plugin_desc'] = 'Resurslar, TV va MiniShop3 parametrlarini lokalizatsiya qilish.';

@@ -8,3 +8,5 @@ $_lang['localizator3_prop_id'] = 'Resource ID.';
 $_lang['localizator3_prop_language'] = 'Language key. Default: current.';
 $_lang['localizator3_prop_scheme'] = 'URL scheme: -1=relative, 0=full, 1=http, 2=https.';
 $_lang['localizator3_prop_fullUrl'] = 'Return full URL with domain.';
+$_lang['localizator3_prop_field'] = 'Language field: key, cultureKey, name or http_host.';
+$_lang['localizator3_prop_format'] = 'Result format: json returns a JSON string.';

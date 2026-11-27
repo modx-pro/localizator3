@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.8-beta] - 2026-11-27
+
+### Added
+- `getCurrentLanguage`: key, cultureKey, name or http_host of the current language. `field=key` reads `localizator3_key` without a database query, `format=json` returns a JSON string.
+
 ## [1.1.7-beta] - 2026-11-24
 
 ### Fixed

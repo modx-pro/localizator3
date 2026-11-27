@@ -131,4 +131,5 @@ $_lang['localizator_snippet_makelocalizedurl_desc'] = 'Resource URL for a langua
 $_lang['localizator_snippet_getlocalizedcanonical_desc'] = 'Canonical URL of the current localization.';
 $_lang['localizator_snippet_getlocalizedsitemap_desc'] = 'Sitemap including localizations.';
 $_lang['localizator_snippet_getlocalizedfield_desc'] = 'Localized resource field.';
+$_lang['localizator_snippet_getcurrentlanguage_desc'] = 'Current language: key, cultureKey, name or http_host.';
 $_lang['localizator3_plugin_desc'] = 'Localizes resources, TVs and MiniShop3 options.';

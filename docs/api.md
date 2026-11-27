@@ -8,6 +8,28 @@
 
 ## Сниппеты
 
+### getCurrentLanguage
+
+Возвращает поле текущего языка: ключ, `cultureKey`, имя или HTTP host.
+
+**Параметры:**
+
+| Имя | Тип | Required | Default | Описание |
+|-----|-----|----------|---------|----------|
+| field | string | No | key | `key`, `cultureKey`, `name`, `http_host` |
+| format | string | No | — | `json` — вернуть JSON-строку |
+
+`field=key` читается из опции `localizator3_key`, которую пакет ставит при определении языка, без запроса к БД. То же значение в Fenom: `$_modx->getOption('localizator3_key', null, '', true)`. Не путайте его с `cultureKey`: последний равен `cultureKey ?: key` из карточки языка и может отличаться от ключа. Для `name` и `http_host` сниппет читает запись `localizator3_languages`.
+
+**Пример:**
+
+```fenom
+{var $key = '!getCurrentLanguage' | snippet : ['field' => 'key']}
+{var $name = '!getCurrentLanguage' | snippet : ['field' => 'name', 'format' => 'json']}
+```
+
+---
+
 ### getLocalizedResources
 
 Выборка ресурсов с учётом локализации. Обёртка над pdoResources / pdoMenu / msProducts.
